@@ -4041,6 +4041,17 @@ function App() {
   const [identityEmail, setIdentityEmail] = useState(() => readNetlifyIdentityProfile().email);
   const [identityInitial, setIdentityInitial] = useState(() => readNetlifyIdentityProfile().initial);
   const [globalXpTotal, setGlobalXpTotal] = useState(() => readGlobalXP());
+  const profileMenuQuickStats = React.useMemo(() => {
+    let streakDays = 0;
+    try {
+      const s = JSON.parse(localStorage.getItem("philoprep_daily_streak") || "{}");
+      streakDays = Math.max(0, Number(s.current || 0));
+    } catch (e) {}
+    const lv = computeLevelFromXP(globalXpTotal);
+    const xp = Math.max(0, Math.floor(Number(globalXpTotal) || 0));
+    const xpLabel = xp >= 10000 ? Math.round(xp / 1000) + "k" : String(xp);
+    return { streakDays, level: lv.level, xpLabel };
+  }, [globalXpTotal, profileMenuOpen]);
   const [xpToast, setXpToast] = useState(null);
   const [levelUpLevel, setLevelUpLevel] = useState(null);
   const [xpDebugOpen, setXpDebugOpen] = useState(false);
@@ -5174,14 +5185,32 @@ function App() {
                     </div>
                     <div style={{ fontSize: "17px", fontWeight: 400, color: T().cream, marginBottom: "4px", fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.5px" }}>{identityDisplayName || identityEmail || "Compte"}</div>
                     <div style={{ fontSize: "10px", color: "rgba(253,246,227,0.35)", marginBottom: "18px", fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: identityEmail && identityDisplayName && identityDisplayName !== identityEmail ? "0.5px" : "1px" }}>{identityEmail && identityDisplayName && identityDisplayName !== identityEmail ? identityEmail : "Terminale"}</div>
-                    <div style={{ display: "flex", gap: "20px", marginBottom: "24px" }}>
-                      <div style={{ textAlign: "center" }}><div style={{ fontSize: "18px", fontWeight: 500, color: "rgba(200,155,30,0.8)" }}>7</div><div style={{ fontSize: "9px", color: T().creamSoft }}>jours</div></div>
-                      <div style={{ width: "0.5px", height: "32px", background: "rgba(255,255,255,0.1)" }} />
-                      <div style={{ textAlign: "center" }}><div style={{ fontSize: "18px", fontWeight: 500, color: "rgba(200,155,30,0.8)" }}>35%</div><div style={{ fontSize: "9px", color: T().creamSoft }}>progression</div></div>
-                      <div style={{ width: "0.5px", height: "32px", background: "rgba(255,255,255,0.1)" }} />
-                      <div style={{ textAlign: "center" }}><div style={{ fontSize: "18px", fontWeight: 500, color: "rgba(200,155,30,0.8)" }}>12</div><div style={{ fontSize: "9px", color: T().creamSoft }}>fiches</div></div>
+                    <div style={{ display: "flex", gap: "16px", marginBottom: "24px", justifyContent: "center", width: "100%" }}>
+                      <div style={{ textAlign: "center", flex: "1 1 0", minWidth: 0 }}>
+                        <div style={{ fontSize: "18px", fontWeight: 600, color: "rgba(200,155,30,0.9)" }}>{profileMenuQuickStats.streakDays}</div>
+                        <div style={{ fontSize: "9px", color: T().creamSoft, lineHeight: 1.25 }}>série jours</div>
+                      </div>
+                      <div style={{ width: "0.5px", height: "32px", background: "rgba(255,255,255,0.1)", flexShrink: 0, alignSelf: "center" }} />
+                      <div style={{ textAlign: "center", flex: "1 1 0", minWidth: 0 }}>
+                        <div style={{ fontSize: "18px", fontWeight: 600, color: "rgba(200,155,30,0.9)" }}>{profileMenuQuickStats.level}</div>
+                        <div style={{ fontSize: "9px", color: T().creamSoft, lineHeight: 1.25 }}>niveau</div>
+                      </div>
+                      <div style={{ width: "0.5px", height: "32px", background: "rgba(255,255,255,0.1)", flexShrink: 0, alignSelf: "center" }} />
+                      <div style={{ textAlign: "center", flex: "1 1 0", minWidth: 0 }}>
+                        <div style={{ fontSize: "18px", fontWeight: 600, color: "rgba(200,155,30,0.9)" }}>{profileMenuQuickStats.xpLabel}</div>
+                        <div style={{ fontSize: "9px", color: T().creamSoft, lineHeight: 1.25 }}>XP total</div>
+                      </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "2px", width: "100%" }}>
+                      <button onClick={() => { setProfileMenuOpen(false); goHome(); }} style={{
+                        background: "none", border: "none", padding: "12px 8px",
+                        display: "flex", alignItems: "center", gap: "10px",
+                        cursor: "pointer", width: "100%",
+                        borderBottom: "0.5px solid rgba(255,255,255,0.06)",
+                      }}>
+                        <SvgIcon name="home" size={14} color="rgba(253,246,227,0.5)" />
+                        <span style={{ fontSize: "13px", color: "rgba(253,246,227,0.7)" }}>Accueil</span>
+                      </button>
                       {[
                         { icon: "user", label: "Mon profil", screen: "profile" },
                         { icon: "stats", label: "Statistiques", screen: "profile" },
