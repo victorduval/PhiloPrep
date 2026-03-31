@@ -189,7 +189,12 @@ RÈGLES :
       };
     }
 
-    const text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : "";
+    const text = Array.isArray(data.content)
+      ? data.content
+          .filter((b) => b && b.type === "text" && typeof b.text === "string")
+          .map((b) => b.text)
+          .join("\n")
+      : "";
     return {
       statusCode: 200,
       headers,
