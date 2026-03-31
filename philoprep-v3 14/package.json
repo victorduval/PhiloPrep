@@ -1,8 +1,0 @@
-{
-  "name": "philoprep",
-  "version": "1.0.0",
-  "description": "PhiloPrep - Bac Philo 2026",
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.32.1"
-  }
-}
