@@ -817,6 +817,7 @@ function SvgIcon({ name, size = 17, color = "rgba(26,45,94,0.6)" }) {
     menu: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
     user: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
     settings: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>,
+    tune: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2"/></svg>,
     logout: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
     x: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
   };
@@ -932,7 +933,7 @@ function extractAnthropicMessageTextFromBody(raw) {
 function socrateActionLabel(type, payload) {
   const map = {
     open_notion: "Ouvrir la fiche",
-    open_notions_list: "Ouvrir les 17 notions",
+    open_notions_list: "Ouvrir les cours",
     open_lexique: "Ouvrir le lexique",
     open_methodologie: "Ouvrir la méthodologie",
     open_synthese: "Vue d'ensemble",
@@ -943,7 +944,7 @@ function socrateActionLabel(type, payload) {
   return payload ? base + " · " + payload : base;
 }
 
-function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMessage, autoMessageNonce, onUserMessageSent }) {
+function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMessage, autoMessageNonce, prefilledAssistantMessage, prefilledAssistantNonce, onUserMessageSent }) {
   const [messages, setMessages] = React.useState([]);
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -954,6 +955,7 @@ function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMess
   const [listening, setListening] = React.useState(false);
   const scrollRef = React.useRef(null);
   const lastAutoNonceRef = React.useRef(0);
+  const lastPrefilledNonceRef = React.useRef(0);
   const typingTimerRef = React.useRef(null);
   const fullAssistantTextRef = React.useRef("");
   const audioCtxRef = React.useRef(null);
@@ -974,12 +976,28 @@ function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMess
     setInput("");
     setDisplayedAssistantText("");
     setIsTyping(false);
+    lastAutoNonceRef.current = 0;
+    lastPrefilledNonceRef.current = 0;
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem(SOCRATE_LS_KEY);
       } catch (e) {}
     }
   }, [open]);
+
+  // Pre-filled assistant message (used for citation explain: compute first, then open chat).
+  React.useEffect(() => {
+    if (!open) return;
+    const n = Number(prefilledAssistantNonce || 0);
+    if (!n) return;
+    if (lastPrefilledNonceRef.current === n) return;
+    lastPrefilledNonceRef.current = n;
+    const txt = String(prefilledAssistantMessage || "").trim();
+    if (!txt) return;
+    setLoading(false);
+    setInput("");
+    setMessages([{ role: "assistant", content: txt, id: Date.now() }]);
+  }, [open, prefilledAssistantNonce, prefilledAssistantMessage]);
 
   React.useEffect(() => {
     if (!scrollRef.current) return;
@@ -3309,7 +3327,7 @@ function NotionsModal({ open, onClose, onSelectNotion }) {
           <button type="button" aria-label="Retour" onClick={(e) => { e.stopPropagation(); onClose(); }} style={{ background: "rgba(255,255,255,0.08)", border: "0.5px solid rgba(255,255,255,0.1)", borderRadius: "10px", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T().textOnLight} strokeWidth="1.8" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
           </button>
-          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 400, color: T().gold, margin: 0, fontStyle: "italic", letterSpacing: "0.3px", flex: 1, minWidth: 0 }}>Les 17 notions</h3>
+          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 400, color: T().gold, margin: 0, fontStyle: "italic", letterSpacing: "0.3px", flex: 1, minWidth: 0 }}>Cours</h3>
           <button type="button" aria-label="Fermer" onClick={(e) => { e.stopPropagation(); onClose(); }} style={{ background: "rgba(255,255,255,0.1)", border: "0.5px solid rgba(255,255,255,0.12)", borderRadius: "10px", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
             <SvgIcon name="x" size={15} color={T().creamSoft} />
           </button>
@@ -4865,6 +4883,8 @@ function App() {
   const [socrateAutoMessage, setSocrateAutoMessage] = useState("");
   const [socrateAutoApiMessage, setSocrateAutoApiMessage] = useState("");
   const [socrateAutoNonce, setSocrateAutoNonce] = useState(0);
+  const [socratePrefilledAssistantMessage, setSocratePrefilledAssistantMessage] = useState("");
+  const [socratePrefilledAssistantNonce, setSocratePrefilledAssistantNonce] = useState(0);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [identityDisplayName, setIdentityDisplayName] = useState(() => readNetlifyIdentityProfile().displayName);
   const [identityEmail, setIdentityEmail] = useState(() => readNetlifyIdentityProfile().email);
@@ -5539,6 +5559,58 @@ function App() {
     socrateExchangeRef.current = 0;
     setSocrateOpen(false);
   }, []);
+  const explainCitationWithSocrate = React.useCallback(async (c) => {
+    const quote = c && c.text ? c.text : "";
+    const author = c && c.author ? c.author : "";
+    const work = c && c.work ? c.work : "";
+    const payload =
+      `Explique cette citation en 2 à 3 lignes MAXIMUM, très simplement (niveau Terminale).\\n` +
+      `Sois direct, sans plan ni liste, sans développement long.\\n\\n` +
+      `Citation : « ${quote} »\\n` +
+      (author ? `Auteur : ${author}${work ? ` (${work})` : ""}` : "");
+    try {
+      const res = await fetch("/.netlify/functions/socrate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: payload,
+          conversationHistory: [],
+          knowledgeBundle: buildSocrateKnowledgeBundle(),
+        }),
+      });
+      const data = await res.json();
+      let reply =
+        typeof data.response === "string"
+          ? data.response
+          : typeof data.error === "string"
+            ? data.error
+            : "";
+      if (!String(reply || "").trim() && data && Array.isArray(data.content)) {
+        reply = data.content
+          .filter((b) => b && b.type === "text")
+          .map((b) => b.text || "")
+          .join("\n");
+      }
+      if (!String(reply || "").trim()) reply = "Je n'ai pas réussi à formuler l'explication pour l'instant.";
+      setSocrateAutoMessage("");
+      setSocrateAutoApiMessage("");
+      setSocrateAutoNonce(0);
+      setSocratePrefilledAssistantMessage(reply);
+      setSocratePrefilledAssistantNonce(Date.now());
+      setSocrateOpen(true);
+    } catch (e) {
+      const visibleMessage =
+        `Peux-tu m'expliquer cette citation de façon pédagogique ?\\n\\n` +
+        `Citation : « ${quote} »\\n` +
+        (author ? `Auteur : ${author}${work ? ` (${work})` : ""}` : "");
+      setSocratePrefilledAssistantMessage("");
+      setSocratePrefilledAssistantNonce(0);
+      setSocrateAutoMessage(visibleMessage);
+      setSocrateAutoApiMessage(payload);
+      setSocrateAutoNonce(Date.now());
+      setSocrateOpen(true);
+    }
+  }, []);
   const handleSocrateUserMessage = React.useCallback(() => {
     socrateExchangeRef.current += 1;
     addGlobalXP(5, { source: "socrate-question", module: "socrate" }, false);
@@ -5667,48 +5739,14 @@ function App() {
           navigate(id, "right");
         }
       }}
-      onExplainCitation={(c) => {
-        const quote = c && c.text ? c.text : "";
-        const author = c && c.author ? c.author : "";
-        const work = c && c.work ? c.work : "";
-        const payload =
-          `Explique cette citation en 2 à 3 lignes MAXIMUM, très simplement (niveau Terminale).\\n` +
-          `Sois direct, sans plan ni liste, sans développement long.\\n\\n` +
-          `Citation : « ${quote} »\\n` +
-          (author ? `Auteur : ${author}${work ? ` (${work})` : ""}` : "");
-        const visibleMessage =
-          `Peux-tu m'expliquer cette citation de façon pédagogique ?\\n\\n` +
-          `Citation : « ${quote} »\\n` +
-          (author ? `Auteur : ${author}${work ? ` (${work})` : ""}` : "");
-        setSocrateAutoMessage(visibleMessage);
-        setSocrateAutoApiMessage(payload);
-        setSocrateAutoNonce(Date.now());
-        setSocrateOpen(true);
-      }}
+      onExplainCitation={explainCitationWithSocrate}
       />;
       case "reviser": return <ReviserTabbedScreen key={"reviser_" + reviserMountKey} initialTab={reviserEntryTab} onReviserTabChange={setReviserSurfaceTab} onBack={() => navigate("home", "left")} onSelectNotion={openFiche} onAuteurs={openAuteurs} onCitations={openCitations} onPerspectives={openPerspectives} onLexique={openLexique} onMethodeDissert={openMethodologie} onMethodePasAPas={openMethodePasAPas} onDissertationsCorrigees={openDissertationsCorrigees} onSynthese={() => setSyntheseModalOpen(true)} onNotions={() => setNotionsModalOpen(true)} onControles={openControles} onExercicesLibres={openExercicesLibres} />;
       case "sentrainer": return <SentrainerTabbedScreen key={"sentrainer_" + (sentrainerInitialTab || "jeux")} onBack={() => navigate("home", "left")} onMethodeDissert={openMethodologie} onMethodePasAPas={openMethodePasAPas} onDissertationsCorrigees={openDissertationsCorrigees} onPhilosophia={openPhilosophia} onPhiloquest={openPhiloquest} onPhilomind={openPhilomind} onPhilorush={openPhilorush} onPhilodoxa={openPhilodoxa} onPhilologique={openPhilologique} onPlanProbl={openPlanProbl} initialTab={sentrainerInitialTab} onTabChange={onSentrainerTabChange} />;
       case "simulation-bac": return <SimulationBacScreen onBack={() => navigate("home", "left")} />;
       case "profile": return <ProfileDashboardScreen onBackHome={() => navigate("home", "left")} displayName={identityDisplayName || identityEmail} xpTotal={globalXpTotal} />;
       case "settings": return <SettingsScreen onBack={() => navigate("home", "left")} currentTheme={themeKey} onThemeChange={changeTheme} onLogout={() => { if (window.netlifyIdentity) netlifyIdentity.logout(); }} />;
-      default: return <HomeScreen onNavigate={(id) => { if (id === "reviser") prepareReviserNotionsTab(); navigate(id, "right"); }} onExplainCitation={(c) => {
-        const quote = c && c.text ? c.text : "";
-        const author = c && c.author ? c.author : "";
-        const work = c && c.work ? c.work : "";
-        const payload =
-          `Explique cette citation en 2 à 3 lignes MAXIMUM, très simplement (niveau Terminale).\\n` +
-          `Sois direct, sans plan ni liste, sans développement long.\\n\\n` +
-          `Citation : « ${quote} »\\n` +
-          (author ? `Auteur : ${author}${work ? ` (${work})` : ""}` : "");
-        const visibleMessage =
-          `Peux-tu m'expliquer cette citation de façon pédagogique ?\\n\\n` +
-          `Citation : « ${quote} »\\n` +
-          (author ? `Auteur : ${author}${work ? ` (${work})` : ""}` : "");
-        setSocrateAutoMessage(visibleMessage);
-        setSocrateAutoApiMessage(payload);
-        setSocrateAutoNonce(Date.now());
-        setSocrateOpen(true);
-      }} />;
+      default: return <HomeScreen onNavigate={(id) => { if (id === "reviser") prepareReviserNotionsTab(); navigate(id, "right"); }} onExplainCitation={explainCitationWithSocrate} />;
     }
   };
 
@@ -6034,6 +6072,7 @@ function App() {
                       <button onClick={() => { setProfileMenuOpen(false); goHome(); }} style={{
                         background: "none", border: "none", padding: "12px 8px",
                         display: "flex", alignItems: "center", gap: "10px",
+                        justifyContent: "center",
                         cursor: "pointer", width: "100%",
                         borderBottom: "0.5px solid rgba(255,255,255,0.06)",
                       }}>
@@ -6043,11 +6082,12 @@ function App() {
                       {[
                         { icon: "user", label: "Mon profil", screen: "profile" },
                         { icon: "stats", label: "Statistiques", screen: "profile" },
-                        { icon: "settings", label: "Paramètres", screen: "settings" },
+                        { icon: "tune", label: "Paramètres", screen: "settings" },
                       ].map((item) => (
                         <button key={item.label} onClick={() => { setProfileMenuOpen(false); if (item.screen) navigate(item.screen, "right"); }} style={{
                           background: "none", border: "none", padding: "12px 8px",
                           display: "flex", alignItems: "center", gap: "10px",
+                          justifyContent: "center",
                           cursor: "pointer", width: "100%",
                           borderBottom: "0.5px solid rgba(255,255,255,0.06)",
                         }}>
@@ -6058,6 +6098,7 @@ function App() {
                       <button onClick={() => { setProfileMenuOpen(false); if (window.netlifyIdentity) netlifyIdentity.logout(); }} style={{
                         background: "none", border: "none", padding: "12px 8px",
                         display: "flex", alignItems: "center", gap: "10px",
+                        justifyContent: "center",
                         cursor: "pointer", width: "100%", marginTop: "8px",
                       }}>
                         <SvgIcon name="logout" size={14} color="rgba(200,100,100,0.5)" />
@@ -6230,7 +6271,7 @@ function App() {
                         <ContentModal open={dissertationsCorrigeesModalOpen} onClose={() => setDissertationsCorrigeesModalOpen(false)} title="Dissertations corrigées" iconName="checkCircle" dataOrPromise={DISSERTATIONS_CORRIGEES_DATA} cacheKey="dissertations_corrigees" />
                         <ContentModal open={controlesModalOpen} onClose={closeControles} title="Contrôles de connaissances" iconName="check" dataOrPromise={CONTROLES_DATA} cacheKey="controles" />
                         <NotionsModal open={notionsModalOpen} onClose={() => setNotionsModalOpen(false)} onSelectNotion={openFiche} />
-                        <SocrateChatPanel open={socrateOpen} onClose={closeSocratePanel} onRunAction={handleSocrateAction} autoMessage={socrateAutoMessage} autoApiMessage={socrateAutoApiMessage} autoMessageNonce={socrateAutoNonce} onUserMessageSent={handleSocrateUserMessage} />
+                        <SocrateChatPanel open={socrateOpen} onClose={closeSocratePanel} onRunAction={handleSocrateAction} autoMessage={socrateAutoMessage} autoApiMessage={socrateAutoApiMessage} autoMessageNonce={socrateAutoNonce} prefilledAssistantMessage={socratePrefilledAssistantMessage} prefilledAssistantNonce={socratePrefilledAssistantNonce} onUserMessageSent={handleSocrateUserMessage} />
                       </>
         )}
       </div>
