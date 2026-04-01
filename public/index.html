@@ -3417,15 +3417,15 @@ function ReviserTabbedScreen({ onBack, onSelectNotion, onAuteurs, onCitations, o
     setTab(initialTab || "notions");
   }, [initialTab]);
   const tabs = [
-    { id: "notions", label: "Cours" },
-    { id: "auteurs", label: "Auteurs" },
-    { id: "methode", label: "Méthode" },
-    { id: "lexique", label: "Lexique" },
+    { id: "notions", label: "Cours", color: "#93C5FD", bg: "rgba(147,197,253,0.15)", border: "rgba(147,197,253,0.45)", glow: "rgba(147,197,253,0.28)" },
+    { id: "auteurs", label: "Auteurs", color: "#C4B5FD", bg: "rgba(196,181,253,0.15)", border: "rgba(196,181,253,0.45)", glow: "rgba(196,181,253,0.28)" },
+    { id: "methode", label: "Méthode", color: "#FBBF24", bg: "rgba(251,191,36,0.16)", border: "rgba(251,191,36,0.5)", glow: "rgba(251,191,36,0.28)" },
+    { id: "lexique", label: "Lexique", color: "#6EE7B7", bg: "rgba(110,231,183,0.15)", border: "rgba(110,231,183,0.45)", glow: "rgba(110,231,183,0.26)" },
   ];
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
       <SubHeader title="Réviser" onBack={onBack} />
-      <div style={{ display: "flex", gap: "6px", padding: "0 16px 10px", overflowX: "auto", flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: "9px", padding: "0 16px 12px", overflowX: "auto", flexShrink: 0 }}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -3442,13 +3442,20 @@ function ReviserTabbedScreen({ onBack, onSelectNotion, onAuteurs, onCitations, o
               changeReviserTab(t.id);
             }}
             style={{
-            padding: "6px 14px", borderRadius: "20px", border: "none", cursor: "pointer",
-            background: tab === t.id ? "rgba(120,180,240,0.15)" : "transparent",
-            color: tab === t.id ? "#78b4f0" : "rgba(255,255,255,0.4)",
-            fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: "13px",
-            fontWeight: tab === t.id ? 600 : 400,
-            border: tab === t.id ? "0.5px solid rgba(120,180,240,0.35)" : "0.5px solid transparent",
-            transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)", whiteSpace: "nowrap",
+            padding: "8px 18px",
+            borderRadius: "999px",
+            border: tab === t.id ? `1px solid ${t.border}` : "1px solid rgba(255,255,255,0.12)",
+            cursor: "pointer",
+            background: tab === t.id ? t.bg : "rgba(255,255,255,0.05)",
+            color: tab === t.id ? t.color : "rgba(255,255,255,0.7)",
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: "14px",
+            fontWeight: tab === t.id ? 700 : 600,
+            letterSpacing: "0.1px",
+            boxShadow: tab === t.id ? `0 6px 18px ${t.glow}, inset 0 1px 0 rgba(255,255,255,0.16)` : "inset 0 1px 0 rgba(255,255,255,0.08)",
+            textShadow: tab === t.id ? "0 1px 0 rgba(0,0,0,0.18)" : "none",
+            transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+            whiteSpace: "nowrap",
           }}>{t.label}</button>
         ))}
       </div>
