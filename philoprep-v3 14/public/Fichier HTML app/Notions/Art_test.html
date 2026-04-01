@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz - L'Art</title>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #1a1612 0%, #3d2a14 50%, #5a4020 100%);
+  min-height: 100vh;
+  padding: calc(env(safe-area-inset-top, 60px) + 1rem) 1rem 2rem;
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+const COLORS = [
+  {main:'#d4a820',light:'#e6be3a',bg:'rgba(212,168,32,0.15)',border:'rgba(212,168,32,0.5)',text:'#fffbea'},
+  {main:'#c97800',light:'#e68a00',bg:'rgba(201,120,0,0.15)',border:'rgba(201,120,0,0.5)',text:'#ffedd5'},
+  {main:'#1e6b6b',light:'#2a8a8a',bg:'rgba(30,107,107,0.15)',border:'rgba(30,107,107,0.5)',text:'#ccfbf1'},
+  {main:'#8a306a',light:'#a8428a',bg:'rgba(138,48,106,0.15)',border:'rgba(138,48,106,0.5)',text:'#fce7f3'},
+  {main:'#3a5080',light:'#4a68a8',bg:'rgba(58,80,128,0.15)',border:'rgba(58,80,128,0.5)',text:'#dbeafe'},
+  {main:'#b8920a',light:'#d4a820',bg:'rgba(184,146,10,0.15)',border:'rgba(184,146,10,0.5)',text:'#fffbea'},
+  {main:'#2a8a8a',light:'#3aacac',bg:'rgba(42,138,138,0.15)',border:'rgba(42,138,138,0.5)',text:'#ccfbf1'},
+  {main:'#a8428a',light:'#c05aaa',bg:'rgba(168,66,138,0.15)',border:'rgba(168,66,138,0.5)',text:'#fce7f3'},
+  {main:'#4a68a8',light:'#6a88c8',bg:'rgba(74,104,168,0.15)',border:'rgba(74,104,168,0.5)',text:'#dbeafe'},
+  {main:'#e68a00',light:'#ffa620',bg:'rgba(230,138,0,0.15)',border:'rgba(230,138,0,0.5)',text:'#ffedd5'}
+];
+
+// BANQUE DE 45 QUESTIONS sur l'Art
+const QUESTIONS = [
+  {
+    id:1,type:"qcm",
+    question:"Quelle est l'étymologie du mot « art » ?",
+    options:["Du latin ars (technique, savoir-faire)","Du grec poiesis (création)","Du latin aesthetica (sensibilité)","Du grec mimesis (imitation)"],
+    correct:0,
+    explanation:"Le mot « art » vient du latin ars, artis, qui signifie « technique », « savoir-faire », « métier ». Il correspond au grec technè, qui désigne également un ensemble de procédés maîtrisés pour produire un résultat.",
+    details:"Dans l'Antiquité, on ne distinguait pas clairement l'artiste de l'artisan : tous deux possédaient une technè. La distinction moderne entre « beaux-arts » et « arts mécaniques » n'apparaît qu'au XVIIIe siècle."
+  },
+  {
+    id:2,type:"qcm",
+    question:"Selon Platon, pourquoi l'art est-il dangereux pour la cité ?",
+    options:["Il détourne de l'utilité pratique","Il nous éloigne de la vérité (mimésis)","Il suscite trop d'émotions","Il favorise l'individualisme"],
+    correct:1,
+    explanation:"Pour Platon, l'art est une mimésis (imitation du réel). Le réel sensible étant lui-même une copie du monde des Idées, l'art est une copie de copie, doublement éloignée de la vérité.",
+    details:"Dans La République, Platon critique la poésie et le théâtre. Il craint que les artistes corrompent les citoyens et les détournent de la connaissance rationnelle. Il propose de chasser les poètes de sa cité idéale."
+  },
+  {
+    id:3,type:"vrai-faux",
+    question:"Pour Aristote, la tragédie permet une purification des passions (catharsis).",
+    correct:true,
+    explanation:"VRAI. Dans la Poétique, Aristote explique que la tragédie « suscitant pitié et crainte, opère la purgation propre à pareilles émotions ». En assistant à la représentation de passions extrêmes, le spectateur éprouve ces émotions dans un cadre contrôlé et s'en libère.",
+    details:"La catharsis a une double fonction : psychologique (soulagement émotionnel) et éthique (apprentissage moral). Contrairement à Platon, Aristote voit dans l'art un remède, pas un poison."
+  },
+  {
+    id:4,type:"qcm",
+    question:"Qu'est-ce que le génie selon Kant ?",
+    options:["Un talent qui s'acquiert par l'apprentissage","Une disposition innée par laquelle la nature donne les règles à l'art","La capacité d'imiter parfaitement la nature","L'intelligence rationnelle appliquée à l'art"],
+    correct:1,
+    explanation:"Pour Kant, le génie est « la disposition innée de l'esprit par laquelle la nature donne les règles à l'art ». Le génie ne suit pas de règles préexistantes : il crée ses propres règles de manière spontanée et originale.",
+    details:"Kant distingue l'artiste de génie (qui crée de manière originale) du simple artisan (qui applique des règles apprises). Le génie a quatre caractéristiques : originalité, exemplarité, absence de règles préalables, et production du beau."
+  },
+  {
+    id:5,type:"citation",
+    question:"Complétez cette citation de Platon :",
+    citation:"Le lit du _____ est à trois degrés de la vérité.",
+    options:["peintre","philosophe","artisan","poète"],
+    correct:0,
+    explanation:"« Le lit du peintre est à trois degrés de la vérité » (La République, Livre X). Platon établit une hiérarchie : 1) l'Idée du lit, 2) le lit de l'artisan, 3) le lit peint par le peintre. L'artiste est trois fois éloigné du vrai.",
+    details:"Cette hiérarchie place le philosophe au sommet, l'artisan au milieu, et l'artiste tout en bas. L'art est une forme de mensonge : le peintre fait croire qu'il connaît ce qu'il représente."
+  },
+  {
+    id:6,type:"qcm",
+    question:"Pour Hegel, pourquoi le beau artistique est-il supérieur au beau naturel ?",
+    options:["Parce qu'il est plus parfait techniquement","Parce qu'il est une production de l'esprit","Parce qu'il dure plus longtemps","Parce qu'il plaît davantage"],
+    correct:1,
+    explanation:"Dans les Leçons sur l'esthétique, Hegel affirme que « le beau artistique est supérieur au beau naturel, parce qu'il est une production de l'esprit ». L'art n'est pas une simple imitation : c'est l'esprit qui se manifeste dans une forme sensible.",
+    details:"Hegel renverse la hiérarchie platonicienne : l'art est une élévation du sensible vers le spirituel. L'art transfigure le réel en lui donnant un sens."
+  },
+  {
+    id:7,type:"vrai-faux",
+    question:"Selon Bergson, l'art nous montre ce que nos sens ne perçoivent pas habituellement.",
+    correct:true,
+    explanation:"VRAI. Bergson écrit : « À quoi vise l'art, sinon à nous montrer des choses qui ne frappaient pas explicitement nos sens et notre conscience ? » Notre perception quotidienne est utilitaire. L'art brise cette routine et nous révèle des aspects inédits du monde.",
+    details:"L'artiste a un regard neuf, désintéressé, qui perçoit le réel dans sa richesse. L'art nous libère de nos habitudes perceptives et nous rend sensibles à la beauté du monde."
+  },
+  {
+    id:8,type:"qcm",
+    question:"Que sont les « affects » et « percepts » selon Deleuze ?",
+    options:["Des émotions et sensations ordinaires","Des concepts philosophiques appliqués à l'art","Des devenirs qui nous dépassent, créés par l'art","Des techniques artistiques"],
+    correct:2,
+    explanation:"Deleuze affirme que « l'art pense par affects et percepts ». Les affects sont des devenirs qui dépassent ceux qui les vivent. Les percepts sont des visions et auditions que l'art rend possibles.",
+    details:"Par exemple, la terreur dans un tableau de Bacon n'est pas l'émotion du peintre : c'est un affect autonome qui existe dans l'œuvre. L'art conserve ces affects et percepts dans des matériaux pour qu'ils survivent à leur créateur."
+  },
+  {
+    id:9,type:"citation",
+    question:"Complétez cette citation de Kant :",
+    citation:"Le génie est la disposition innée de l'esprit par laquelle la nature donne les règles à _____.",
+    options:["l'art","la beauté","la création","l'imagination"],
+    correct:0,
+    explanation:"« Le génie est la disposition innée de l'esprit par laquelle la nature donne les règles à l'art » (Critique de la faculté de juger, § 46). Cette définition insiste sur le caractère naturel et inexplicable de la création artistique.",
+    details:"Kant précise que le génie ne peut pas expliquer comment il crée. La science est reproductible, l'art génial ne l'est pas. Cette conception fonde le romantisme."
+  },
+  {
+    id:10,type:"vrai-faux",
+    question:"Pour Platon, l'artiste est un artisan comme les autres.",
+    correct:false,
+    explanation:"FAUX. Pour Platon, l'artiste est inférieur à l'artisan. L'artisan fabrique des objets utiles en s'inspirant de l'Idée : il possède une connaissance technique. L'artiste se contente d'imiter les apparences sans connaître ni l'Idée ni la technique.",
+    details:"Hiérarchie platonicienne : 1) philosophe (connaît les Idées), 2) artisan (fabrique selon les Idées), 3) artiste (imite sans comprendre)."
+  },
+  {
+    id:11,type:"qcm",
+    question:"Quelle est la fonction principale de la catharsis selon Aristote ?",
+    options:["Divertir le public","Purifier les passions par leur représentation","Enseigner la morale","Imiter parfaitement la réalité"],
+    correct:1,
+    explanation:"La catharsis désigne la purgation des émotions de pitié et de crainte provoquée par la tragédie. En voyant sur scène des personnages submergés par des passions extrêmes, le spectateur éprouve ces émotions dans un cadre fictif et s'en libère.",
+    details:"Aristote répond à Platon : la tragédie n'est pas dangereuse, elle est thérapeutique. Elle nous permet de vivre les passions sans passer à l'acte, de comprendre leurs mécanismes et de nous en purger."
+  },
+  {
+    id:12,type:"qcm",
+    question:"Dans la conception romantique, l'artiste est avant tout :",
+    options:["Un technicien habile","Un génie inspiré et original","Un imitateur de la nature","Un artisan comme les autres"],
+    correct:1,
+    explanation:"Le romantisme fait de l'artiste un génie inspiré, un créateur original qui ne suit pas de règles établies mais invente ses propres normes. Influencé par Kant, il sacralise l'artiste comme un être exceptionnel.",
+    details:"Cette conception s'oppose à la vision classique de l'art comme imitation de modèles anciens. Le romantique valorise l'originalité, l'expression de la subjectivité, la spontanéité créatrice."
+  },
+  {
+    id:13,type:"vrai-faux",
+    question:"Selon Hegel, l'art est la manifestation sensible de l'Idée.",
+    correct:true,
+    explanation:"VRAI. Pour Hegel, l'art est l'apparition sensible de l'Idée. L'œuvre d'art n'est pas une simple chose matérielle ni une pure abstraction : c'est l'esprit qui se rend visible dans une forme sensible.",
+    details:"Hegel distingue trois moments : 1) art symbolique (Orient), 2) art classique (Grèce), 3) art romantique (depuis le christianisme). Cette évolution annonce la « mort de l'art » : l'esprit se libère du sensible pour s'exprimer dans la philosophie."
+  },
+  {
+    id:14,type:"citation",
+    question:"Complétez cette citation d'Aristote :",
+    citation:"La tragédie, suscitant pitié et crainte, opère la _____ propre à pareilles émotions.",
+    options:["purgation","création","imitation","expression"],
+    correct:0,
+    explanation:"« La tragédie, suscitant pitié et crainte, opère la purgation propre à pareilles émotions » (Poétique, chapitre VI). Le mot grec est katharsis (purification, purgation). Aristote justifie la valeur éthique et psychologique de la tragédie.",
+    details:"La pitié est l'émotion face à la souffrance imméritée. La crainte est la peur que le même malheur nous arrive. En éprouvant ces émotions dans un cadre fictionnel, nous nous en libérons et les comprenons mieux."
+  },
+  {
+    id:15,type:"qcm",
+    question:"Pour Nietzsche, quel est le rôle essentiel de l'art ?",
+    options:["Imiter fidèlement la nature","Rendre la vie supportable et l'embellir","Exprimer la vérité rationnelle","Suivre des règles universelles"],
+    correct:1,
+    explanation:"Nietzsche affirme : « Sans la musique, la vie serait une erreur. » L'art n'a pas pour fonction de représenter le vrai mais de rendre la vie vivable, de la transfigurer, de lui donner un sens et une beauté.",
+    details:"Face à l'absurdité de l'existence, l'art est une affirmation joyeuse de la vie. L'artiste est un créateur de valeurs, un affirmateur de la vie contre toutes les morales de négation."
+  },
+  {
+    id:16,type:"vrai-faux",
+    question:"Pour Schopenhauer, la musique exprime l'essence du monde.",
+    correct:true,
+    explanation:"VRAI. Schopenhauer écrit : « La musique exprime, dans une langue éminemment universelle, l'être, l'essence du monde. » Le monde est fondamentalement Volonté (force aveugle, irrationnelle) et la musique exprime directement cette Volonté.",
+    details:"Les autres arts représentent des objets du monde phénoménal, mais la musique exprime immédiatement la Volonté dans ses mouvements : tension, apaisement, désir. C'est pourquoi elle nous touche si profondément."
+  },
+  {
+    id:17,type:"qcm",
+    question:"Que signifie « mimésis » en grec ?",
+    options:["Création","Imitation","Expression","Transformation"],
+    correct:1,
+    explanation:"Mimésis signifie « imitation ». C'est le concept central de la théorie platonicienne : l'artiste imite les apparences du monde sensible. Mais le monde sensible étant lui-même une imitation du monde des Idées, l'art est une imitation d'imitation.",
+    details:"Aristote reprendra ce concept mais en lui donnant un sens positif : l'imitation n'est pas un défaut mais une capacité naturelle de l'homme, source de plaisir et de connaissance."
+  },
+  {
+    id:18,type:"citation",
+    question:"Complétez cette citation de Camus :",
+    citation:"Créer, c'est ainsi donner une forme à son _____.",
+    options:["destin","génie","imagination","bonheur"],
+    correct:0,
+    explanation:"« Créer, c'est ainsi donner une forme à son destin » (Le Mythe de Sisyphe). Pour Camus, la création artistique est une réponse à l'absurde : face à un monde dénué de sens, l'artiste crée des formes, impose un ordre, affirme sa liberté.",
+    details:"Camus développe cette idée dans Le Mythe de Sisyphe. Face à l'absurdité, l'homme dispose de trois attitudes : le suicide, la fuite religieuse, ou la révolte lucide. L'artiste incarne cette troisième voie : il crée malgré l'absurde."
+  },
+  {
+    id:19,type:"qcm",
+    question:"Quelle distinction Kant établit-il entre le beau et l'agréable ?",
+    options:["Le beau est objectif, l'agréable subjectif","Le beau plaît universellement sans concept, l'agréable plaît par intérêt personnel","Le beau concerne la vue, l'agréable le goût","Le beau est naturel, l'agréable artificiel"],
+    correct:1,
+    explanation:"Kant distingue le beau (qui plaît de manière désintéressée et prétend à l'universalité) de l'agréable (qui plaît par intérêt sensible et reste subjectif). « Cette tarte est agréable » exprime un goût personnel. « Cette symphonie est belle » prétend que tous devraient l'apprécier.",
+    details:"Le jugement esthétique sur le beau a quatre caractères : désintéressement, universalité sans concept, finalité sans fin, nécessité. C'est cette prétention à l'universalité qui distingue le beau de l'agréable."
+  },
+  {
+    id:20,type:"vrai-faux",
+    question:"Selon Bergson, l'art brise nos habitudes perceptives pour nous révéler le réel.",
+    correct:true,
+    explanation:"VRAI. Pour Bergson, notre perception ordinaire est utilitaire : nous ne voyons que ce qui nous sert à agir. L'artiste a un regard neuf, désintéressé : il perçoit le réel dans sa singularité, sa richesse qualitative.",
+    details:"Les impressionnistes nous ont appris à voir des nuances de lumière que nous négligions. L'art est une connaissance intuitive qui complète la connaissance scientifique. En brisant nos automatismes, l'art nous rend au monde."
+  },
+  {
+    id:21,type:"qcm",
+    question:"Selon Platon, l'Idée du Beau est :",
+    options:["Variable selon les cultures","Une forme éternelle et parfaite","Le résultat de conventions sociales","Une création de l'artiste"],
+    correct:1,
+    explanation:"Pour Platon, l'Idée du Beau est une forme éternelle, immuable et parfaite qui existe dans le monde intelligible. Les belles choses du monde sensible ne sont que des copies imparfaites de cette Idée.",
+    details:"Dans Le Banquet, Platon décrit l'ascension dialectique vers le Beau en soi : des beaux corps aux belles âmes, des belles actions aux belles connaissances, jusqu'au Beau absolu."
+  },
+  {
+    id:22,type:"qcm",
+    question:"Qu'est-ce que la technè pour les Grecs ?",
+    options:["L'inspiration divine","Le savoir-faire technique et reproductible","L'émotion esthétique","La beauté naturelle"],
+    correct:1,
+    explanation:"La technè désigne le savoir-faire technique, l'ensemble des procédés maîtrisés et reproductibles pour produire un résultat. Elle s'applique aussi bien à l'artisan qu'à l'artiste.",
+    details:"Les Grecs ne distinguaient pas nettement l'art de l'artisanat : tous deux relèvent de la technè. Cette distinction n'apparaîtra qu'au XVIIIe siècle avec la notion de « beaux-arts »."
+  },
+  {
+    id:23,type:"vrai-faux",
+    question:"Pour Kant, le génie peut expliquer rationnellement comment il crée ses œuvres.",
+    correct:false,
+    explanation:"FAUX. Kant insiste sur le fait que le génie ne peut pas expliquer comment ses idées surgissent et s'assemblent. Newton pouvait expliquer ses découvertes scientifiques, mais aucun poète ne peut expliquer son processus créatif.",
+    details:"Cette inexplicabilité du génie fonde la différence entre science (reproductible, enseignable) et art (unique, mystérieux). Le génie crée spontanément, sans suivre de règles conscientes."
+  },
+  {
+    id:24,type:"citation",
+    question:"Complétez cette citation de Nietzsche :",
+    citation:"Sans la musique, la vie serait une _____.",
+    options:["erreur","illusion","tragédie","souffrance"],
+    correct:0,
+    explanation:"« Sans la musique, la vie serait une erreur » (Le Crépuscule des idoles). Pour Nietzsche, l'art (et particulièrement la musique) est essentiel à la vie : il la transfigure, la rend supportable, lui donne un sens.",
+    details:"L'art dionysiaque (musique, tragédie) nous réconcilie avec le chaos et le devenir du monde. Face à l'absurdité de l'existence, l'art est une affirmation joyeuse de la vie."
+  },
+  {
+    id:25,type:"qcm",
+    question:"Dans la philosophie d'Aristote, que révèle la tragédie ?",
+    options:["L'illusion de la réalité","La structure des actions humaines et leurs conséquences","Les mensonges des artistes","La supériorité de la nature sur l'art"],
+    correct:1,
+    explanation:"Pour Aristote, la tragédie révèle la structure des actions humaines : elle montre comment les choix et les caractères produisent des conséquences, comment le malheur peut frapper même les héros vertueux.",
+    details:"La tragédie n'est pas une simple copie du réel : elle en abstrait les lois universelles et nécessaires. Elle nous fait comprendre la logique des passions et du destin humain."
+  },
+  {
+    id:26,type:"qcm",
+    question:"Que critique Hegel dans le concept de « mort de l'art » ?",
+    options:["La fin de toute création artistique","Le fait que l'art ne peut plus exprimer pleinement l'Esprit moderne","La disparition des musées","L'impossibilité de créer de belles œuvres"],
+    correct:1,
+    explanation:"La « mort de l'art » chez Hegel ne signifie pas la fin de la production artistique, mais le fait que l'art n'est plus la forme suprême de manifestation de l'Esprit. L'esprit moderne est trop réflexif pour se satisfaire de la forme sensible.",
+    details:"L'art a eu son apogée dans la Grèce classique. Depuis, l'esprit se libère progressivement du sensible pour s'exprimer dans la religion, puis dans la philosophie, formes plus adéquates à la conscience moderne."
+  },
+  {
+    id:27,type:"vrai-faux",
+    question:"Selon Deleuze, l'art conserve des blocs de sensations (affects et percepts) dans la matière.",
+    correct:true,
+    explanation:"VRAI. Deleuze affirme que l'art conserve des affects et des percepts dans des matériaux (pierre, son, couleur). Ces blocs de sensations survivent à leur créateur et restent accessibles à travers l'œuvre.",
+    details:"Par exemple, les ciels de Turner sont des percepts conservés dans la peinture. Ils ne dépendent ni de l'artiste ni du spectateur : ils existent de manière autonome dans l'œuvre."
+  },
+  {
+    id:28,type:"qcm",
+    question:"Pour Hegel, l'art permet à l'homme de :",
+    options:["Fuir la réalité","Se reconnaître lui-même dans ses productions","Imiter la nature parfaitement","Gagner de l'argent"],
+    correct:1,
+    explanation:"Hegel affirme que l'homme a besoin de se reconnaître dans ses productions. L'art est la forme par excellence où l'homme objective son intériorité et se contemple dans ce qu'il a créé.",
+    details:"L'homme existe doublement : théoriquement (il se pense) et pratiquement (il transforme le monde). L'œuvre d'art unit ces deux dimensions : elle est une production matérielle qui exprime l'esprit."
+  },
+  {
+    id:29,type:"citation",
+    question:"Complétez cette citation de Bergson :",
+    citation:"À quoi vise l'art, sinon à nous montrer des choses qui ne frappaient pas explicitement nos _____ et notre conscience ?",
+    options:["sens","yeux","oreilles","mémoires"],
+    correct:0,
+    explanation:"« À quoi vise l'art, sinon à nous montrer des choses qui ne frappaient pas explicitement nos sens et notre conscience ? » (La pensée et le mouvant). L'art révèle ce qui était là mais nous échappait.",
+    details:"Bergson voit l'artiste comme un révélateur : il ne crée pas arbitrairement, il rend visible ce qui existait déjà mais que nous ne percevions pas à cause de nos habitudes utilitaires."
+  },
+  {
+    id:30,type:"qcm",
+    question:"Quel est le problème de la « copie de copie » chez Platon ?",
+    options:["Elle coûte trop cher","Elle est trois fois éloignée de la vérité","Elle est trop parfaite","Elle dure trop longtemps"],
+    correct:1,
+    explanation:"Pour Platon, l'Idée est la vérité première. L'objet sensible (le lit de l'artisan) est une première copie. La représentation artistique (le lit peint) est une copie de cette copie, donc trois fois éloignée du vrai.",
+    details:"Cette triple distance fait de l'art une activité dévalorisée, voire dangereuse : l'artiste ne connaît ni l'Idée ni la fabrication réelle, il ne produit que des illusions trompeuses."
+  },
+  {
+    id:31,type:"vrai-faux",
+    question:"Pour Kant, le beau naturel est supérieur au beau artistique.",
+    correct:false,
+    explanation:"FAUX. Kant accorde une valeur particulière au beau naturel (il témoigne d'une finalité de la nature qui nous réjouit moralement), mais ne le place pas systématiquement au-dessus du beau artistique. Les deux ont des valeurs différentes.",
+    details:"Le beau naturel nous touche parce qu'il semble avoir une finalité sans que nous puissions la déterminer. Le beau artistique exprime le génie humain, la liberté créatrice de l'esprit."
+  },
+  {
+    id:32,type:"qcm",
+    question:"Dans « Qu'est-ce que la philosophie ? », Deleuze distingue trois activités de pensée. L'art pense par :",
+    options:["Concepts","Affects et percepts","Fonctions","Symboles"],
+    correct:1,
+    explanation:"Deleuze distingue : la philosophie (qui crée des concepts), la science (qui crée des fonctions), et l'art (qui crée des affects et des percepts). Chacune est une forme de pensée légitime et irréductible.",
+    details:"L'art ne pense pas moins que la philosophie, il pense autrement. Les affects et percepts sont des blocs de sensations qui expriment quelque chose que les concepts ne peuvent pas dire."
+  },
+  {
+    id:33,type:"citation",
+    question:"Complétez cette citation de Hegel :",
+    citation:"Le beau artistique est supérieur au beau naturel, parce qu'il est une production de l'_____.",
+    options:["esprit","nature","technique","imagination"],
+    correct:0,
+    explanation:"« Le beau artistique est supérieur au beau naturel, parce qu'il est une production de l'esprit » (Leçons sur l'esthétique). L'art est spirituel, il exprime une idée, une vision du monde.",
+    details:"Hegel renverse Platon : loin d'être une dégradation du réel, l'art est une élévation. Il transfigure le sensible en lui donnant un sens spirituel."
+  },
+  {
+    id:34,type:"qcm",
+    question:"Quel philosophe affirme que l'art nous libère temporairement de la souffrance causée par la Volonté ?",
+    options:["Nietzsche","Schopenhauer","Kant","Hegel"],
+    correct:1,
+    explanation:"Pour Schopenhauer, la Volonté est la source de toute souffrance (désir insatiable). L'art, et particulièrement la musique, nous permet de nous détacher temporairement de cette Volonté et d'atteindre une forme de contemplation pure.",
+    details:"Dans la contemplation esthétique, nous cessons d'être des individus souffrants pour devenir des sujets connaissants purs. C'est une libération temporaire de la tyrannie du vouloir-vivre."
+  },
+  {
+    id:35,type:"vrai-faux",
+    question:"Pour Aristote, l'art est inférieur à la nature car il ne peut que l'imiter.",
+    correct:false,
+    explanation:"FAUX. Aristote valorise l'art : il ne se contente pas d'imiter, il achève ce que la nature ne peut accomplir ou corrige ses imperfections. L'art peut même surpasser la nature en extrayant l'universel du particulier.",
+    details:"Contrairement à Platon, Aristote voit dans l'imitation une activité cognitive : imiter, c'est comprendre, abstraire, reconnaître des structures. L'art révèle des vérités sur le monde."
+  },
+  {
+    id:36,type:"qcm",
+    question:"Selon Camus, dans « Le Mythe de Sisyphe », l'artiste face à l'absurde doit :",
+    options:["Se suicider","Créer malgré tout","Se convertir à la religion","Cesser toute activité"],
+    correct:1,
+    explanation:"Pour Camus, face à l'absurdité de l'existence, l'artiste choisit la révolte lucide : il reconnaît l'absence de sens mais crée quand même. Créer, c'est donner une forme à son destin, affirmer sa liberté contre le néant.",
+    details:"Camus distingue trois réponses à l'absurde : le suicide (refuser la vie), l'espoir religieux (nier l'absurde), ou la révolte (assumer l'absurde et créer malgré tout). L'artiste incarne cette troisième voie."
+  },
+  {
+    id:37,type:"citation",
+    question:"Complétez cette citation de Kant sur le génie :",
+    citation:"Le génie est un talent qui consiste à produire ce dont on ne saurait donner aucune règle _____.",
+    options:["déterminée","exacte","mathématique","simple"],
+    correct:0,
+    explanation:"Kant explique que le génie produit des œuvres dont on ne peut formuler de règle déterminée. Contrairement à la science, l'art du génie ne peut être enseigné par des règles explicites.",
+    details:"Cette impossibilité de codifier la création géniale fonde la différence entre art et science. Newton pouvait transmettre sa méthode, Shakespeare ne peut pas enseigner comment écrire Hamlet."
+  },
+  {
+    id:38,type:"qcm",
+    question:"Quel terme désigne la purification des émotions par l'art tragique ?",
+    options:["Mimésis","Catharsis","Poiesis","Technè"],
+    correct:1,
+    explanation:"La catharsis (du grec katharsis, purification) désigne la purgation des émotions de pitié et de crainte que provoque la tragédie selon Aristote.",
+    details:"En éprouvant intensément ces émotions dans le cadre sécurisé de la fiction théâtrale, le spectateur s'en libère et les comprend mieux. C'est une forme d'éducation émotionnelle."
+  },
+  {
+    id:39,type:"vrai-faux",
+    question:"Nietzsche critique l'art apollinien (harmonie, forme) au profit exclusif de l'art dionysiaque (ivresse, chaos).",
+    correct:false,
+    explanation:"FAUX. Dans « La Naissance de la tragédie », Nietzsche montre que le grand art (la tragédie grecque) naît de l'union du principe apollinien (forme, rêve, apparence) et du principe dionysiaque (ivresse, musique, dissolution).",
+    details:"L'apollinien sans le dionysiaque est stérile (académisme froid). Le dionysiaque sans l'apollinien est chaos destructeur. Le génie artistique unit les deux : il donne forme au chaos."
+  },
+  {
+    id:40,type:"qcm",
+    question:"Dans la théorie kantienne, quelle faculté est principalement mobilisée dans le jugement esthétique ?",
+    options:["L'entendement pur","L'imagination et l'entendement en libre jeu","La raison pratique","La sensibilité brute"],
+    correct:1,
+    explanation:"Pour Kant, le jugement esthétique met en jeu un « libre jeu » entre l'imagination (qui présente la forme) et l'entendement (qui cherche à comprendre) sans qu'un concept déterminé ne soit appliqué.",
+    details:"Ce libre jeu produit un plaisir désintéressé et universel. Contrairement à la connaissance (où l'entendement détermine l'objet par des concepts), le beau laisse les facultés jouer librement."
+  },
+  {
+    id:41,type:"qcm",
+    question:"Que désigne le terme « beaux-arts » dans la classification du XVIIIe siècle ?",
+    options:["Tous les métiers artistiques","Les arts orientés vers le beau, distincts des arts mécaniques","Les arts anciens grecs et romains","Les arts décoratifs"],
+    correct:1,
+    explanation:"Au XVIIIe siècle, on distingue les « beaux-arts » (peinture, sculpture, musique, poésie, danse, architecture) orientés vers le beau et l'expression, des « arts mécaniques » (artisanat) orientés vers l'utilité.",
+    details:"Cette distinction consacre la séparation moderne entre l'artiste (créateur original) et l'artisan (exécutant technique). Elle valorise la création libre au détriment du savoir-faire utile."
+  },
+  {
+    id:42,type:"vrai-faux",
+    question:"Pour Bergson, l'art impressionniste illustre particulièrement bien le rôle révélateur de l'art.",
+    correct:true,
+    explanation:"VRAI. Bergson prend souvent l'exemple des impressionnistes qui nous ont appris à voir des jeux de lumière, des nuances de couleur que nous ne remarquions pas avant eux.",
+    details:"Après Monet, nous voyons différemment les reflets sur l'eau, les brumes matinales. L'artiste a éduqué notre perception, révélé des aspects du réel que notre œil utilitaire négligeait."
+  },
+  {
+    id:43,type:"citation",
+    question:"Complétez cette citation de Schopenhauer :",
+    citation:"La musique exprime, dans une langue éminemment universelle, l'être, l'_____ du monde.",
+    options:["essence","apparence","surface","utilité"],
+    correct:0,
+    explanation:"« La musique exprime, dans une langue éminemment universelle, l'être, l'essence du monde » (Le Monde comme volonté et comme représentation). La musique exprime directement la Volonté, l'essence profonde du réel.",
+    details:"Contrairement aux autres arts qui représentent le monde phénoménal, la musique atteint immédiatement la chose en soi : elle dit la Volonté dans ses mouvements (désir, tension, résolution)."
+  },
+  {
+    id:44,type:"qcm",
+    question:"Quel risque Platon voit-il dans les représentations artistiques des dieux et des héros ?",
+    options:["Qu'elles soient trop belles","Qu'elles corrompent moralement les citoyens en montrant des comportements vicieux","Qu'elles coûtent trop cher","Qu'elles soient incomprises"],
+    correct:1,
+    explanation:"Dans La République, Platon critique les poètes qui représentent les dieux comme jaloux, colériques ou injustes, et les héros comme cédant à leurs passions. Ces représentations peuvent corrompre les jeunes citoyens en leur donnant de mauvais modèles.",
+    details:"C'est l'un des arguments pour chasser les poètes de la cité idéale : l'art véhicule des valeurs et peut donc être moralement dangereux s'il glorifie le vice ou la passion."
+  },
+  {
+    id:45,type:"vrai-faux",
+    question:"Selon Deleuze, un affect artistique est identique à l'émotion personnelle de l'artiste.",
+    correct:false,
+    explanation:"FAUX. Pour Deleuze, l'affect artistique est un bloc de sensation autonome qui existe dans l'œuvre, indépendamment des émotions de l'artiste ou du spectateur. Ce n'est pas une émotion vécue mais un devenir conservé dans la matière.",
+    details:"Par exemple, la terreur dans un tableau de Bacon n'est ni la peur du peintre ni celle du spectateur : c'est un affect qui subsiste dans l'œuvre et peut être éprouvé par quiconque la contemple, même des siècles plus tard."
+  }
+];
+
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function pickForQuiz(pool, count) {
+  const shuffled = shuffleArray(pool);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+function QuizApp() {
+  const [screen, setScreen] = useState('format');
+  const [format, setFormat] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  const startQuiz = (count) => {
+    setFormat(count);
+    setQuestions(pickForQuiz(QUESTIONS, count));
+    setCurrentIndex(0);
+    setUserAnswers([]);
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setScreen('quiz');
+  };
+
+  const handleAnswer = () => {
+    if (selectedAnswer === null) return;
+    
+    const current = questions[currentIndex];
+    const isCorrect = current.type === 'vrai-faux' 
+      ? selectedAnswer === current.correct
+      : selectedAnswer === current.correct;
+
+    setUserAnswers([...userAnswers, { question: current, answer: selectedAnswer, correct: isCorrect }]);
+    setShowFeedback(true);
+  };
+
+  const nextQuestion = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setSelectedAnswer(null);
+      setShowFeedback(false);
+    } else {
+      setScreen('results');
+    }
+  };
+
+  const restart = () => {
+    setScreen('format');
+    setFormat(null);
+    setQuestions([]);
+    setCurrentIndex(0);
+    setUserAnswers([]);
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+  };
+
+  const current = questions[currentIndex];
+  const currentColor = current ? COLORS[currentIndex % COLORS.length] : COLORS[0];
+  const correctCount = userAnswers.filter(a => a.correct).length;
+  const score = userAnswers.length > 0 ? Math.round((correctCount / userAnswers.length) * 100) : 0;
+
+  return (
+    <div style={{maxWidth:'500px',margin:'0 auto'}}>
+      
+      {screen === 'format' && (
+        <div style={{paddingTop:'2rem',textAlign:'center'}}>
+          <div style={{fontSize:'26px',fontWeight:300,color:'rgba(255,255,255,0.95)',fontFamily:'Georgia,serif',marginBottom:'0.5rem'}}>L'Art</div>
+          <div style={{fontSize:'15px',color:'rgba(255,255,255,0.7)',marginBottom:'2.5rem'}}>Choisissez la durée du test</div>
+          
+          {[
+            {count:10,label:'Format court',time:'~5 minutes',color:'#d4a820'},
+            {count:20,label:'Format intermédiaire',time:'~10 minutes',color:'#c97800'},
+            {count:30,label:'Format long',time:'~15 minutes',color:'#1e6b6b'}
+          ].map(({count,label,time,color}) => (
+            <div key={count} onClick={() => startQuiz(count)} style={{background:'rgba(255,255,255,0.1)',backdropFilter:'blur(20px)',border:`2px solid ${color}`,borderRadius:'18px',padding:'1.4rem 1.6rem',cursor:'pointer',marginBottom:'16px',display:'flex',alignItems:'center',gap:'18px',transition:'all 0.2s',boxShadow:`0 4px 20px ${color}30`}}>
+              <div style={{width:52,height:52,background:`${color}30`,border:`2px solid ${color}`,borderRadius:'14px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div style={{flex:1,textAlign:'left'}}>
+                <div style={{fontSize:'18px',fontWeight:600,color,marginBottom:'5px'}}>{label}</div>
+                <div style={{fontSize:'14px',color:'rgba(255,255,255,0.7)'}}>{count} questions · {time}</div>
+              </div>
+              <div style={{color,fontSize:'22px',fontWeight:300}}>→</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {screen === 'quiz' && current && !showFeedback && (
+        <div style={{paddingTop:'2rem'}}>
+          <div style={{textAlign:'center',marginBottom:'2rem'}}>
+            <div style={{fontSize:'14px',color:'rgba(255,255,255,0.65)',marginBottom:'0.7rem'}}>Question {currentIndex + 1} / {format}</div>
+            <div style={{width:'100%',height:'4px',background:'rgba(255,255,255,0.15)',borderRadius:'3px',maxWidth:'420px',margin:'0 auto'}}>
+              <div style={{width:`${((currentIndex + 1) / format) * 100}%`,height:'100%',background:currentColor.main,borderRadius:'3px',transition:'width 0.3s'}}/>
+            </div>
+          </div>
+
+          <div style={{background:'rgba(255,255,255,0.1)',backdropFilter:'blur(24px)',border:`2px solid ${currentColor.main}`,borderRadius:'20px',padding:'1.8rem',boxShadow:`0 8px 32px ${currentColor.main}40`}}>
+            <div style={{marginBottom:'1.8rem'}}>
+              {current.citation && <div style={{background:currentColor.bg,borderLeft:`4px solid ${currentColor.main}`,padding:'1.2rem',borderRadius:'10px',fontStyle:'italic',color:'rgba(255,255,255,0.95)',marginBottom:'1.2rem',fontSize:'15.5px',lineHeight:1.6}}>« {current.citation} »</div>}
+              <div style={{fontSize:'18px',fontWeight:500,color:'rgba(255,255,255,0.98)',lineHeight:1.6}}>{current.question}</div>
+            </div>
+
+            <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+              {current.type === 'vrai-faux' ? (
+                <>
+                  <button onClick={() => setSelectedAnswer(true)} style={{background:selectedAnswer === true ? currentColor.bg : 'rgba(255,255,255,0.08)',border:selectedAnswer === true ? `2px solid ${currentColor.main}` : '2px solid rgba(255,255,255,0.2)',borderRadius:'14px',padding:'16px',color:selectedAnswer === true ? currentColor.text : 'rgba(255,255,255,0.9)',fontSize:'16px',fontWeight:selectedAnswer === true ? 600 : 500,cursor:'pointer',textAlign:'left',transition:'all 0.2s'}}>Vrai</button>
+                  <button onClick={() => setSelectedAnswer(false)} style={{background:selectedAnswer === false ? currentColor.bg : 'rgba(255,255,255,0.08)',border:selectedAnswer === false ? `2px solid ${currentColor.main}` : '2px solid rgba(255,255,255,0.2)',borderRadius:'14px',padding:'16px',color:selectedAnswer === false ? currentColor.text : 'rgba(255,255,255,0.9)',fontSize:'16px',fontWeight:selectedAnswer === false ? 600 : 500,cursor:'pointer',textAlign:'left',transition:'all 0.2s'}}>Faux</button>
+                </>
+              ) : (
+                current.options.map((opt, idx) => (
+                  <button key={idx} onClick={() => setSelectedAnswer(idx)} style={{background:selectedAnswer === idx ? currentColor.bg : 'rgba(255,255,255,0.08)',border:selectedAnswer === idx ? `2px solid ${currentColor.main}` : '2px solid rgba(255,255,255,0.2)',borderRadius:'14px',padding:'16px',color:selectedAnswer === idx ? currentColor.text : 'rgba(255,255,255,0.9)',fontSize:'16px',fontWeight:selectedAnswer === idx ? 600 : 500,cursor:'pointer',textAlign:'left',transition:'all 0.2s'}}>{opt}</button>
+                ))
+              )}
+            </div>
+
+            <div style={{marginTop:'2rem',textAlign:'center'}}>
+              <button onClick={handleAnswer} disabled={selectedAnswer === null} style={{background:selectedAnswer !== null ? currentColor.bg : 'rgba(255,255,255,0.08)',border:selectedAnswer !== null ? `2px solid ${currentColor.main}` : '2px solid rgba(255,255,255,0.2)',borderRadius:'14px',padding:'14px 40px',color:selectedAnswer !== null ? currentColor.text : 'rgba(255,255,255,0.5)',fontSize:'16px',fontWeight:600,cursor:selectedAnswer !== null ? 'pointer' : 'default',opacity:selectedAnswer !== null ? 1 : 0.5}}>Valider</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === 'quiz' && current && showFeedback && (
+        <div style={{paddingTop:'2rem'}}>
+          <div style={{textAlign:'center',marginBottom:'2rem'}}>
+            <div style={{fontSize:'14px',color:'rgba(255,255,255,0.65)',marginBottom:'0.7rem'}}>Question {currentIndex + 1} / {format}</div>
+            <div style={{width:'100%',height:'4px',background:'rgba(255,255,255,0.15)',borderRadius:'3px',maxWidth:'420px',margin:'0 auto'}}>
+              <div style={{width:`${((currentIndex + 1) / format) * 100}%`,height:'100%',background:currentColor.main,borderRadius:'3px',transition:'width 0.3s'}}/>
+            </div>
+          </div>
+
+          <div style={{background:'rgba(255,255,255,0.1)',backdropFilter:'blur(24px)',border:`2px solid ${currentColor.main}`,borderRadius:'20px',padding:'1.8rem',boxShadow:`0 8px 32px ${currentColor.main}40`}}>
+            <div style={{textAlign:'center',marginBottom:'1.8rem'}}>
+              <div style={{width:64,height:64,background:userAnswers[userAnswers.length-1].correct?'rgba(52,211,153,0.2)':'rgba(248,113,113,0.2)',border:userAnswers[userAnswers.length-1].correct?'3px solid #34D399':'3px solid #F87171',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 1.2rem'}}>
+                {userAnswers[userAnswers.length-1].correct ? (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                ) : (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F87171" strokeWidth="3.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                )}
+              </div>
+              <div style={{fontSize:'20px',fontWeight:600,color:userAnswers[userAnswers.length-1].correct?'#6EE7B7':'#FCA5A5'}}>{userAnswers[userAnswers.length-1].correct?'Correct !':'Incorrect'}</div>
+            </div>
+
+            <div style={{background:userAnswers[userAnswers.length-1].correct?'rgba(52,211,153,0.15)':'rgba(248,113,113,0.15)',border:userAnswers[userAnswers.length-1].correct?'2px solid rgba(52,211,153,0.4)':'2px solid rgba(248,113,113,0.4)',borderRadius:'14px',padding:'1.3rem',marginBottom:'1.2rem'}}>
+              <div style={{fontSize:'15px',color:'rgba(255,255,255,0.95)',lineHeight:1.7}}>{current.explanation}</div>
+            </div>
+
+            {current.details && (
+              <div style={{background:'rgba(255,255,255,0.08)',border:'2px solid rgba(255,255,255,0.2)',borderRadius:'14px',padding:'1.3rem',marginBottom:'1.5rem'}}>
+                <div style={{fontSize:'12px',color:'rgba(255,255,255,0.7)',marginBottom:'0.7rem',textTransform:'uppercase',letterSpacing:'0.8px',fontWeight:600}}>Pour aller plus loin</div>
+                <div style={{fontSize:'14.5px',color:'rgba(255,255,255,0.9)',lineHeight:1.7}}>{current.details}</div>
+              </div>
+            )}
+
+            <div style={{textAlign:'center'}}>
+              <button onClick={nextQuestion} style={{background:currentColor.bg,border:`2px solid ${currentColor.main}`,borderRadius:'14px',padding:'14px 40px',color:currentColor.text,fontSize:'16px',fontWeight:600,cursor:'pointer'}}>
+                {currentIndex < questions.length - 1 ? 'Question suivante →' : 'Voir les résultats'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === 'results' && (
+        <div style={{paddingTop:'2rem'}}>
+          <div style={{background:'rgba(255,255,255,0.1)',backdropFilter:'blur(24px)',border:'2px solid #d4a820',borderRadius:'20px',padding:'2rem',boxShadow:'0 8px 32px rgba(212,168,32,0.4)'}}>
+            <div style={{textAlign:'center',marginBottom:'2.5rem'}}>
+              <div style={{width:90,height:90,background:'rgba(212,168,32,0.2)',border:'3px solid #d4a820',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 1.5rem'}}>
+                <div style={{fontSize:'32px',fontWeight:600,color:'#fffbea'}}>{correctCount}/{userAnswers.length}</div>
+              </div>
+              <div style={{fontSize:'22px',fontWeight:600,color:'rgba(255,255,255,0.98)',marginBottom:'0.6rem'}}>
+                {score >= 80 ? 'Excellent travail !' : score >= 60 ? 'Bien joué !' : 'Continue tes efforts !'}
+              </div>
+              <div style={{fontSize:'15px',color:'rgba(255,255,255,0.75)'}}>
+                {score >= 80 ? 'Tu maîtrises bien les notions clés' : score >= 60 ? 'Bonne compréhension générale' : 'Revois le cours'}
+              </div>
+            </div>
+
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'14px',marginBottom:'2rem'}}>
+              <div style={{background:'rgba(52,211,153,0.15)',border:'2px solid rgba(52,211,153,0.5)',borderRadius:'14px',padding:'1.2rem',textAlign:'center'}}>
+                <div style={{fontSize:'26px',fontWeight:600,color:'#6EE7B7',marginBottom:'6px'}}>{correctCount}</div>
+                <div style={{fontSize:'12px',color:'rgba(255,255,255,0.75)',fontWeight:500}}>Correctes</div>
+              </div>
+              <div style={{background:'rgba(248,113,113,0.15)',border:'2px solid rgba(248,113,113,0.5)',borderRadius:'14px',padding:'1.2rem',textAlign:'center'}}>
+                <div style={{fontSize:'26px',fontWeight:600,color:'#FCA5A5',marginBottom:'6px'}}>{userAnswers.length - correctCount}</div>
+                <div style={{fontSize:'12px',color:'rgba(255,255,255,0.75)',fontWeight:500}}>Incorrectes</div>
+              </div>
+              <div style={{background:'rgba(251,191,36,0.15)',border:'2px solid rgba(251,191,36,0.5)',borderRadius:'14px',padding:'1.2rem',textAlign:'center'}}>
+                <div style={{fontSize:'26px',fontWeight:600,color:'#FCD34D',marginBottom:'6px'}}>{score}%</div>
+                <div style={{fontSize:'12px',color:'rgba(255,255,255,0.75)',fontWeight:500}}>Score</div>
+              </div>
+            </div>
+
+            {userAnswers.filter(a => !a.correct).length > 0 && (
+              <div style={{background:'rgba(255,255,255,0.08)',border:'2px solid rgba(255,255,255,0.2)',borderRadius:'14px',padding:'1.3rem',marginBottom:'1.5rem'}}>
+                <div style={{fontSize:'13px',color:'rgba(255,255,255,0.7)',marginBottom:'0.8rem',fontWeight:600}}>Points à revoir</div>
+                <div style={{fontSize:'14.5px',color:'rgba(255,255,255,0.9)',lineHeight:1.7}}>
+                  {userAnswers.filter(a => !a.correct).slice(0,3).map((a,i) => (
+                    <div key={i} style={{marginBottom:'6px'}}>• {a.question.question.substring(0,70)}...</div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
+              <button style={{background:'rgba(255,255,255,0.1)',border:'2px solid rgba(255,255,255,0.3)',borderRadius:'14px',padding:'14px',color:'rgba(255,255,255,0.9)',fontSize:'15px',fontWeight:600,cursor:'pointer'}}>Revoir le cours</button>
+              <button onClick={restart} style={{background:'rgba(212,168,32,0.2)',border:'2px solid #d4a820',borderRadius:'14px',padding:'14px',color:'#fffbea',fontSize:'15px',fontWeight:600,cursor:'pointer'}}>Recommencer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+ReactDOM.render(<QuizApp />, document.getElementById('root'));
+</script>
+</body>
+</html>

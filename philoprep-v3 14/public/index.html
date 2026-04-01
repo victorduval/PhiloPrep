@@ -151,6 +151,8 @@ async function getFiche(ficheKey) {
       _cache[ck] = await fetchAppStaticHtml(
         "./Cours/Cours%20Chateaubriand/Cours%20philosophie/Notions/Conscience/Fiche%20de%20révision%20–%20Conscience.html"
       );
+    } else if (ficheKey === "art") {
+      _cache[ck] = await fetchAppStaticHtml("./Fichier%20HTML%20app/Notions/Fiche_de_revision_Art.html");
     } else if (typeof FICHES_DATA !== 'undefined' && FICHES_DATA[ficheKey]) {
       _cache[ck] = await _decompress(FICHES_DATA[ficheKey]);
     }
@@ -246,11 +248,28 @@ async function fetchAppStaticHtml(relativePath) {
     }
 
     console.warn('embedded-html-missing-key', relativePath);
+    try {
+      // Fallback for newly added static HTML files.
+      var res = await fetch(relativePath, { cache: 'no-cache' });
+      if (res && res.ok) {
+        var txt = await res.text();
+        if (txt && txt.indexOf('const APP_NAME = "PhiloPrep"') === -1) {
+          if (/<\s*head\b/i.test(txt) && !/<\s*base\b/i.test(txt)) {
+            var abs = new URL(relativePath, window.location.href).href;
+            var dirHref = new URL('./', abs).href.replace(/"/g, '&quot;');
+            txt = txt.replace(/<head([^>]*)>/i, '<head$1><base href="' + dirHref + '">');
+          }
+          return txt;
+        }
+      }
+    } catch (fetchErr) {
+      console.warn('fetchAppStaticHtml fallback failed:', relativePath, fetchErr);
+    }
     return (
       '<!doctype html><html><head><meta charset="utf-8"><title>Contenu indisponible</title></head>' +
       '<body style="margin:0;padding:24px;font-family:DM Sans,system-ui,sans-serif;color:#6b7280;background:#fff;">' +
       '<h3 style="margin:0 0 10px 0;font-size:16px;color:#374151;">Contenu non disponible</h3>' +
-      '<p style="margin:0;font-size:13px;line-height:1.5;">Ce contenu doit etre embarque dans index.html. Aucune ressource HTML externe n est chargee.</p>' +
+      '<p style="margin:0;font-size:13px;line-height:1.5;">Ce contenu est introuvable. Verifie le chemin du fichier HTML.</p>' +
       '</body></html>'
     );
   } catch (e) {
@@ -317,6 +336,18 @@ async function getNatureQuizFile() {
   var ck = 'test_nature';
   if (_cache[ck]) return _cache[ck];
   _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Notions/Nature_tester_ses_connaissances.html');
+  return _cache[ck];
+}
+async function getArtQuizFile() {
+  var ck = 'test_art';
+  if (_cache[ck]) return _cache[ck];
+  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Notions/Art_test.html');
+  return _cache[ck];
+}
+async function getArtCourseFile() {
+  var ck = 'fiche_art';
+  if (_cache[ck]) return _cache[ck];
+  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Notions/Fiche_de_revision_Art.html');
   return _cache[ck];
 }
 async function getLexiqueFile() {
@@ -836,7 +867,7 @@ const notions = [
   { name: "La vérité", svgIcon: "search", shade: "#50be8c", fiche: "verite" },
   { name: "La raison", svgIcon: "search", shade: "#f06464" },
   { name: "Le langage", svgIcon: "bookOpen", shade: "#78b4f0", fiche: "langage" },
-  { name: "L'art", svgIcon: "edit", shade: "#a882f0" },
+  { name: "L'art", svgIcon: "edit", shade: "#a882f0", fiche: "art" },
   { name: "La religion", svgIcon: "compass", shade: "#f0a030" },
   { name: "La science", svgIcon: "search", shade: "#50be8c" },
   { name: "Le travail", svgIcon: "terminal", shade: "#f06464" },
@@ -3943,7 +3974,7 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
       <div style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
         {tab === "jeux" && (
           <div style={{ flex: 1, minHeight: 0, overflow: "auto", WebkitOverflowScrolling: "touch" }}>
-            {renderList(jeuxItems, jeuxPalettes)}
+            {renderList(jeuxItems)}
           </div>
         )}
         {tab === "parcours-guide" && (
@@ -6334,7 +6365,7 @@ function App() {
                 </button>
               );
             })()}
-                        <ContentModal open={ficheModalOpen && !!selectedNotion} onClose={closeFiche} title={selectedNotion ? selectedNotion.name : ""} iconName={selectedNotion ? selectedNotion.svgIcon : null} iconColor={selectedNotion ? (selectedNotion.shade || "#1a3fa0") + "99" : null} getData={selectedNotion ? () => getFiche(selectedNotion.fiche) : null} cacheKey={selectedNotion ? "fiche_" + selectedNotion.fiche : ""} showMenu={showNotionMenu} onViewCourse={() => { setShowNotionMenu(false); setShowNotionTestMode(false); }} onTestKnowledge={() => { homeNavIgnoreRef.current = true; homeSwipeLockRef.current = true; setTimeout(() => { homeNavIgnoreRef.current = false; homeSwipeLockRef.current = false; }, 1200); setShowNotionMenu(false); setShowNotionTestMode(true); }} canTestKnowledge={selectedNotion && ["conscience", "bonheur", "inconscient", "langage", "liberte", "technique", "temps", "verite", "nature"].includes(selectedNotion.fiche)} showTestMode={showNotionTestMode} testGetData={selectedNotion ? ({ conscience: getConscienceTest, bonheur: getBonheurQuizFile, inconscient: getInconscientQuizFile, langage: getLangageQuizFile, liberte: getLiberteQuizFile, technique: getTechniqueQuizFile, temps: getTempsQuizFile, verite: getVeriteQuizFile, nature: getNatureQuizFile }[selectedNotion.fiche] || null) : null} testCacheKey={selectedNotion ? "test_" + selectedNotion.fiche : ""} notionShade={selectedNotion ? selectedNotion.shade : null} />
+                        <ContentModal open={ficheModalOpen && !!selectedNotion} onClose={closeFiche} title={selectedNotion ? selectedNotion.name : ""} iconName={selectedNotion ? selectedNotion.svgIcon : null} iconColor={selectedNotion ? (selectedNotion.shade || "#1a3fa0") + "99" : null} getData={selectedNotion ? (selectedNotion.fiche === "art" ? getArtCourseFile : () => getFiche(selectedNotion.fiche)) : null} cacheKey={selectedNotion ? "fiche_" + selectedNotion.fiche : ""} showMenu={showNotionMenu} onViewCourse={() => { setShowNotionMenu(false); setShowNotionTestMode(false); }} onTestKnowledge={() => { homeNavIgnoreRef.current = true; homeSwipeLockRef.current = true; setTimeout(() => { homeNavIgnoreRef.current = false; homeSwipeLockRef.current = false; }, 1200); setShowNotionMenu(false); setShowNotionTestMode(true); }} canTestKnowledge={selectedNotion && ["conscience", "bonheur", "inconscient", "langage", "liberte", "technique", "temps", "verite", "nature", "art"].includes(selectedNotion.fiche)} showTestMode={showNotionTestMode} testGetData={selectedNotion ? ({ conscience: getConscienceTest, bonheur: getBonheurQuizFile, inconscient: getInconscientQuizFile, langage: getLangageQuizFile, liberte: getLiberteQuizFile, technique: getTechniqueQuizFile, temps: getTempsQuizFile, verite: getVeriteQuizFile, nature: getNatureQuizFile, art: getArtQuizFile }[selectedNotion.fiche] || null) : null} testCacheKey={selectedNotion ? "test_" + selectedNotion.fiche : ""} notionShade={selectedNotion ? selectedNotion.shade : null} />
                         <ContentModal open={syntheseModalOpen} onClose={closeSynthese} title="Vue d'ensemble" iconName="compass" dataOrPromise={PANORAMA_DATA} cacheKey="panorama" />
                         <ContentModal open={citationsModalOpen} onClose={closeCitations} title="Citations expliquées" iconName="bookOpen" dataOrPromise={CITATIONS_DATA} cacheKey="citations" />
                         <AuteursModal open={auteursModalOpen} onClose={closeAuteurs} onDialogue={() => setDialogueModalOpen(true)} />
