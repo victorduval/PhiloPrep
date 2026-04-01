@@ -1353,48 +1353,45 @@ function updateLivesBar(id){
 // ═══════════════════════════════════════════════════════════════
 // INTRO NIVEAU
 // ═══════════════════════════════════════════════════════════════
-function openLevel(idx){
-  const lv = PARCOURS[ST.mode].levels[idx];
-  G.levelIdx = idx;
-  G.level = lv;
-  showNotionSelector(idx);
+function openLevel(levelIdx){
+  G.levelIdx = levelIdx;
+  G.level = PARCOURS[ST.mode].levels[levelIdx];
+  showNotionSelector(levelIdx);
 }
 
 function showNotionSelector(levelIdx){
-  const level = PARCOURS[ST.mode].levels[levelIdx];
-  const existingSelector = document.getElementById('s-notion-selector');
-  if(existingSelector) existingSelector.remove();
-
-  const notionCards = NOTIONS_PROGRAMME.map((notion) => {
-    const stats = (ST.stats_by_notion && ST.stats_by_notion[notion]) || {correct:0, total:0};
-    const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-    return `
-      <div onclick="startLevelWithNotion(${levelIdx}, '${notion.replace(/'/g, "\\'")}')"
-           style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:all .2s"
-           onmouseover="this.style.borderColor='rgba(139,92,246,.6)';this.style.background='rgba(139,92,246,.15)'"
-           onmouseout="this.style.borderColor='rgba(255,255,255,.15)';this.style.background='rgba(255,255,255,.08)'">
-        <div style="font-size:1.5rem;margin-bottom:8px">${getNotionIcon(notion)}</div>
-        <div style="color:white;font-weight:700;font-size:.9rem;margin-bottom:4px">${notion}</div>
-        <div style="color:rgba(255,255,255,.5);font-size:.75rem">${stats.total > 0 ? (pct + '%') : 'Nouveau'}</div>
-      </div>
-    `;
-  }).join('');
-
   const selectorHTML = `
-    <div id="s-notion-selector" class="screen">
-      <div style="background:linear-gradient(160deg,#1a2a4a 0%,#16213e 40%,#0f3460 100%);min-height:100vh;padding:40px 20px">
-        <div style="max-width:600px;margin:0 auto">
-          <button onclick="goToMap()" style="background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);color:white;padding:10px 20px;border-radius:12px;cursor:pointer;margin-bottom:20px">
-            ← Retour à la carte
-          </button>
-          <h2 style="color:white;text-align:center;font-size:1.8rem;margin-bottom:10px">${level.title || level.notion || ("Niveau " + (levelIdx+1))}</h2>
-          <p style="color:rgba(255,255,255,.7);text-align:center;margin-bottom:30px">Quelle notion travailles-tu en cours ?</p>
-          <div id="notion-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">${notionCards}</div>
-          <p style="color:rgba(255,255,255,.5);text-align:center;margin-top:20px;font-size:.85rem">Choisis la notion que tu etudies actuellement en classe</p>
+    <div id="s-notion-selector" class="screen active" style="background:linear-gradient(160deg,#1a2a4a 0%,#16213e 40%,#0f3460 100%);min-height:100vh;padding:40px 20px">
+      <div style="max-width:600px;margin:0 auto">
+        <button onclick="goToMap()" style="background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);color:white;padding:10px 20px;border-radius:12px;cursor:pointer;margin-bottom:20px;font-family:var(--ff);font-weight:700">
+          ← Retour
+        </button>
+        <h2 style="color:white;text-align:center;font-size:1.8rem;margin-bottom:10px;font-family:var(--ff)">
+          Niveau ${levelIdx + 1}
+        </h2>
+        <p style="color:rgba(255,255,255,.7);text-align:center;margin-bottom:30px;font-family:var(--fb)">
+          Quelle notion travailles-tu en cours ?
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+          ${NOTIONS_PROGRAMME.map(notion => `
+            <div onclick='startLevelWithNotion(${levelIdx}, ${JSON.stringify(notion)})'
+                 style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:all .2s"
+                 onmouseover="this.style.borderColor='rgba(139,92,246,.6)'"
+                 onmouseout="this.style.borderColor='rgba(255,255,255,.15)'">
+              <div style="font-size:1.5rem;margin-bottom:8px">${getNotionIcon(notion)}</div>
+              <div style="color:white;font-weight:700;font-size:.9rem;font-family:var(--ff)">${notion}</div>
+            </div>
+          `).join('')}
         </div>
+        <p style="color:rgba(255,255,255,.5);text-align:center;margin-top:20px;font-size:.85rem;font-family:var(--fb)">
+          💡 Choisis la notion que tu étudies en classe
+        </p>
       </div>
     </div>
   `;
+  
+  const existing = document.getElementById('s-notion-selector');
+  if(existing) existing.remove();
   document.body.insertAdjacentHTML('beforeend', selectorHTML);
   showScreen('s-notion-selector');
 }
@@ -1402,14 +1399,16 @@ function showNotionSelector(levelIdx){
 function startLevelWithNotion(levelIdx, notion){
   G.currentNotion = notion;
   const level = PARCOURS[ST.mode].levels[levelIdx];
-  const byNotion = level.questions_by_notion || {};
-  const questionIds = byNotion[notion];
-  if(!questionIds || !questionIds.length){
-    alert('Pas encore de questions pour cette notion. Choisis-en une autre !');
-    return;
-  }
-  G.selectedQuestionIds = shuffle(questionIds).slice(0, level.n_questions || 5);
-  beginLevel();
+  
+  // For now, use existing questions until we reorganize data
+  const questionIds = level.questions || [];
+  const selectedIds = shuffle(questionIds).slice(0, level.n_questions);
+  G.questions = selectedIds.map(id => EXERCISES[id]).filter(Boolean);
+  
+  G.qIdx = 0;
+  G.correct = 0;
+  showScreen('s-game');
+  nextQuestion();
 }
 
 function beginLevel(){
@@ -1482,7 +1481,14 @@ function getTypeLabel(rtype){
   return m[rtype]||rtype;
 }
 
-function shuffle(arr){ return [...arr].sort(()=>Math.random()-.5); }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
 
 // ─── Mark answer ─────────────────────────────────────────────
 function markAnswer(isCorrect, ex, feedbackText){
@@ -1500,7 +1506,7 @@ function markAnswer(isCorrect, ex, feedbackText){
     if(G.streak >= 10 && ST.lives < 5){
       ST.lives = Math.min(ST.lives + 1, 5);
       G.streak = 0;
-      showToast('Serie de 10 ! +1 vie recuperee');
+      showToast("🎉 Série de 10 ! +1 vie récupérée");
       saveState();
       updateLivesBar('lives-bar-game');
     }
