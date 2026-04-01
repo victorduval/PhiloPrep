@@ -3645,14 +3645,14 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
     { name: "PhiloDoxa", svgIcon: "messageCircle", onClick: onPhilodoxa },
     { name: "PhiloLogique", svgIcon: "zap", onClick: onPhilologique },
   ];
-  const jeuxPalettes = [
-    { start: "#8B5CF6", end: "#EC4899", glow: "rgba(236,72,153,0.36)", border: "rgba(236,72,153,0.6)" }, // violet/rose
-    { start: "#22D3EE", end: "#3B82F6", glow: "rgba(59,130,246,0.34)", border: "rgba(56,189,248,0.62)" }, // cyan/bleu
-    { start: "#FB923C", end: "#EF4444", glow: "rgba(249,115,22,0.35)", border: "rgba(251,146,60,0.62)" }, // orange/rouge
-    { start: "#10B981", end: "#14B8A6", glow: "rgba(16,185,129,0.32)", border: "rgba(20,184,166,0.6)" }, // vert
-    { start: "#7C3AED", end: "#4F46E5", glow: "rgba(99,102,241,0.34)", border: "rgba(139,92,246,0.62)" }, // violet fonce
-    { start: "#F59E0B", end: "#EAB308", glow: "rgba(245,158,11,0.36)", border: "rgba(234,179,8,0.62)" }, // jaune
-  ];
+  const jeuxPalettesByName = {
+    PhiloSophia: "linear-gradient(170deg, rgba(240, 171, 252, 0.95) 0%, rgba(217, 70, 239, 0.95) 50%, rgba(168, 85, 247, 0.95) 100%)",
+    PhiloQuest: "linear-gradient(170deg, rgba(103, 232, 249, 0.95) 0%, rgba(6, 182, 212, 0.95) 50%, rgba(14, 116, 144, 0.95) 100%)",
+    PhiloMind: "linear-gradient(170deg, rgba(134, 239, 172, 0.95) 0%, rgba(34, 197, 94, 0.95) 50%, rgba(21, 128, 61, 0.95) 100%)",
+    PhiloRush: "linear-gradient(170deg, rgba(251, 191, 36, 0.95) 0%, rgba(245, 158, 11, 0.95) 50%, rgba(217, 119, 6, 0.95) 100%)",
+    PhiloDoxa: "linear-gradient(170deg, rgba(248, 113, 113, 0.95) 0%, rgba(239, 68, 68, 0.95) 50%, rgba(185, 28, 28, 0.95) 100%)",
+    PhiloLogique: "linear-gradient(170deg, rgba(196, 181, 253, 0.95) 0%, rgba(139, 92, 246, 0.95) 50%, rgba(109, 40, 217, 0.95) 100%)",
+  };
   const renderList = (items, colorPalette) => {
     const scrollLeft = () => {
       const container = document.querySelector('.jeux-carousel');
@@ -3821,7 +3821,7 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
         textTransform: "uppercase",
         marginBottom: "18px",
       }}>
-        Modes libres
+        Mini-jeux
       </div>
       <div style={{ position: "relative", maxWidth: "358px", margin: "0 auto" }}>
         <button onClick={scrollLeft} style={{
@@ -3841,83 +3841,70 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M11 6L18 14L11 22" stroke="#e85d75" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
         <div style={{ overflow: "hidden", width: "358px" }}>
-          <div className="jeux-carousel" style={{ 
-            display: "flex", gap: "22px", overflowX: "auto", overflowY: "hidden", paddingBottom: "12px",
+          <div className="jeux-carousel" style={{
+            display: "flex", gap: "16px", overflowX: "auto", overflowY: "hidden", paddingBottom: "12px",
             scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch",
             scrollSnapType: "x mandatory", scrollPadding: "0",
           }}>
         {items.map((item, idx) => {
-          const palette = colorPalette[idx % colorPalette.length];
+          const cardBg = jeuxPalettesByName[item.name] || "linear-gradient(170deg, rgba(120, 180, 240, 0.95) 0%, rgba(76, 130, 212, 0.95) 50%, rgba(58, 95, 168, 0.95) 100%)";
           return (
             <button key={item.name} onClick={item.onClick || (() => {})} className="nav-card" style={{
-              border: `2px solid ${palette.border}`,
-              padding: 0,
-              display: "flex", flexDirection: "column", alignItems: "stretch",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              padding: "24px 20px",
+              display: "flex", flexDirection: "column", alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
               cursor: item.onClick ? "pointer" : "default",
               transition: "all 0.26s cubic-bezier(0.4, 0, 0.2, 1)",
-              overflow: "hidden", borderRadius: "16px",
+              overflow: "hidden", borderRadius: "26px",
               opacity: item.onClick ? 1 : 0.5,
               animation: `cardAppear 0.4s ease-out ${idx * 0.08}s both`,
-              minWidth: "206px",
-              width: "206px",
-              minHeight: "258px",
+              minWidth: "200px",
+              width: "200px",
+              minHeight: "240px",
+              height: "240px",
               flexShrink: 0,
               scrollSnapAlign: "start",
-              justifyContent: "space-between",
-              background: `linear-gradient(145deg, ${palette.start} 0%, ${palette.end} 100%)`,
-              boxShadow: `0 14px 36px ${palette.glow}, inset 0 1px 0 rgba(255,255,255,0.24)`,
-              backdropFilter: "blur(30px)",
-              WebkitBackdropFilter: "blur(30px)",
+              background: cardBg,
+              boxShadow: "0 14px 34px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.14)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
             }}
               onMouseEnter={(e) => {
                 if (!item.onClick) return;
                 e.currentTarget.style.transform = "translateY(-4px) scale(1.01)";
-                e.currentTarget.style.boxShadow = `0 22px 44px ${palette.glow}, inset 0 1px 0 rgba(255,255,255,0.28)`;
+                e.currentTarget.style.boxShadow = "0 22px 44px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.2)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0) scale(1)";
-                e.currentTarget.style.boxShadow = `0 14px 36px ${palette.glow}, inset 0 1px 0 rgba(255,255,255,0.24)`;
+                e.currentTarget.style.boxShadow = "0 14px 34px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.14)";
               }}
             >
-                <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%" }}>
                   <div style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: "16px",
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.26), rgba(255,255,255,0.12))",
-                    border: "1px solid rgba(255,255,255,0.24)",
+                    width: 66,
+                    height: 66,
+                    borderRadius: "19px",
+                    background: "linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    marginBottom: "20px",
                     boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 8px 24px rgba(0,0,0,0.16)"
                   }}>
                   <SvgIcon name={item.svgIcon} size={24} color="#FFFFFF" />
                 </div>
                   <div style={{
                     fontFamily: "'DM Sans', system-ui, sans-serif",
-                    fontSize: "36px",
-                    lineHeight: 1,
-                    color: "rgba(255,255,255,0.08)",
-                    fontWeight: 700,
-                    letterSpacing: "-1px",
-                    marginBottom: "-6px"
-                  }}>{String(idx + 1).padStart(2, "0")}</div>
-                  <div style={{
-                    fontFamily: "'DM Sans', system-ui, sans-serif",
-                    fontSize: "30px",
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,0.96)",
-                    lineHeight: 1.1,
-                    textShadow: "0 3px 12px rgba(0,0,0,0.28)"
+                    fontSize: "22px",
+                    fontWeight: 500,
+                    color: "white",
+                    letterSpacing: "-0.3px",
+                    lineHeight: 1.2,
+                    textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)"
                   }}>{item.name}</div>
-                  <div style={{
-                    fontFamily: "'DM Sans', system-ui, sans-serif",
-                    fontSize: "11px",
-                    color: "rgba(255,255,255,0.86)",
-                    lineHeight: 1.5
-                  }}>
-                    Touchez pour lancer ce mode pédagogique.
-                  </div>
               </div>
             </button>
           );
@@ -6120,18 +6107,18 @@ function App() {
                         <div style={{ fontSize: "9px", color: T().creamSoft, lineHeight: 1.25 }}>XP total</div>
                       </div>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "2px", width: "100%", maxWidth: 220, margin: "0 auto" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px", width: "100%", maxWidth: 260, margin: "0 auto" }}>
                       <button onClick={() => { setProfileMenuOpen(false); goHome(); }} style={{
-                        background: "none", border: "none", padding: "12px 8px",
-                        display: "flex", alignItems: "center", gap: "10px",
+                        background: "none", border: "none", padding: "14px 20px",
+                        display: "flex", alignItems: "center",
                         justifyContent: "flex-start",
-                        cursor: "pointer", width: "100%",
+                        cursor: "pointer", width: "100%", borderRadius: "8px",
                         borderBottom: "0.5px solid rgba(255,255,255,0.06)",
                       }}>
-                        <span style={{ width: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <SvgIcon name="home" size={14} color="rgba(253,246,227,0.5)" />
+                        <span style={{ width: 20, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginRight: 16, opacity: 0.7 }}>
+                          <SvgIcon name="home" size={20} color="rgba(255,255,255,0.85)" />
                         </span>
-                        <span style={{ fontSize: "13px", color: "rgba(253,246,227,0.7)" }}>Accueil</span>
+                        <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.85)", flex: 1, textAlign: "left" }}>Accueil</span>
                       </button>
                       {[
                         { icon: "user", label: "Mon profil", screen: "profile" },
@@ -6139,28 +6126,28 @@ function App() {
                         { icon: "tune", label: "Paramètres", screen: "settings" },
                       ].map((item) => (
                         <button key={item.label} onClick={() => { setProfileMenuOpen(false); if (item.screen) navigate(item.screen, "right"); }} style={{
-                          background: "none", border: "none", padding: "12px 8px",
-                          display: "flex", alignItems: "center", gap: "10px",
+                          background: "none", border: "none", padding: "14px 20px",
+                          display: "flex", alignItems: "center",
                           justifyContent: "flex-start",
-                          cursor: "pointer", width: "100%",
+                          cursor: "pointer", width: "100%", borderRadius: "8px",
                           borderBottom: "0.5px solid rgba(255,255,255,0.06)",
                         }}>
-                          <span style={{ width: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <SvgIcon name={item.icon} size={14} color="rgba(253,246,227,0.5)" />
+                          <span style={{ width: 20, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginRight: 16, opacity: 0.7 }}>
+                            <SvgIcon name={item.icon} size={20} color="rgba(255,255,255,0.85)" />
                           </span>
-                          <span style={{ fontSize: "13px", color: "rgba(253,246,227,0.7)" }}>{item.label}</span>
+                          <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.85)", flex: 1, textAlign: "left" }}>{item.label}</span>
                         </button>
                       ))}
                       <button onClick={() => { setProfileMenuOpen(false); if (window.netlifyIdentity) netlifyIdentity.logout(); }} style={{
-                        background: "none", border: "none", padding: "12px 8px",
-                        display: "flex", alignItems: "center", gap: "10px",
+                        background: "none", border: "none", padding: "14px 20px",
+                        display: "flex", alignItems: "center",
                         justifyContent: "flex-start",
-                        cursor: "pointer", width: "100%", marginTop: "8px",
+                        cursor: "pointer", width: "100%", marginTop: "8px", borderRadius: "8px",
                       }}>
-                        <span style={{ width: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <SvgIcon name="logout" size={14} color="rgba(200,100,100,0.5)" />
+                        <span style={{ width: 20, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginRight: 16, opacity: 0.7 }}>
+                          <SvgIcon name="logout" size={20} color="#ef4444" />
                         </span>
-                        <span style={{ fontSize: "13px", color: "rgba(200,100,100,0.6)" }}>Déconnexion</span>
+                        <span style={{ fontSize: "16px", color: "#ef4444", flex: 1, textAlign: "left" }}>Déconnexion</span>
                       </button>
                     </div>
                   </div>
