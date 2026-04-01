@@ -1527,6 +1527,806 @@ function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMess
   );
 }
 
+function getAuthorThoughtContent(auteur) {
+  const a = auteur || {};
+  const name = a.nom || "Auteur";
+  const themes = Array.isArray(a.themes) ? a.themes : [];
+  const themeText = themes.length ? themes.join(", ") : "—";
+
+  const built = {
+    title: `Comprendre ${name}`,
+    subtitle: a.dates ? `${a.dates} · Thèmes: ${themeText}` : `Thèmes: ${themeText}`,
+    chips: themes.slice(0, 4),
+    sections: [
+      {
+        title: "L’idée directrice",
+        paragraphs: [
+          (a.bio ? String(a.bio) : "")
+            .replace(/\s+/g, " ")
+            .trim() || `${name} propose une manière de penser qui transforme notre façon de voir le monde.`,
+          "Lis ce qui suit comme une carte mentale: une thèse centrale, des concepts, puis ce que ça change concrètement quand on argumente.",
+        ],
+      },
+      {
+        title: "Concepts majeurs (à connaître)",
+        paragraphs: [
+          themes.length
+            ? `Repère d’abord ses notions-phare (${themeText}). Demande-toi: que veut-il sauver, critiquer ou refonder à propos de ces thèmes ?`
+            : "Repère d’abord ce qu’il cherche à expliquer (connaissance, morale, politique, existence…).",
+          "Pour réviser efficacement, essaie de formuler chaque concept en une phrase simple, puis illustre-le par un exemple (expérience, situation politique, dilemme moral, etc.).",
+        ],
+      },
+      {
+        title: "Ce que ça change pour une dissertation",
+        paragraphs: [
+          "Tu peux t’en servir pour: définir une notion (clarifier les mots), proposer une distinction, ou construire une objection solide.",
+          "Astuce: écris une mini-phrase de thèse, puis une objection, puis une réponse. Le but n’est pas de réciter, mais d’argumenter avec précision.",
+        ],
+      },
+    ],
+  };
+
+  const byId = {
+    socrate: {
+      title: "Socrate — apprendre à penser",
+      subtitle: "Maïeutique · Ironie · Examen de soi",
+      chips: ["Conscience", "Vérité", "Langage"],
+      sections: [
+        {
+          title: "La méthode: interroger plutôt qu’enseigner",
+          paragraphs: [
+            "Socrate ne transmet pas un savoir tout fait: il questionne. Son objectif est de faire apparaître ce que nous croyons savoir, puis d’en tester la solidité.",
+            "La maïeutique (l’« accouchement des esprits ») vise à transformer une opinion confuse en jugement mieux fondé.",
+          ],
+        },
+        {
+          title: "Ironie et ignorance féconde",
+          paragraphs: [
+            "L’ironie socratique consiste à reconnaître d’abord son ignorance pour pousser l’autre à expliciter ses raisons.",
+            "Découvrir qu’on ne sait pas n’est pas un échec: c’est le point de départ d’une recherche rationnelle, plus exigeante.",
+          ],
+        },
+        {
+          title: "Pourquoi c’est utile au bac",
+          paragraphs: [
+            "Socrate t’aide à construire une introduction solide: définir les termes, repérer les présupposés, distinguer opinion et connaissance.",
+            "Dans un plan, il sert souvent à défendre l’exigence de justification: qu’est-ce qu’une vraie raison ? comment éviter les évidences trompeuses ?",
+          ],
+        },
+      ],
+    },
+    descartes: {
+      title: "Descartes — fonder la certitude",
+      subtitle: "Doute méthodique · Cogito · Idées claires et distinctes",
+      chips: ["Conscience", "Vérité", "Raison"],
+      sections: [
+        {
+          title: "Le doute comme méthode",
+          paragraphs: [
+            "Descartes doute pour trouver un point absolument certain. Il ne doute pas par scepticisme, mais pour reconstruire un savoir plus solide.",
+            "Il écarte ce qui peut être mis en doute (sens trompeurs, rêves, hypothèses) pour atteindre une certitude indubitable.",
+          ],
+        },
+        {
+          title: "Le cogito: une certitude de la conscience",
+          paragraphs: [
+            "Même si tout est trompeur, le fait de penser est certain: « je pense, donc je suis ». Cette vérité n’est pas déduite: elle se saisit dans l’acte même.",
+            "Ensuite, Descartes cherche des règles de vérité (clarté/distinction) et un ordre rationnel des raisons.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très efficace pour discuter la confiance dans les sens, la vérité, la preuve, ou la méthode scientifique.",
+            "Attention: ne pas réduire à « il doute de tout ». Il doute pour mieux établir ce qui résiste au doute.",
+          ],
+        },
+      ],
+    },
+    kant: {
+      title: "Kant — limites et puissance de la raison",
+      subtitle: "Critique · Devoir · Autonomie",
+      chips: ["Raison", "Liberté", "Devoir", "Vérité"],
+      sections: [
+        {
+          title: "Ce que la raison peut (et ne peut pas) connaître",
+          paragraphs: [
+            "Kant distingue ce qui relève de l’expérience possible et ce qui dépasse toute expérience (Dieu, l’âme, le monde comme totalité).",
+            "La critique n’abaisse pas la raison: elle la rend plus sûre en lui donnant des limites.",
+          ],
+        },
+        {
+          title: "Morale: agir par devoir",
+          paragraphs: [
+            "Pour Kant, la valeur morale d’une action dépend de l’intention: agir par respect pour la loi morale, pas seulement par intérêt ou inclination.",
+            "L’autonomie signifie: se donner à soi-même une loi rationnelle (et non obéir à ses désirs).",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Parfait pour « la liberté », « le devoir », « la raison », « la morale ». Permet des distinctions nettes et des arguments structurés.",
+          ],
+        },
+      ],
+    },
+    nietzsche: {
+      title: "Nietzsche — critiquer les valeurs",
+      subtitle: "Généalogie · Morale · Vérité",
+      chips: ["Vérité", "Morale", "Art"],
+      sections: [
+        {
+          title: "D’où viennent nos valeurs ?",
+          paragraphs: [
+            "Nietzsche ne demande pas seulement si une valeur est « vraie », mais pourquoi elle s’est imposée. Il en fait la généalogie.",
+            "Il critique une morale qui condamne la vie, la force et la création au nom d’idéaux de renoncement.",
+          ],
+        },
+        {
+          title: "Vérité et interprétation",
+          paragraphs: [
+            "La vérité n’est pas un bloc neutre: elle est liée à des perspectives, des intérêts, des forces.",
+            "Cela ne veut pas dire « tout se vaut »: cela oblige à examiner ce que nos discours font, ce qu’ils servent, et ce qu’ils empêchent.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très utile pour critiquer les évidences morales, interroger l’objectivité, ou défendre la création (art, style, affirmation).",
+          ],
+        },
+      ],
+    },
+    marx: {
+      title: "Marx — comprendre la société par le travail",
+      subtitle: "Idéologie · Aliénation · Lutte des classes",
+      chips: ["Travail", "État", "Justice"],
+      sections: [
+        {
+          title: "Le réel social avant les idées",
+          paragraphs: [
+            "Marx explique que les idées dominantes d’une époque reflètent souvent les intérêts du groupe dominant: c’est la critique de l’idéologie.",
+            "Pour comprendre une société, il faut analyser ses rapports économiques, le travail, la production et la répartition.",
+          ],
+        },
+        {
+          title: "Aliénation et émancipation",
+          paragraphs: [
+            "Le travail peut devenir aliénant quand le travailleur est dépossédé de ce qu’il produit, de sa propre activité et de sa puissance.",
+            "La philosophie devient alors pratique: transformer les conditions réelles, pas seulement les interpréter.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Idéal pour problématiser la justice sociale, l’État, le travail, la liberté réelle vs formelle.",
+          ],
+        },
+      ],
+    },
+    freud: {
+      title: "Freud — l’inconscient et le désir",
+      subtitle: "Refoulement · Symptôme · Interprétation",
+      chips: ["Inconscient", "Désir", "Bonheur"],
+      sections: [
+        {
+          title: "L’inconscient: une logique",
+          paragraphs: [
+            "Freud soutient qu’une partie de nos pensées et désirs nous échappe. Les rêves, lapsus, symptômes donnent des indices.",
+            "L’inconscient n’est pas le chaos: il a une logique (condensation, déplacement) qui demande interprétation.",
+          ],
+        },
+        {
+          title: "Conflit psychique et culture",
+          paragraphs: [
+            "La vie psychique est traversée par des conflits (désirs, interdits, culpabilité). La culture canalise ces forces mais produit aussi des frustrations.",
+            "Cela éclaire les débats sur le bonheur, la liberté intérieure, la responsabilité.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très utile pour discuter « suis-je maître de moi ? », « la conscience suffit-elle ? », « que vaut l’introspection ? ». ",
+          ],
+        },
+      ],
+    },
+    platon: {
+      title: "Platon — penser au-delà des apparences",
+      subtitle: "Monde sensible · Idées · Justice",
+      chips: ["Vérité", "Conscience", "Art"],
+      sections: [
+        {
+          title: "Le réel et les apparences",
+          paragraphs: [
+            "Platon distingue le monde changeant des apparences et le monde intelligible des Idées, qui fonde la vérité.",
+            "L’allégorie de la caverne montre le passage difficile de l’opinion à la connaissance.",
+          ],
+        },
+        {
+          title: "Connaître, c’est se convertir",
+          paragraphs: [
+            "Apprendre n’est pas accumuler des informations: c’est orienter l’âme vers ce qui est stable et rationnel.",
+            "La dialectique sert à dépasser les contradictions pour atteindre une compréhension plus universelle.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très utile pour traiter la vérité, la justice, l’éducation et la critique des illusions collectives.",
+          ],
+        },
+      ],
+    },
+    aristote: {
+      title: "Aristote — organiser le réel avec précision",
+      subtitle: "Substance · Cause · Vertu",
+      chips: ["Bonheur", "Justice", "Technique", "Nature"],
+      sections: [
+        {
+          title: "Observer le monde concret",
+          paragraphs: [
+            "Aristote part de l’expérience et cherche des concepts pour décrire ce qui existe réellement.",
+            "Sa théorie des causes (matière, forme, agent, fin) explique un phénomène de manière complète.",
+          ],
+        },
+        {
+          title: "Éthique de la juste mesure",
+          paragraphs: [
+            "Le bonheur (eudaimonia) est une activité de l’âme conforme à la vertu, et non un plaisir passager.",
+            "La vertu est un équilibre pratique: ni excès, ni défaut, mais jugement ajusté à la situation.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Excellent pour articuler nature, finalité, technique, justice et formation du caractère.",
+          ],
+        },
+      ],
+    },
+    epicure: {
+      title: "Épicure — philosopher pour vivre heureux",
+      subtitle: "Ataraxie · Désirs · Amitié",
+      chips: ["Bonheur", "Liberté"],
+      sections: [
+        {
+          title: "Un bonheur sobre et lucide",
+          paragraphs: [
+            "Épicure vise l’ataraxie: une tranquillité de l’âme obtenue par la maîtrise des peurs et des désirs.",
+            "Il distingue les désirs naturels/nécessaires, naturels/non nécessaires et vains.",
+          ],
+        },
+        {
+          title: "Délivrer des peurs",
+          paragraphs: [
+            "La philosophie sert de médecine: elle combat la peur des dieux, de la mort et de la souffrance imaginaire.",
+            "Le plaisir véritable est stable: absence de trouble plutôt qu’intensité spectaculaire.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très pertinent pour discuter bonheur, désir, liberté intérieure et rapport à la mort.",
+          ],
+        },
+      ],
+    },
+    hobbes: {
+      title: "Hobbes — sécurité et contrat politique",
+      subtitle: "État de nature · Souveraineté · Paix civile",
+      chips: ["Justice", "État", "Liberté"],
+      sections: [
+        {
+          title: "Pourquoi l’État est nécessaire",
+          paragraphs: [
+            "Dans l’état de nature, chacun cherche sa conservation: cela produit méfiance et conflit permanent.",
+            "Le contrat social institue un pouvoir souverain pour garantir la paix et la sécurité.",
+          ],
+        },
+        {
+          title: "Liberté et obéissance",
+          paragraphs: [
+            "Pour Hobbes, la liberté n’exclut pas la loi: elle est compatible avec l’obéissance civile.",
+            "La priorité n’est pas l’idéal moral, mais la sortie de la violence généralisée.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Utile pour interroger la légitimité de l’État, la peur, la loi et le fondement de la justice.",
+          ],
+        },
+      ],
+    },
+    spinoza: {
+      title: "Spinoza — comprendre pour devenir libre",
+      subtitle: "Nécessité · Conatus · Joie active",
+      chips: ["Liberté", "Bonheur", "Nature"],
+      sections: [
+        {
+          title: "Une nature entièrement intelligible",
+          paragraphs: [
+            "Spinoza pense un monde régi par la nécessité: tout a une cause et s’explique rationnellement.",
+            "Dieu n’est pas un être extérieur: il s’identifie à la nature elle-même.",
+          ],
+        },
+        {
+          title: "Des passions à l’action",
+          paragraphs: [
+            "Nous sommes d’abord passifs quand nous subissons des causes extérieures.",
+            "La liberté grandit quand nous comprenons nos affects et agissons selon des idées adéquates.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très fort pour traiter liberté/déterminisme, désir, bonheur, raison et puissance d’agir.",
+          ],
+        },
+      ],
+    },
+    locke: {
+      title: "Locke — expérience, identité et droits",
+      subtitle: "Empirisme · Conscience de soi · Propriété",
+      chips: ["Conscience", "État", "Liberté"],
+      sections: [
+        {
+          title: "L’esprit n’est pas inné",
+          paragraphs: [
+            "Locke refuse les idées innées: nos connaissances viennent de l’expérience externe et de la réflexion.",
+            "L’esprit est d’abord une page blanche qui se structure progressivement.",
+          ],
+        },
+        {
+          title: "Identité personnelle",
+          paragraphs: [
+            "L’identité personnelle repose sur la continuité de la conscience (mémoire), pas sur une substance immuable.",
+            "Cela renouvelle les débats sur responsabilité, personne et sujet moral.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Pertinent pour conscience de soi, connaissance empirique, droit naturel et consentement politique.",
+          ],
+        },
+      ],
+    },
+    rousseau: {
+      title: "Rousseau — liberté politique et authenticité",
+      subtitle: "Volonté générale · Contrat social · Inégalité",
+      chips: ["Liberté", "État", "Nature"],
+      sections: [
+        {
+          title: "Critique de la société inégale",
+          paragraphs: [
+            "Rousseau montre que les institutions peuvent fabriquer domination et dépendance.",
+            "Il distingue l’amour de soi naturel et l’amour-propre social, source de rivalité.",
+          ],
+        },
+        {
+          title: "Obéir à la loi qu’on se donne",
+          paragraphs: [
+            "La liberté politique n’est pas faire ce qu’on veut: c’est participer à une loi commune orientée vers l’intérêt général.",
+            "La volonté générale n’est pas la somme des intérêts particuliers.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très utile pour liberté, citoyenneté, contrat, éducation et critique de l’aliénation sociale.",
+          ],
+        },
+      ],
+    },
+    hume: {
+      title: "Hume — l’expérience contre les illusions de la raison",
+      subtitle: "Habitude · Causalité · Sentiment moral",
+      chips: ["Raison", "Conscience", "Vérité"],
+      sections: [
+        {
+          title: "Ce que l’expérience autorise",
+          paragraphs: [
+            "Hume soutient que nos idées dérivent d’impressions sensibles: pas d’idée valable sans origine expérimentale.",
+            "La causalité n’est pas une nécessité visible, mais une habitude mentale née de répétitions.",
+          ],
+        },
+        {
+          title: "Raison et passions",
+          paragraphs: [
+            "La raison éclaire les moyens, mais ce sont les passions qui motivent l’action.",
+            "La morale se fonde sur le sentiment et la sympathie, pas sur une pure déduction abstraite.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Efficace pour discuter la preuve, l’induction, l’objectivité morale et les limites de la raison.",
+          ],
+        },
+      ],
+    },
+    hegel: {
+      title: "Hegel — la raison dans l’histoire",
+      subtitle: "Dialectique · Reconnaissance · Esprit",
+      chips: ["Conscience", "Histoire", "Liberté", "État"],
+      sections: [
+        {
+          title: "Penser le devenir",
+          paragraphs: [
+            "Hegel refuse les oppositions figées: la vérité se construit dans un processus dialectique.",
+            "Une contradiction n’annule pas la pensée: elle la fait avancer vers une forme plus riche.",
+          ],
+        },
+        {
+          title: "Liberté et reconnaissance",
+          paragraphs: [
+            "La conscience de soi se forme dans le rapport à autrui et la quête de reconnaissance.",
+            "La liberté devient concrète dans des institutions historiques (droit, société civile, État).",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très utile pour articuler individu/société, conflit/reconnaissance et histoire de la liberté.",
+          ],
+        },
+      ],
+    },
+    schopenhauer: {
+      title: "Schopenhauer — lucidité sur le désir",
+      subtitle: "Volonté · Souffrance · Art",
+      chips: ["Bonheur", "Désir", "Art"],
+      sections: [
+        {
+          title: "La volonté au fond du réel",
+          paragraphs: [
+            "Schopenhauer voit dans le monde l’expression d’une volonté aveugle, toujours tendue vers de nouveaux objets.",
+            "Le désir insatisfait ou satisfait brièvement reconduit le manque et l’ennui.",
+          ],
+        },
+        {
+          title: "Voies d’apaisement",
+          paragraphs: [
+            "L’art suspend temporairement la tyrannie du vouloir: on contemple sans posséder.",
+            "La compassion et l’ascèse visent une réduction de la souffrance produite par l’égoïsme du désir.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Pertinent pour bonheur, désir, pessimisme, art et morale de la compassion.",
+          ],
+        },
+      ],
+    },
+    bergson: {
+      title: "Bergson — retrouver le temps vécu",
+      subtitle: "Durée · Intuition · Élan vital",
+      chips: ["Temps", "Conscience", "Liberté"],
+      sections: [
+        {
+          title: "Durée contre temps mesuré",
+          paragraphs: [
+            "Bergson distingue le temps spatialisé des horloges et la durée vécue, qualitative et continue.",
+            "La conscience n’est pas une suite d’instants juxtaposés: elle est une continuité créatrice.",
+          ],
+        },
+        {
+          title: "Intelligence et intuition",
+          paragraphs: [
+            "L’intelligence est puissante pour l’action et la technique, mais peut manquer le mouvement vivant.",
+            "L’intuition cherche à saisir de l’intérieur ce qui change réellement.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Excellent pour temps, mémoire, conscience, liberté et critique du mécanicisme.",
+          ],
+        },
+      ],
+    },
+    husserl: {
+      title: "Husserl — revenir aux choses mêmes",
+      subtitle: "Intentionnalité · Épochè · Phénoménologie",
+      chips: ["Conscience", "Vérité", "Raison"],
+      sections: [
+        {
+          title: "Décrire l’expérience vécue",
+          paragraphs: [
+            "Husserl propose de suspendre les présupposés (épochè) pour décrire rigoureusement ce qui apparaît à la conscience.",
+            "Toute conscience est intentionnelle: elle est toujours conscience de quelque chose.",
+          ],
+        },
+        {
+          title: "Fonder le savoir autrement",
+          paragraphs: [
+            "La phénoménologie cherche des structures essentielles de l’expérience, au lieu de réduire le vécu à des faits bruts.",
+            "Elle renouvelle la question de la vérité en repartant des conditions de donation du sens.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Utile pour conscience, perception, objectivité et méthode philosophique.",
+          ],
+        },
+      ],
+    },
+    heidegger: {
+      title: "Heidegger — questionner le sens de l’être",
+      subtitle: "Dasein · Authenticité · Technique",
+      chips: ["Existence", "Temps", "Technique"],
+      sections: [
+        {
+          title: "L’existence comme question",
+          paragraphs: [
+            "Heidegger analyse l’être humain (Dasein) comme un être qui se comprend à partir de ses possibilités.",
+            "Le temps n’est pas un simple cadre externe: il structure notre manière d’exister.",
+          ],
+        },
+        {
+          title: "Monde technique et oubli de l’être",
+          paragraphs: [
+            "La technique moderne tend à tout considérer comme ressource disponible.",
+            "Le danger n’est pas l’outil en soi, mais une manière unique de dévoiler le réel.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Pertinent pour existence, angoisse, authenticité, technique et rapport au monde.",
+          ],
+        },
+      ],
+    },
+    sartre: {
+      title: "Sartre — la liberté en situation",
+      subtitle: "Existentialisme · Responsabilité · Mauvaise foi",
+      chips: ["Liberté", "Existence", "Conscience"],
+      sections: [
+        {
+          title: "L’existence précède l’essence",
+          paragraphs: [
+            "Chez Sartre, l’être humain n’est pas défini d’avance: il se fait par ses choix.",
+            "Cette liberté radicale n’est pas confortable: elle implique responsabilité et angoisse.",
+          ],
+        },
+        {
+          title: "Mauvaise foi et authenticité",
+          paragraphs: [
+            "La mauvaise foi consiste à se fuir soi-même en se traitant comme une chose déterminée.",
+            "Être authentique, c’est assumer sa liberté sans se cacher derrière des rôles figés.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très utile pour liberté, responsabilité, engagement et rapport à autrui.",
+          ],
+        },
+      ],
+    },
+    arendt: {
+      title: "Arendt — penser le politique et l’action",
+      subtitle: "Pluralité · Action · Totalitarisme",
+      chips: ["Politique", "Justice", "Travail"],
+      sections: [
+        {
+          title: "La condition humaine",
+          paragraphs: [
+            "Arendt distingue travail, oeuvre et action: trois manières d’être au monde.",
+            "L’action politique est liée à la pluralité: elle suppose parole, initiative et espace public.",
+          ],
+        },
+        {
+          title: "Totalitarisme et responsabilité",
+          paragraphs: [
+            "Arendt analyse les mécanismes totalitaires et la fragilité des institutions démocratiques.",
+            "Avec la banalité du mal, elle montre comment l’absence de pensée peut rendre possible l’inacceptable.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Essentielle pour justice, citoyenneté, jugement, responsabilité politique et vérité en démocratie.",
+          ],
+        },
+      ],
+    },
+    levinas: {
+      title: "Levinas — l’éthique avant tout",
+      subtitle: "Visage d’autrui · Responsabilité · Altérité",
+      chips: ["Autrui", "Morale", "Justice"],
+      sections: [
+        {
+          title: "Autrui comme appel",
+          paragraphs: [
+            "Pour Levinas, la rencontre du visage d’autrui n’est pas d’abord un savoir: c’est une exigence éthique.",
+            "Je suis responsable avant même tout contrat explicite.",
+          ],
+        },
+        {
+          title: "Sortir du moi centré sur soi",
+          paragraphs: [
+            "L’éthique rompt avec la logique du même: autrui ne se réduit pas à mes catégories.",
+            "La justice apparaît quand il faut répondre à plusieurs autres dans un monde commun.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très fort pour autrui, devoir, responsabilité et fondement non utilitaire de la morale.",
+          ],
+        },
+      ],
+    },
+    foucault: {
+      title: "Foucault — savoir, pouvoir, subjectivation",
+      subtitle: "Dispositifs · Normes · Pratiques de soi",
+      chips: ["Pouvoir", "Vérité", "Liberté"],
+      sections: [
+        {
+          title: "Le pouvoir n’est pas seulement répressif",
+          paragraphs: [
+            "Foucault montre que le pouvoir circule dans les institutions, les discours et les pratiques ordinaires.",
+            "Il produit des normes, des catégories et des subjectivités.",
+          ],
+        },
+        {
+          title: "Vérité et gouvernement des conduites",
+          paragraphs: [
+            "Les régimes de vérité définissent ce qui est crédible à une époque donnée.",
+            "La liberté se joue aussi dans des pratiques critiques de soi et du présent.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Très utile pour analyser école, prison, médecine, normes sociales et construction des identités.",
+          ],
+        },
+      ],
+    },
+    deleuze: {
+      title: "Deleuze — créer des concepts, penser la différence",
+      subtitle: "Différence · Devenir · Désir",
+      chips: ["Désir", "Différence", "Création"],
+      sections: [
+        {
+          title: "Contre la pensée de l’identique",
+          paragraphs: [
+            "Deleuze valorise la différence comme puissance positive, et non comme simple écart par rapport à un modèle.",
+            "Penser, c’est créer des concepts capables de saisir du nouveau.",
+          ],
+        },
+        {
+          title: "Désir et lignes de fuite",
+          paragraphs: [
+            "Le désir n’est pas manque, mais production de réalités, de connexions et de devenirs.",
+            "Les lignes de fuite ouvrent des possibilités hors des structures trop rigides.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Pertinent pour créativité, normativité, subjectivité et critique des cadres figés.",
+          ],
+        },
+      ],
+    },
+    derrida: {
+      title: "Derrida — lire les tensions du sens",
+      subtitle: "Déconstruction · Différance · Écriture",
+      chips: ["Langage", "Vérité", "Différence"],
+      sections: [
+        {
+          title: "Déconstruire sans détruire",
+          paragraphs: [
+            "Derrida analyse les oppositions qui organisent les textes (présence/absence, parole/écriture...).",
+            "Déconstruire, c’est montrer leurs hiérarchies implicites et leurs zones d’instabilité.",
+          ],
+        },
+        {
+          title: "Le sens n’est jamais clos",
+          paragraphs: [
+            "La différance indique que le sens se forme par écarts et renvois, sans présence totale immédiate.",
+            "Cela invite à une lecture rigoureuse, attentive aux marges, aux silences et aux ambiguïtés.",
+          ],
+        },
+        {
+          title: "Usage dissertation",
+          paragraphs: [
+            "Utile pour le langage, l’interprétation, la vérité textuelle et la critique des oppositions simplistes.",
+          ],
+        },
+      ],
+    },
+  };
+
+  const id = String(a.id || "").toLowerCase();
+  return (byId[id] ? { ...built, ...byId[id] } : built);
+}
+
+function AuthorThoughtModal({ open, onClose, auteur, portraitUrl, silhouetteSvgDataUri }) {
+  if (!open || !auteur) return null;
+  const content = getAuthorThoughtContent(auteur);
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 130, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
+      <div style={{ position: "absolute", inset: 0, ...glass(0.6) }} />
+      <div
+        style={{
+          position: "relative",
+          width: "min(94vw, 860px)",
+          height: "min(82vh, 100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
+          ...glass(0.78),
+          borderRadius: "22px",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: 0,
+          border: "1px solid rgba(255,255,255,0.14)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ padding: "16px 18px", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.08)", flexShrink: 0 }}>
+              <img
+                src={portraitUrl || silhouetteSvgDataUri}
+                alt={auteur.nom}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                onError={(e) => { try { e.currentTarget.src = silhouetteSvgDataUri; } catch (err) {} }}
+              />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 600, color: colors.cream, lineHeight: 1.05, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {content.title}
+              </div>
+              <div style={{ fontSize: 12, color: "rgba(253,246,227,0.55)", marginTop: 3, fontFamily: "'DM Sans', system-ui, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {content.subtitle}
+              </div>
+            </div>
+          </div>
+          <button type="button" aria-label="Fermer" onClick={onClose} style={{ background: "none", border: "none", color: colors.cream, fontSize: "28px", cursor: "pointer", padding: 0, width: 32, height: 32, lineHeight: 1, flexShrink: 0 }}>×</button>
+        </div>
+
+        <div style={{ padding: "14px 18px 0", display: "flex", flexWrap: "wrap", gap: 8, flexShrink: 0 }}>
+          {(content.chips || []).map((c) => (
+            <span key={c} style={{ padding: "6px 10px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.08)", color: "rgba(253,246,227,0.8)", fontSize: 12, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+              {c}
+            </span>
+          ))}
+        </div>
+
+        <div style={{ padding: "14px 18px 18px", overflowY: "auto", flex: 1, minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+          {(content.sections || []).map((sec, idx) => (
+            <div key={idx} style={{ marginBottom: 16 }}>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 18, fontWeight: 600, color: "#f88282", letterSpacing: "0.2px", marginBottom: 6 }}>
+                {sec.title}
+              </div>
+              {(sec.paragraphs || []).map((p, j) => (
+                <p key={j} style={{ margin: "0 0 10px 0", fontSize: 14, lineHeight: 1.7, color: "rgba(253,246,227,0.9)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                  {p}
+                </p>
+              ))}
+            </div>
+          ))}
+          <div style={{ height: 10 }} />
+        </div>
+
+        <div style={{ padding: "14px 18px", borderTop: "1px solid rgba(255,255,255,0.1)", flexShrink: 0, display: "flex", justifyContent: "flex-end" }}>
+          <button type="button" onClick={onClose} style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.08)", color: colors.cream, cursor: "pointer", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AuteursModal({ open, onClose, onDialogue }) {
   if (!open) return null;
   const [filter, setFilter] = React.useState("tous");
@@ -1569,6 +2369,8 @@ function AuteursModal({ open, onClose, onDialogue }) {
 
   const [portraitUrls, setPortraitUrls] = React.useState({});
   const portraitCacheRef = React.useRef({});
+  const [thoughtOpen, setThoughtOpen] = React.useState(false);
+  const [thoughtAuteur, setThoughtAuteur] = React.useState(null);
   const silhouetteSvgDataUri = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
       <defs>
@@ -1728,7 +2530,27 @@ function AuteursModal({ open, onClose, onDialogue }) {
                 }}>
                   {auteur.bio}
                 </div>
-                {/* Thèmes supprimés pour libérer de la place et éviter de couper le texte. */}
+                <div style={{ marginTop: 12, paddingBottom: 14 }}>
+                  <button
+                    type="button"
+                    onClick={() => { setThoughtAuteur(auteur); setThoughtOpen(true); }}
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: 14,
+                      border: "none",
+                      background: "linear-gradient(135deg, #f0a030, #e07018)",
+                      color: "white",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      fontFamily: "'DM Sans', system-ui, sans-serif",
+                      boxShadow: "0 10px 26px rgba(240,160,48,0.28)",
+                    }}
+                  >
+                    Découvrir sa pensée
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -1738,6 +2560,13 @@ function AuteursModal({ open, onClose, onDialogue }) {
           <button type="button" onClick={onDialogue} style={{ width: "100%", padding: "14px", borderRadius: "14px", border: "none", background: "linear-gradient(135deg, #f88282, #f06464)", color: "white", fontSize: "16px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>⚡ Confronter deux philosophes</button>
         </div>
       </div>
+      <AuthorThoughtModal
+        open={thoughtOpen}
+        onClose={() => { setThoughtOpen(false); setThoughtAuteur(null); }}
+        auteur={thoughtAuteur}
+        portraitUrl={thoughtAuteur ? (portraitUrls[thoughtAuteur.id] || null) : null}
+        silhouetteSvgDataUri={silhouetteSvgDataUri}
+      />
     </div>
   );
 }
