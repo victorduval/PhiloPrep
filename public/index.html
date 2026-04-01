@@ -813,6 +813,7 @@ function SvgIcon({ name, size = 17, color = "rgba(26,45,94,0.6)" }) {
     edit: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
     checkCircle: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
     search: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    stats: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="11" width="3" height="7" rx="1"/><rect x="11" y="7" width="3" height="11" rx="1"/><rect x="16" y="4" width="3" height="14" rx="1"/></svg>,
     home: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
     menu: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
     user: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
@@ -868,8 +869,8 @@ function buildSocrateKnowledgeBundle() {
       name: n.name,
       ficheKey: n.fiche || null,
       hint: n.fiche
-        ? "Réviser → Les 17 notions → " + n.name + " → « Voir le cours »"
-        : "Réviser → Les 17 notions → " + n.name + " (bientôt)",
+        ? "Réviser → Cours → " + n.name + " → « Voir le cours »"
+        : "Réviser → Cours → " + n.name + " (bientôt)",
     })),
   };
 }
@@ -956,6 +957,7 @@ function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMess
   const scrollRef = React.useRef(null);
   const lastAutoNonceRef = React.useRef(0);
   const lastPrefilledNonceRef = React.useRef(0);
+  const skipTypingOnceRef = React.useRef(false);
   const typingTimerRef = React.useRef(null);
   const fullAssistantTextRef = React.useRef("");
   const audioCtxRef = React.useRef(null);
@@ -978,6 +980,7 @@ function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMess
     setIsTyping(false);
     lastAutoNonceRef.current = 0;
     lastPrefilledNonceRef.current = 0;
+    skipTypingOnceRef.current = false;
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem(SOCRATE_LS_KEY);
@@ -994,6 +997,7 @@ function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMess
     lastPrefilledNonceRef.current = n;
     const txt = String(prefilledAssistantMessage || "").trim();
     if (!txt) return;
+    skipTypingOnceRef.current = true;
     setLoading(false);
     setInput("");
     setMessages([{ role: "assistant", content: txt, id: Date.now() }]);
@@ -1053,6 +1057,13 @@ function SocrateChatPanel({ open, onClose, onRunAction, autoMessage, autoApiMess
     const last = messages[messages.length - 1];
     if (!last || last.role !== "assistant") return;
     const full = String(last.content || "");
+    if (skipTypingOnceRef.current) {
+      skipTypingOnceRef.current = false;
+      fullAssistantTextRef.current = full;
+      setDisplayedAssistantText(full);
+      setIsTyping(false);
+      return;
+    }
     fullAssistantTextRef.current = full;
     setDisplayedAssistantText("");
     setIsTyping(true);
@@ -3434,7 +3445,7 @@ function ReviserTabbedScreen({ onBack, onSelectNotion, onAuteurs, onCitations, o
                 </div>
                 <div style={{ flex: 1, textAlign: "center" }}>
                   <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "17px", fontWeight: 400, color: "#C4B5FD", fontStyle: "italic", letterSpacing: "0.3px" }}>Révision express</div>
-                  <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: "10px", color: "rgba(196,181,253,0.78)", marginTop: "2px" }}>Panorama des 17 notions</div>
+                  <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: "10px", color: "rgba(196,181,253,0.78)", marginTop: "2px" }}>Panorama des cours</div>
                 </div>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(168,130,240,0.5)" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6" /></svg>
               </div>
@@ -3474,7 +3485,7 @@ function ReviserTabbedScreen({ onBack, onSelectNotion, onAuteurs, onCitations, o
                   <SvgIcon name="bookOpen" size={18} color="#78b4f0" />
                 </div>
                 <div style={{ flex: 1, textAlign: "center" }}>
-                  <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "17px", fontWeight: 400, color: "#93C5FD", fontStyle: "italic", letterSpacing: "0.3px" }}>Les 17 notions</div>
+                  <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "17px", fontWeight: 400, color: "#93C5FD", fontStyle: "italic", letterSpacing: "0.3px" }}>Cours</div>
                   <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: "10px", color: "rgba(147,197,253,0.78)", marginTop: "2px" }}>Chaque notion détaillée</div>
                 </div>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(120,180,240,0.5)" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6" /></svg>
@@ -4357,7 +4368,7 @@ function ProfileDashboardScreen({ onBackHome, displayName, xpTotal }) {
         {tab === "stats" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <div style={{ color: T().cream, fontWeight: 600 }}>Les 17 notions</div>
+              <div style={{ color: T().cream, fontWeight: 600 }}>Cours</div>
               <select value={statsSort} onChange={(e) => setStatsSort(e.target.value)} style={{ background: "rgba(255,255,255,0.08)", color: "#fff", borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", padding: "4px 8px" }}>
                 <option value="alpha">A-Z</option><option value="pct_desc">% décroissant</option><option value="pct_asc">% croissant</option><option value="last">Dernière activité</option>
               </select>
@@ -4885,6 +4896,8 @@ function App() {
   const [socrateAutoNonce, setSocrateAutoNonce] = useState(0);
   const [socratePrefilledAssistantMessage, setSocratePrefilledAssistantMessage] = useState("");
   const [socratePrefilledAssistantNonce, setSocratePrefilledAssistantNonce] = useState(0);
+  const [socrateCitationLoading, setSocrateCitationLoading] = useState(false);
+  const socrateCitationCacheRef = React.useRef({});
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [identityDisplayName, setIdentityDisplayName] = useState(() => readNetlifyIdentityProfile().displayName);
   const [identityEmail, setIdentityEmail] = useState(() => readNetlifyIdentityProfile().email);
@@ -5563,12 +5576,41 @@ function App() {
     const quote = c && c.text ? c.text : "";
     const author = c && c.author ? c.author : "";
     const work = c && c.work ? c.work : "";
+    const cacheKey = [quote, author, work].join("||").toLowerCase();
     const payload =
       `Explique cette citation en 2 à 3 lignes MAXIMUM, très simplement (niveau Terminale).\\n` +
       `Sois direct, sans plan ni liste, sans développement long.\\n\\n` +
       `Citation : « ${quote} »\\n` +
       (author ? `Auteur : ${author}${work ? ` (${work})` : ""}` : "");
+    setSocrateCitationLoading(true);
     try {
+      // Fast path: in-memory cache.
+      if (socrateCitationCacheRef.current[cacheKey]) {
+        setSocrateAutoMessage("");
+        setSocrateAutoApiMessage("");
+        setSocrateAutoNonce(0);
+        setSocratePrefilledAssistantMessage(String(socrateCitationCacheRef.current[cacheKey]));
+        setSocratePrefilledAssistantNonce(Date.now());
+        setSocrateOpen(true);
+        return;
+      }
+      // Persistent cache (7 days).
+      try {
+        const raw = localStorage.getItem("philoprep_socrate_citation_cache");
+        const bag = raw ? (JSON.parse(raw) || {}) : {};
+        const hit = bag && bag[cacheKey];
+        if (hit && hit.text && hit.ts && (Date.now() - Number(hit.ts) < 7 * 24 * 60 * 60 * 1000)) {
+          const txt = String(hit.text);
+          socrateCitationCacheRef.current[cacheKey] = txt;
+          setSocrateAutoMessage("");
+          setSocrateAutoApiMessage("");
+          setSocrateAutoNonce(0);
+          setSocratePrefilledAssistantMessage(txt);
+          setSocratePrefilledAssistantNonce(Date.now());
+          setSocrateOpen(true);
+          return;
+        }
+      } catch (e) {}
       const res = await fetch("/.netlify/functions/socrate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -5592,6 +5634,13 @@ function App() {
           .join("\n");
       }
       if (!String(reply || "").trim()) reply = "Je n'ai pas réussi à formuler l'explication pour l'instant.";
+      socrateCitationCacheRef.current[cacheKey] = reply;
+      try {
+        const raw = localStorage.getItem("philoprep_socrate_citation_cache");
+        const bag = raw ? (JSON.parse(raw) || {}) : {};
+        bag[cacheKey] = { text: reply, ts: Date.now() };
+        localStorage.setItem("philoprep_socrate_citation_cache", JSON.stringify(bag));
+      } catch (e) {}
       setSocrateAutoMessage("");
       setSocrateAutoApiMessage("");
       setSocrateAutoNonce(0);
@@ -5609,6 +5658,8 @@ function App() {
       setSocrateAutoApiMessage(payload);
       setSocrateAutoNonce(Date.now());
       setSocrateOpen(true);
+    } finally {
+      setSocrateCitationLoading(false);
     }
   }, []);
   const handleSocrateUserMessage = React.useCallback(() => {
@@ -5869,6 +5920,7 @@ function App() {
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
             <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes ficheSlideUp { from { opacity: 0; transform: translateY(40px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes ficheBackdropIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes softGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.15); } }
@@ -6068,15 +6120,17 @@ function App() {
                         <div style={{ fontSize: "9px", color: T().creamSoft, lineHeight: 1.25 }}>XP total</div>
                       </div>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "2px", width: "100%" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px", width: "100%", maxWidth: 220, margin: "0 auto" }}>
                       <button onClick={() => { setProfileMenuOpen(false); goHome(); }} style={{
                         background: "none", border: "none", padding: "12px 8px",
                         display: "flex", alignItems: "center", gap: "10px",
-                        justifyContent: "center",
+                        justifyContent: "flex-start",
                         cursor: "pointer", width: "100%",
                         borderBottom: "0.5px solid rgba(255,255,255,0.06)",
                       }}>
-                        <SvgIcon name="home" size={14} color="rgba(253,246,227,0.5)" />
+                        <span style={{ width: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <SvgIcon name="home" size={14} color="rgba(253,246,227,0.5)" />
+                        </span>
                         <span style={{ fontSize: "13px", color: "rgba(253,246,227,0.7)" }}>Accueil</span>
                       </button>
                       {[
@@ -6087,27 +6141,69 @@ function App() {
                         <button key={item.label} onClick={() => { setProfileMenuOpen(false); if (item.screen) navigate(item.screen, "right"); }} style={{
                           background: "none", border: "none", padding: "12px 8px",
                           display: "flex", alignItems: "center", gap: "10px",
-                          justifyContent: "center",
+                          justifyContent: "flex-start",
                           cursor: "pointer", width: "100%",
                           borderBottom: "0.5px solid rgba(255,255,255,0.06)",
                         }}>
-                          <SvgIcon name={item.icon} size={14} color="rgba(253,246,227,0.5)" />
+                          <span style={{ width: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <SvgIcon name={item.icon} size={14} color="rgba(253,246,227,0.5)" />
+                          </span>
                           <span style={{ fontSize: "13px", color: "rgba(253,246,227,0.7)" }}>{item.label}</span>
                         </button>
                       ))}
                       <button onClick={() => { setProfileMenuOpen(false); if (window.netlifyIdentity) netlifyIdentity.logout(); }} style={{
                         background: "none", border: "none", padding: "12px 8px",
                         display: "flex", alignItems: "center", gap: "10px",
-                        justifyContent: "center",
+                        justifyContent: "flex-start",
                         cursor: "pointer", width: "100%", marginTop: "8px",
                       }}>
-                        <SvgIcon name="logout" size={14} color="rgba(200,100,100,0.5)" />
+                        <span style={{ width: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <SvgIcon name="logout" size={14} color="rgba(200,100,100,0.5)" />
+                        </span>
                         <span style={{ fontSize: "13px", color: "rgba(200,100,100,0.6)" }}>Déconnexion</span>
                       </button>
                     </div>
                   </div>
                 </div>
               </>
+            )}
+            {socrateCitationLoading && (
+              <div style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 12500,
+                background: "rgba(6,10,24,0.52)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backdropFilter: "blur(4px)",
+                WebkitBackdropFilter: "blur(4px)",
+              }}>
+                <div style={{
+                  ...glass(0.7),
+                  borderRadius: 16,
+                  padding: "14px 16px",
+                  minWidth: 220,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  color: T().cream,
+                  border: "1px solid rgba(255,255,255,0.16)",
+                }}>
+                  <span style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    border: "2px solid rgba(255,255,255,0.25)",
+                    borderTopColor: "#f0a030",
+                    animation: "spin 0.9s linear infinite",
+                    flexShrink: 0,
+                  }} />
+                  <div style={{ fontSize: 13, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                    Socrate réfléchit à la citation...
+                  </div>
+                </div>
+              </div>
             )}
             {xpToast && (
               <div style={{
