@@ -4,14 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Citations expliquées — PhiloPrep</title>
-<style>#hub-home{min-height:100vh;box-sizing:border-box;background:linear-gradient(165deg,#0b1224 0%,#152036 45%,#1a2a48 100%);color:#e2e8f0;font-family:'DM Sans',system-ui,-apple-system,sans-serif;padding:clamp(1rem,4vw,1.75rem);padding-top:calc(1rem + env(safe-area-inset-top,0px))}
-#hub-home h1{font-family:Georgia,'Times New Roman',serif;font-weight:500;font-size:clamp(1.35rem,4.2vw,1.75rem);letter-spacing:.02em;color:#f8fafc;text-align:center;margin:0 0 .35rem;text-shadow:0 2px 24px rgba(15,23,42,.45)}
-#hub-home .hub-sub{text-align:center;font-size:.85rem;color:rgba(226,232,240,.72);margin:0 0 1.75rem;line-height:1.45}
-.hub-actions{display:flex;flex-direction:column;gap:14px;max-width:420px;margin:0 auto}
-.hub-actions button{appearance:none;border:none;border-radius:16px;padding:16px 20px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;box-shadow:0 10px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12);text-align:center}
-.hub-actions button:active{transform:translateY(2px) scale(.99)}
-#btn-fiche{background:linear-gradient(135deg,rgba(120,180,240,.35),rgba(80,140,220,.42));color:#e0f2fe;border:1px solid rgba(147,197,253,.45)}
-#btn-game{background:linear-gradient(135deg,rgba(168,130,240,.38),rgba(120,100,200,.45));color:#f5f3ff;border:1px solid rgba(196,181,253,.5)}
+<style>#hub-home{min-height:100vh;box-sizing:border-box;background:linear-gradient(165deg,#0a1e3d 0%,#122e55 15%,#1a4270 30%,#225a8a 50%,#2e72a4 70%,#4a90be 85%,#6aadda 100%);color:#fff;font-family:'DM Sans',system-ui,-apple-system,sans-serif;padding:clamp(1rem,4vw,1.75rem);padding-top:calc(1rem + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:center}
+.hub-center{width:min(540px,100%);background:rgba(8,24,52,.34);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.2);border-radius:24px;box-shadow:0 18px 44px rgba(3,10,30,.32),inset 0 1px 0 rgba(255,255,255,.12);padding:clamp(1.1rem,3.5vw,1.8rem)}
+#hub-home h1{font-family:'Palatino','Book Antiqua','Georgia','Times New Roman',serif;font-weight:500;font-size:clamp(1.45rem,4.5vw,1.95rem);letter-spacing:.02em;color:#fff;text-align:center;margin:0 0 .45rem;text-shadow:0 2px 22px rgba(6,16,40,.45)}
+#hub-home .hub-sub{text-align:center;font-size:.92rem;color:rgba(255,255,255,.9);margin:0 0 1.55rem;line-height:1.5}
+.hub-actions{display:flex;flex-direction:column;gap:14px;max-width:430px;margin:0 auto}
+.hub-actions button{appearance:none;border:none;border-radius:16px;padding:16px 20px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;box-shadow:0 12px 28px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.22);text-align:center;font-family:'Palatino','Book Antiqua','Georgia',serif;letter-spacing:.01em}
+.hub-actions button:hover{transform:translateY(-1px);filter:brightness(1.03)}
+.hub-actions button:active{transform:translateY(1px) scale(.995)}
+#btn-fiche{background:linear-gradient(135deg,rgba(189,223,255,.92),rgba(137,187,239,.9));color:#0f2f57;border:1px solid rgba(255,255,255,.55)}
+#btn-game{background:linear-gradient(135deg,rgba(229,214,255,.92),rgba(178,157,232,.9));color:#2e1f56;border:1px solid rgba(255,255,255,.5)}
 .hub-frame-host{display:none;position:fixed;inset:0;z-index:100;background:#0f172a;flex-direction:column}
 .hub-frame-host.active{display:flex}
 .hub-frame-host iframe{flex:1;width:100%;border:0;background:#faf8f4}
@@ -20,11 +22,13 @@
 </head>
 <body>
 <div id="hub-home">
+<div class="hub-center">
 <h1>Citations expliquées</h1>
 <p class="hub-sub">Choisis une ressource : fiches commentées ou entraînement par cœur.</p>
 <div class="hub-actions">
 <button type="button" id="btn-fiche">Fiche citations</button>
 <button type="button" id="btn-game">Apprendre les citations</button>
+</div>
 </div>
 </div>
 <div id="hub-fiche-host" class="hub-frame-host" aria-hidden="true">
