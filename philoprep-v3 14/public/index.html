@@ -3664,10 +3664,6 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
     setTab(t);
     if (onTabChange) onTabChange(t);
   }, [initialTab]);
-  const tabs = [
-    { id: "parcours-guide", label: "Parcours guidé" },
-    { id: "jeux", label: "Jeux" },
-  ];
   const jeuxItems = [
     { name: "PhiloSophia", svgIcon: "compass", onClick: onPhilosophia },
     { name: "PhiloQuest", svgIcon: "target", onClick: onPhiloquest },
@@ -3958,19 +3954,6 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
         }
         onBack={onBack}
       />
-      {initialTab !== "exercices" && <div style={{ display: "flex", gap: "6px", padding: "0 16px 10px", flexShrink: 0 }}>
-        {tabs.map((t) => (
-          <button key={t.id} onClick={() => changeTab(t.id)} style={{
-            padding: "6px 14px", borderRadius: "20px", border: "none", cursor: "pointer",
-            background: tab === t.id ? "rgba(120,180,240,0.15)" : "transparent",
-            color: tab === t.id ? "#78b4f0" : "rgba(255,255,255,0.4)",
-            fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: "13px",
-            fontWeight: tab === t.id ? 600 : 400,
-            border: tab === t.id ? "0.5px solid rgba(120,180,240,0.35)" : "0.5px solid transparent",
-            transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-          }}>{t.label}</button>
-        ))}
-      </div>}
       <div style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
         {tab === "jeux" && (
           <div style={{ flex: 1, minHeight: 0, overflow: "auto", WebkitOverflowScrolling: "touch" }}>
