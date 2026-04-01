@@ -4,33 +4,241 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Citations expliquées — PhiloPrep</title>
-<style>#hub-home{min-height:100vh;box-sizing:border-box;background:linear-gradient(165deg,#0a1e3d 0%,#122e55 15%,#1a4270 30%,#225a8a 50%,#2e72a4 70%,#4a90be 85%,#6aadda 100%);color:#fff;font-family:'DM Sans',system-ui,-apple-system,sans-serif;padding:clamp(1rem,4vw,1.75rem);padding-top:calc(1rem + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:center}
-.hub-center{width:min(540px,100%);background:rgba(8,24,52,.34);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.2);border-radius:24px;box-shadow:0 18px 44px rgba(3,10,30,.32),inset 0 1px 0 rgba(255,255,255,.12);padding:clamp(1.1rem,3.5vw,1.8rem)}
-#hub-home h1{font-family:'Palatino','Book Antiqua','Georgia','Times New Roman',serif;font-weight:500;font-size:clamp(1.45rem,4.5vw,1.95rem);letter-spacing:.02em;color:#fff;text-align:center;margin:0 0 .45rem;text-shadow:0 2px 22px rgba(6,16,40,.45)}
-#hub-home .hub-sub{text-align:center;font-size:.92rem;color:rgba(255,255,255,.9);margin:0 0 1.55rem;line-height:1.5}
-.hub-actions{display:flex;flex-direction:column;gap:14px;max-width:430px;margin:0 auto}
-.hub-actions button{appearance:none;border:none;border-radius:16px;padding:16px 20px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;box-shadow:0 12px 28px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.22);text-align:center;font-family:'Palatino','Book Antiqua','Georgia',serif;letter-spacing:.01em}
-.hub-actions button:hover{transform:translateY(-1px);filter:brightness(1.03)}
-.hub-actions button:active{transform:translateY(1px) scale(.995)}
-#btn-fiche{background:linear-gradient(135deg,rgba(189,223,255,.92),rgba(137,187,239,.9));color:#0f2f57;border:1px solid rgba(255,255,255,.55)}
-#btn-game{background:linear-gradient(135deg,rgba(229,214,255,.92),rgba(178,157,232,.9));color:#2e1f56;border:1px solid rgba(255,255,255,.5)}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { font-family: 'DM Sans', system-ui, -apple-system, sans-serif; }
+
+#hub-home {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a3a52 0%, #2c5f7f 50%, #4a8ba8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(28px, env(safe-area-inset-top, 0px)) 28px max(28px, env(safe-area-inset-bottom, 0px));
+}
+
+.hub-rays {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 0;
+  height: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hub-ray {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(120vw, 520px);
+  height: clamp(56px, 14vw, 100px);
+  margin-left: 0;
+  margin-top: calc(var(--h) / -2);
+  transform-origin: 0 50%;
+  transform: rotate(var(--a)) translateZ(0);
+  background: linear-gradient(90deg, rgba(255, 220, 150, 0.4), rgba(255, 220, 150, 0) 78%);
+  border-radius: 50%;
+  filter: blur(8px);
+  opacity: 0;
+  --h: clamp(56px, 14vw, 100px);
+  animation: rayPulse 4s ease-in-out infinite, rayWave 7s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.18s), calc(var(--i) * 0.22s);
+}
+
+@keyframes rayPulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes rayWave {
+  0%, 100% { transform: rotate(var(--a)) translateX(0) skewY(0deg) scaleY(1); }
+  50% { transform: rotate(calc(var(--a) + 2deg)) translateX(1.5%) skewY(4deg) scaleY(1.08); }
+}
+
+.hub-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hub-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation-name: twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.hub-star.s2 { width: 2px; height: 2px; }
+.hub-star.s3 { width: 3px; height: 3px; }
+.hub-star.s4 { width: 4px; height: 4px; box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.95); }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.hub-xp-badge {
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top, 0px));
+  right: 20px;
+  z-index: 10;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a3a52;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.55), 0 0 24px rgba(255, 237, 78, 0.35);
+  letter-spacing: 0.02em;
+}
+
+.hub-actions-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 35px;
+}
+
+.hub-btn {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 35px;
+  padding: 35px 50px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 23px;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.hub-btn-label {
+  position: relative;
+  z-index: 4;
+  display: inline-block;
+  pointer-events: none;
+}
+
+.hub-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 34px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0.28) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hub-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -110%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.38) 45%, transparent 100%);
+  transition: left 0.55s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hub-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+.hub-btn:hover::after {
+  left: 110%;
+}
+
+.hub-btn:active {
+  transform: translateY(-1px);
+}
+
+#btn-fiche {
+  background: linear-gradient(135deg, rgba(120, 160, 180, 0.4) 0%, rgba(100, 140, 170, 0.35) 50%, rgba(90, 130, 160, 0.4) 100%);
+}
+
+#btn-game {
+  background: linear-gradient(135deg, rgba(140, 200, 200, 0.4) 0%, rgba(120, 180, 190, 0.35) 50%, rgba(100, 170, 180, 0.4) 100%);
+}
+
 .hub-frame-host{display:none;position:fixed;inset:0;z-index:100;background:#0f172a;flex-direction:column}
 .hub-frame-host.active{display:flex}
 .hub-frame-host iframe{flex:1;width:100%;border:0;background:#faf8f4}
 .back-hub{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:rgba(15,23,42,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(148,163,184,.2)}
-.back-hub button{appearance:none;border:1px solid rgba(148,163,184,.35);background:rgba(30,41,59,.65);color:#e2e8f0;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}</style>
+.back-hub button{appearance:none;border:1px solid rgba(148,163,184,.35);background:rgba(30,41,59,.65);color:#e2e8f0;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+</style>
 </head>
 <body>
 <div id="hub-home">
-<div class="hub-center">
-<h1>Citations expliquées</h1>
-<p class="hub-sub">Choisis une ressource : fiches commentées ou entraînement par cœur.</p>
-<div class="hub-actions">
-<button type="button" id="btn-fiche">Fiche citations</button>
-<button type="button" id="btn-game">Apprendre les citations</button>
+<div class="hub-rays" aria-hidden="true">
+<div class="hub-ray" style="--i:0;--a:0deg"></div>
+<div class="hub-ray" style="--i:1;--a:30deg"></div>
+<div class="hub-ray" style="--i:2;--a:60deg"></div>
+<div class="hub-ray" style="--i:3;--a:90deg"></div>
+<div class="hub-ray" style="--i:4;--a:120deg"></div>
+<div class="hub-ray" style="--i:5;--a:150deg"></div>
+<div class="hub-ray" style="--i:6;--a:180deg"></div>
+<div class="hub-ray" style="--i:7;--a:210deg"></div>
+<div class="hub-ray" style="--i:8;--a:240deg"></div>
+<div class="hub-ray" style="--i:9;--a:270deg"></div>
+<div class="hub-ray" style="--i:10;--a:300deg"></div>
+<div class="hub-ray" style="--i:11;--a:330deg"></div>
+</div>
+<div class="hub-stars" id="hub-stars" aria-hidden="true"></div>
+<div class="hub-xp-badge">+2 XP</div>
+<div class="hub-actions-wrap">
+<button type="button" id="btn-fiche" class="hub-btn"><span class="hub-btn-label">Citations expliquées</span></button>
+<button type="button" id="btn-game" class="hub-btn"><span class="hub-btn-label">S'entraîner</span></button>
 </div>
 </div>
-</div>
+<script>
+(function () {
+  var c = document.getElementById('hub-stars');
+  if (!c) return;
+  var sizes = [2, 2, 3, 3, 3, 4];
+  for (var i = 0; i < 35; i++) {
+    var s = document.createElement('span');
+    s.className = 'hub-star s' + sizes[Math.floor(Math.random() * sizes.length)];
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.top = (Math.random() * 100) + '%';
+    s.style.animationDuration = (2 + Math.random() * 3).toFixed(2) + 's';
+    s.style.animationDelay = (Math.random() * 5).toFixed(2) + 's';
+    c.appendChild(s);
+  }
+})();
+</script>
 <div id="hub-fiche-host" class="hub-frame-host" aria-hidden="true">
 <div class="back-hub"><button type="button" onclick="showHubHome()">← Retour</button></div>
 <iframe id="if-fiche" title="Fiche citations"></iframe>
