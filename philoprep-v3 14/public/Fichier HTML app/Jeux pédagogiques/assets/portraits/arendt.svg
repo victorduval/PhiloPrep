@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 1024">
+  <defs>
+    <linearGradient id="g-arendt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#404248"/>
+      <stop offset="1" stop-color="#1e2026"/>
+    </linearGradient>
+    <filter id="noise-arendt">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch" result="n"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.12 0" in="n" result="a"/>
+      <feBlend in="SourceGraphic" in2="a" mode="overlay"/>
+    </filter>
+  </defs>
+  <rect width="768" height="1024" fill="url(#g-arendt)" filter="url(#noise-arendt)"/>
+  <rect x="40" y="40" width="688" height="944" fill="none" stroke="#D4AF37" stroke-opacity="0.35" stroke-width="2" rx="8"/>
+  <text x="384" y="470" text-anchor="middle" fill="#D4AF37" font-size="36" font-family="Georgia,serif" font-weight="bold">Hannah Arendt</text>
+  <text x="384" y="520" text-anchor="middle" fill="#F5F5DC" font-size="20" font-family="Georgia,serif" opacity="0.75">Portrait — remplacer par .jpg</text>
+</svg>

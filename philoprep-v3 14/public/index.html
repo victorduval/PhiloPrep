@@ -4044,7 +4044,7 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
             : tab === "parcours-guide"
               ? "Parcours guidé"
               : tab === "mode-aventure"
-                ? "Mode aventure"
+                ? "L'Odyssée philosophique"
                 : "Jeux pédagogiques"
         }
         onBack={onBack}
@@ -4056,60 +4056,24 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
           </div>
         )}
         {tab === "mode-aventure" && (
-          <div style={{
-            flex: 1,
-            minHeight: 0,
-            overflow: "auto",
-            WebkitOverflowScrolling: "touch",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "32px 20px calc(32px + env(safe-area-inset-bottom, 0px))",
-            background: "linear-gradient(165deg, rgba(10, 30, 61, 0.94) 0%, rgba(18, 46, 85, 0.92) 35%, rgba(34, 90, 138, 0.9) 70%, rgba(46, 114, 164, 0.88) 100%)",
-          }}>
-            <div style={{
-              width: "100%",
-              maxWidth: 360,
-              padding: "28px 22px",
-              borderRadius: "20px",
-              background: "rgba(255, 255, 255, 0.1)",
-              border: "1px solid rgba(255, 255, 255, 0.22)",
-              backdropFilter: "blur(18px)",
-              WebkitBackdropFilter: "blur(18px)",
-              boxShadow: "0 14px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-              textAlign: "center",
-            }}>
-              <div style={{
-                width: 56,
-                height: 56,
-                margin: "0 auto 16px",
-                borderRadius: 16,
-                background: "linear-gradient(135deg, rgba(80, 190, 140, 0.35), rgba(80, 190, 140, 0.15))",
-                border: "1.5px solid rgba(80, 190, 140, 0.45)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
-                <SvgIcon name="compass" size={26} color="#50be8c" />
-              </div>
-              <h2 style={{
-                fontFamily: "'DM Sans', system-ui, sans-serif",
-                fontSize: "20px",
-                fontWeight: 700,
-                color: "#ffffff",
-                margin: "0 0 10px",
-                letterSpacing: "-0.3px",
-              }}>Mode aventure</h2>
-              <p style={{
-                fontFamily: "'DM Sans', system-ui, sans-serif",
-                fontSize: "14px",
-                fontWeight: 400,
-                color: "rgba(255, 255, 255, 0.78)",
-                lineHeight: 1.55,
-                margin: 0,
-              }}>Le parcours aventure complet arrive très bientôt. En attendant, utilise le parcours guidé pour réviser notion par notion.</p>
-            </div>
+          <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", background: "#0a0e27" }}>
+            {/*
+              Odyssée / Mode aventure — iframe avec src (pas srcdoc) pour que assets/portraits, assets/backgrounds, etc.
+              restent résolus par rapport à odyssee_philosophique.html.
+              Chemin relatif depuis index.html (servi à la racine du site) :
+              ./Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html
+            */}
+            <iframe
+              title="L'Odyssée philosophique"
+              src="./Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html"
+              style={{
+                flex: 1,
+                width: "100%",
+                minHeight: 0,
+                border: "none",
+                display: "block",
+              }}
+            />
           </div>
         )}
         {tab === "parcours-guide" && (

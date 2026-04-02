@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Odyssée philosophique — Démo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* =============================================================================
+       Variables & reset — palette peinte / cinéma antique (extensible)
+       ============================================================================= */
+    :root {
+      --gold: #D4AF37;
+      --gold-light: #FFD700;
+      --gold-dark: #B8860B;
+      --bronze: #CD7F32;
+      --marble: #F5F5DC;
+      --night-deep: #0a0e27;
+      --night-medium: #1a1f3a;
+      --night-light: #2a2f4a;
+      --purple: #6B46C1;
+      --purple-light: #9F7AEA;
+      --red-accent: #C53030;
+      --ochre: #CC7722;
+      --terracotta: #D4735E;
+      --font-title: "Cinzel", serif;
+      --font-body: "Crimson Pro", Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: radial-gradient(ellipse 120% 80% at 50% 0%, #1e2448 0%, var(--night-deep) 55%, #05060f 100%);
+      color: var(--marble);
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    /* Arrière-plan : particules dorées (léger, performant) */
+    #particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--gold);
+      opacity: 0.45;
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-12px) translateX(6px); }
+      50% { transform: translateY(4px) translateX(-8px); }
+      75% { transform: translateY(14px) translateX(4px); }
+    }
+
+    #game-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1rem 1rem 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* Header : titre + compétences */
+    header.game-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 14px;
+      background: rgba(26, 31, 58, 0.72);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    }
+    .brand h1 {
+      font-family: var(--font-title);
+      font-size: clamp(1.1rem, 3vw, 1.45rem);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: linear-gradient(120deg, var(--gold-light), var(--gold), var(--bronze));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .brand .tagline {
+      font-size: 0.8rem;
+      opacity: 0.75;
+      margin-top: 0.15rem;
+    }
+
+    .skills-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: flex-end;
+    }
+    .skill-pill {
+      min-width: 100px;
+    }
+    .skill-pill label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.9;
+      margin-bottom: 0.2rem;
+      font-family: var(--font-title);
+    }
+    .skill-bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .skill-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .skill-clarte .skill-bar-fill { background: linear-gradient(90deg, #7c5cbf, var(--purple-light)); }
+    .skill-justification .skill-bar-fill { background: linear-gradient(90deg, var(--gold-dark), var(--gold-light)); }
+    .skill-examen .skill-bar-fill { background: linear-gradient(90deg, #a83232, #ff6b6b); }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn-ghost, .btn-gold {
+      font-family: var(--font-title);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--marble);
+      transition: background 0.25s, border-color 0.25s, transform 0.15s;
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--gold-dark); }
+    .btn-gold {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(184, 134, 11, 0.15));
+      border-color: var(--gold-dark);
+      color: var(--gold-light);
+    }
+    .btn-gold:hover { transform: translateY(-1px); }
+
+    /* Zone principale + carnet */
+    .main-row {
+      display: grid;
+      grid-template-columns: 1fr minmax(260px, 300px);
+      gap: 1rem;
+      flex: 1;
+      align-items: stretch;
+    }
+    @media (max-width: 960px) {
+      .main-row { grid-template-columns: 1fr; }
+      #notebook { order: 2; max-height: 280px; }
+    }
+
+    #game-screen {
+      min-height: 420px;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      background: rgba(10, 14, 39, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Panneau carnet */
+    #notebook {
+      border-radius: 14px;
+      padding: 1rem;
+      background: rgba(26, 31, 58, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      display: flex;
+      flex-direction: column;
+      max-height: min(70vh, 640px);
+    }
+    #notebook h2 {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      padding-bottom: 0.5rem;
+    }
+    #notebook-list {
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      padding-right: 0.25rem;
+    }
+    .notebook-entry {
+      padding: 0.55rem 0.65rem;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.92rem;
+    }
+    .notebook-entry strong { color: var(--gold-light); font-weight: 600; }
+    .notebook-entry p { margin-top: 0.35rem; opacity: 0.88; font-size: 0.85rem; }
+    .notebook-empty {
+      opacity: 0.55;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    /* Scène dialogue */
+    .dialogue-scene {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(200px, 32%) 1fr;
+      grid-template-rows: 1fr auto;
+      animation: fadeIn 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @media (max-width: 720px) {
+      .dialogue-scene {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Calque décor : image plein écran + léger voile lisibilité + vignette bords */
+    .scene-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.75;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .scene-bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+      opacity: 0.92;
+      filter: blur(0) saturate(1.12) brightness(1.02);
+      transform: none;
+      transition: opacity 0.8s ease, filter 0.8s ease;
+    }
+    .scene-bg-gradient {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(
+        100deg,
+        rgba(10, 14, 39, 0.42) 0%,
+        rgba(10, 14, 39, 0.12) 40%,
+        rgba(10, 14, 39, 0.35) 100%
+      );
+    }
+    .scene-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 95% 90% at 50% 45%,
+        transparent 0%,
+        transparent 38%,
+        rgba(10, 14, 39, 0.35) 72%,
+        rgba(10, 14, 39, 0.72) 100%
+      );
+    }
+
+    .character-portrait {
+      position: relative;
+      z-index: 2;
+      grid-column: 1;
+      grid-row: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 1.25rem 1rem 1.5rem;
+      gap: 0.5rem;
+    }
+    @media (max-width: 720px) {
+      .character-portrait { grid-row: 1; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+    }
+    .portrait-frame {
+      width: min(220px, 85vw);
+      aspect-ratio: 3/4;
+      border-radius: 14px;
+      padding: 5px;
+      border: 2px solid rgba(212, 175, 55, 0.65);
+      background: linear-gradient(145deg, var(--gold-dark), var(--bronze), var(--night-medium));
+      box-shadow: 0 22px 58px rgba(0, 0, 0, 0.78);
+      position: relative;
+      z-index: 2;
+    }
+    .portrait-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block;
+      filter: contrast(1.1) saturate(1.15) brightness(1.02);
+      background: #222;
+    }
+    .character-name {
+      font-family: var(--font-title);
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+    }
+    .character-title {
+      font-size: 0.82rem;
+      opacity: 0.85;
+      text-align: center;
+      max-width: 260px;
+    }
+
+    .dialogue-box {
+      position: relative;
+      z-index: 2;
+      grid-column: 2;
+      grid-row: 1 / -1;
+      margin: 1rem 1rem 1rem 0;
+      padding: 1rem 1.1rem 1.1rem;
+      align-self: end;
+      min-height: 0;
+      max-height: calc(100% - 2rem);
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    @media (max-width: 720px) {
+      .dialogue-box { grid-column: 1; grid-row: 2; margin: 0 0.75rem 0.75rem; max-height: calc(100% - 1.5rem); }
+    }
+    .dialogue-text {
+      max-height: none;
+      overflow-y: visible;
+      background: transparent;
+      backdrop-filter: none;
+      box-shadow: none;
+      padding: 36px 30px 30px;
+      border-left: 4px solid var(--purple-light);
+      font-size: 1.2em;
+      line-height: 1.9;
+      margin-bottom: 25px;
+    }
+    .dialogue-text p,
+    .dialogue-text .dialogue-line {
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+    }
+    .dialogue-line {
+      margin-bottom: 0.65rem;
+      opacity: 0;
+      animation: lineReveal 0.5s ease forwards;
+    }
+    .dialogue-line:nth-child(1) { animation-delay: 0.05s; }
+    .dialogue-line:nth-child(2) { animation-delay: 0.15s; }
+    .dialogue-line:nth-child(3) { animation-delay: 0.25s; }
+    .dialogue-line:nth-child(4) { animation-delay: 0.35s; }
+    .dialogue-line:nth-child(5) { animation-delay: 0.45s; }
+    .dialogue-line:nth-child(n+6) { animation-delay: 0.55s; }
+    @keyframes lineReveal {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dialogue-line.speaker-narration {
+      font-style: italic;
+      color: #c4b8a8;
+      border-left: 3px solid var(--bronze);
+      padding-left: 0.75rem;
+    }
+    .dialogue-line .speaker-tag {
+      font-family: var(--font-title);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.25rem;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .choice-btn {
+      position: relative;
+      overflow: hidden;
+      text-align: left;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 2px solid rgba(107, 70, 193, 0.85);
+      background: linear-gradient(
+        135deg,
+        rgba(107, 70, 193, 0.88),
+        rgba(74, 50, 120, 0.82)
+      );
+      color: var(--marble);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s, filter 0.2s;
+    }
+    .choice-btn:hover {
+      border-color: var(--gold-light);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+      transform: translateX(4px);
+      filter: brightness(1.05);
+    }
+    .choice-btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+      transition: left 0.55s ease;
+    }
+    .choice-btn:hover::before { left: 100%; }
+
+    .wrong-attempt-panel {
+      margin-top: 1.25rem;
+      padding: 1.35rem 1.5rem 1.5rem;
+      border-radius: 14px;
+      border: 1px solid rgba(159, 122, 234, 0.5);
+      background: rgba(10, 14, 39, 0.72);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+      animation: fadeIn 0.35s ease;
+    }
+    .wrong-attempt-title {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 0.85rem;
+    }
+    .wrong-attempt-body {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--marble);
+      margin-bottom: 1.25rem;
+    }
+    .wrong-attempt-body p + p {
+      margin-top: 0.75rem;
+    }
+    .btn-retry-wrong {
+      font-family: var(--font-title);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      padding: 0.75rem 1.5rem;
+      margin-top: 0;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: #1a1020;
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+    }
+    .btn-retry-wrong:hover { filter: brightness(1.08); }
+
+    .btn-continue {
+      font-family: var(--font-title);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      padding: 0.75rem 1.25rem;
+      margin-top: 0.25rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: #1a1020;
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
+    }
+    .btn-continue:hover { filter: brightness(1.08); }
+
+    /* Transition & ending */
+    .panel-center {
+      position: relative;
+      z-index: 2;
+      max-width: 640px;
+      margin: 2rem auto;
+      padding: 2rem;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    .panel-center h2 {
+      font-family: var(--font-title);
+      color: var(--gold);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .panel-center p, .panel-center li { text-align: left; }
+    .panel-center .subtitle { opacity: 0.85; margin-bottom: 1.25rem; }
+    .panel-center ul { margin: 0.75rem 0 0 1.25rem; }
+    .unlocked-notions, .demo-info {
+      text-align: left;
+      margin-top: 1.25rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .panel-center code {
+      font-size: 0.85em;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    /* Mini-jeu tri */
+    .minigame-wrap {
+      position: relative;
+      z-index: 2;
+      padding: 1rem;
+      height: 100%;
+      overflow-y: auto;
+      animation: fadeIn 0.6s ease;
+    }
+    .minigame-wrap h2 {
+      font-family: var(--font-title);
+      color: var(--gold);
+      font-size: 1.15rem;
+      margin-bottom: 0.35rem;
+    }
+    .minigame-instruction {
+      opacity: 0.88;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    .sorting-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 720px) {
+      .sorting-grid { grid-template-columns: 1fr; }
+    }
+    .drop-zone {
+      min-height: 140px;
+      padding: 0.5rem;
+      border-radius: 12px;
+      border: 2px dashed rgba(212, 175, 55, 0.35);
+      background: rgba(0, 0, 0, 0.2);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .drop-zone.drag-over {
+      border-color: var(--gold-light);
+      background: rgba(107, 70, 193, 0.12);
+    }
+    .drop-zone h3 {
+      font-family: var(--font-title);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.2rem;
+    }
+    .drop-zone .hint { font-size: 0.75rem; opacity: 0.65; margin-bottom: 0.5rem; }
+
+    .card-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 1rem;
+    }
+    .sort-card {
+      cursor: grab;
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      background: linear-gradient(145deg, rgba(42, 47, 74, 0.95), rgba(26, 31, 58, 0.9));
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      font-size: 0.85rem;
+      max-width: 100%;
+      touch-action: none;
+    }
+    .sort-card:active { cursor: grabbing; }
+    .sort-card.placed { opacity: 0.95; }
+
+    .minigame-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Séquence narrative (ex. allégorie de la caverne) */
+    .narrative-sequence {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 1.25rem 1rem 2rem;
+      min-height: 100%;
+      animation: fadeIn 0.65s ease;
+    }
+    .narrative-title {
+      font-family: var(--font-title);
+      font-size: clamp(1.25rem, 4vw, 2rem);
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1rem;
+    }
+    .narrative-image-container {
+      max-width: min(1100px, 100%);
+      margin: 0 auto 1.25rem;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+    }
+    .narrative-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      vertical-align: middle;
+    }
+    .narrative-text {
+      max-width: 42rem;
+      margin: 0 auto 1rem;
+      font-size: 1.12rem;
+      line-height: 1.65;
+      color: var(--marble);
+      padding: 1rem 1.15rem;
+      background: rgba(0, 0, 0, 0.38);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .narrative-progress {
+      margin-top: 0.75rem;
+      color: var(--gold);
+      font-family: var(--font-title);
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .narrative-actions {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Config modal & loading */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(5, 8, 20, 0.82);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeIn 0.4s ease;
+    }
+    .modal glass-panel, .glass-panel {
+      background: rgba(26, 31, 58, 0.92);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      border-radius: 16px;
+      padding: 1.75rem;
+      max-width: 480px;
+      width: 100%;
+    }
+    .modal h2 {
+      font-family: var(--font-title);
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+    }
+    .modal p { margin-bottom: 0.75rem; font-size: 0.95rem; }
+    .modal input[type="text"], .modal input[type="password"] {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--marble);
+      font-family: var(--font-body);
+      margin-bottom: 0.75rem;
+    }
+    .modal .info { font-size: 0.82rem; opacity: 0.75; margin-top: 0.5rem; }
+    .modal .info a { color: var(--purple-light); }
+    .error-msg {
+      color: #ff8a8a;
+      font-size: 0.88rem;
+      margin-bottom: 0.5rem;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    .loading-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      background: rgba(10, 14, 39, 0.94);
+    }
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(212, 175, 55, 0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-message {
+      font-family: var(--font-title);
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+      color: var(--gold-light);
+    }
+    .loading-bar {
+      width: min(320px, 90%);
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .loading-progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+      transition: width 0.35s ease;
+    }
+
+    /* Toast notification */
+    #toast {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      z-index: 200;
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      background: rgba(26, 31, 58, 0.95);
+      border: 1px solid var(--gold-dark);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      font-size: 0.9rem;
+      max-width: 90vw;
+      opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
+      pointer-events: none;
+    }
+    #toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div id="particles" aria-hidden="true"></div>
+  <div id="toast" role="status"></div>
+
+  <div id="game-container">
+    <header class="game-header">
+      <div class="brand">
+        <h1>L'Odyssée philosophique</h1>
+        <p class="tagline">Visual novel — Terminale · Philosophie</p>
+      </div>
+      <div class="skills-bar" id="skills-bar">
+        <div class="skill-pill skill-clarte" data-skill="clarte">
+          <label><span aria-hidden="true">🔍</span> Clarté</label>
+          <div class="skill-bar-track"><div class="skill-bar-fill" id="skill-fill-clarte"></div></div>
+        </div>
+        <div class="skill-pill skill-justification" data-skill="justification">
+          <label><span aria-hidden="true">⚖️</span> Justification</label>
+          <div class="skill-bar-track"><div class="skill-bar-fill" id="skill-fill-justification"></div></div>
+        </div>
+        <div class="skill-pill skill-examen" data-skill="examen">
+          <label><span aria-hidden="true">🎯</span> Examen</label>
+          <div class="skill-bar-track"><div class="skill-bar-fill" id="skill-fill-examen"></div></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn-ghost" id="btn-save" title="Sauvegarder">Sauver</button>
+        <button type="button" class="btn-ghost" id="btn-load" title="Charger">Charger</button>
+        <button type="button" class="btn-ghost" id="btn-new" title="Nouvelle partie">Nouvelle partie</button>
+      </div>
+    </header>
+
+    <div class="main-row">
+      <div id="game-screen"></div>
+      <aside id="notebook" aria-label="Carnet philosophique">
+        <h2>Carnet</h2>
+        <div id="notebook-list"></div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * =============================================================================
+     * L'ODYSSÉE PHILOSOPHIQUE — moteur monofichier (HTML + CSS + JS)
+     *
+     * IMAGES LOCALES : placez les .jpg générés (Midjourney, etc.) dans assets/…
+     * Les .svg du dossier servent de placeholders si le .jpg est absent.
+     * Liste des prompts : voir IMAGES_A_GENERER.md à la racine du projet.
+     *
+     * Extension : gameData.philosophers / scenes + IMAGE_PATHS pour les médias.
+     * =============================================================================
+     */
+
+    const STORAGE_KEYS = { save: "odyssee_save" };
+
+    /** Cibles .jpg — les placeholders .svg portent le même nom de base. */
+    const IMAGE_PATHS = {
+      portraits: {
+        socrate: "assets/portraits/socrate.jpg",
+        platon: "assets/portraits/platon.jpg",
+        aristote: "assets/portraits/aristote.jpg",
+        epicure: "assets/portraits/epicure.jpg",
+        epictete: "assets/portraits/epictete.jpg",
+        marc_aurele: "assets/portraits/marc_aurele.jpg",
+        augustin: "assets/portraits/augustin.jpg",
+        thomas_aquin: "assets/portraits/thomas_aquin.jpg",
+        descartes: "assets/portraits/descartes.jpg",
+        spinoza: "assets/portraits/spinoza.jpg",
+        leibniz: "assets/portraits/leibniz.jpg",
+        hobbes: "assets/portraits/hobbes.jpg",
+        rousseau: "assets/portraits/rousseau.jpg",
+        kant: "assets/portraits/kant.jpg",
+        hegel: "assets/portraits/hegel.jpg",
+        marx: "assets/portraits/marx.jpg",
+        nietzsche: "assets/portraits/nietzsche.jpg",
+        freud: "assets/portraits/freud.jpg",
+        bergson: "assets/portraits/bergson.jpg",
+        sartre: "assets/portraits/sartre.jpg",
+        beauvoir: "assets/portraits/beauvoir.jpg",
+        arendt: "assets/portraits/arendt.jpg",
+        foucault: "assets/portraits/foucault.jpg"
+      },
+      backgrounds: {
+        athens_agora: "assets/backgrounds/athens_agora_sunset.jpg",
+        plato_academy: "assets/backgrounds/plato_academy.jpg",
+        aristotle_lyceum: "assets/backgrounds/aristotle_lyceum.jpg",
+        epicurus_garden: "assets/backgrounds/epicurus_garden.jpg",
+        roman_forum: "assets/backgrounds/roman_forum.jpg",
+        gothic_cathedral: "assets/backgrounds/gothic_cathedral.jpg",
+        monastery_library: "assets/backgrounds/monastery_library.jpg",
+        study_17th: "assets/backgrounds/17th_study.jpg",
+        enlightenment_salon: "assets/backgrounds/enlightenment_salon.jpg",
+        industrial_factory: "assets/backgrounds/industrial_factory.jpg",
+        modern_library: "assets/backgrounds/modern_library.jpg",
+        paris_cafe: "assets/backgrounds/paris_cafe.jpg"
+      },
+      scenes: {
+        caverne_prisoners: "assets/scenes/caverne/01_prisoners_chained.jpg",
+        caverne_freed: "assets/scenes/caverne/02_freed_prisoner.jpg",
+        caverne_exit: "assets/scenes/caverne/03_cave_exit.jpg",
+        caverne_outside: "assets/scenes/caverne/04_outside_world.jpg",
+        gyges_ring: "assets/scenes/gyges/01_shepherd_finds_ring.jpg",
+        gyges_invisible: "assets/scenes/gyges/02_invisibility.jpg",
+        gyges_dilemma: "assets/scenes/gyges/03_moral_dilemma.jpg",
+        epicure_garden: "assets/scenes/epicure/peaceful_garden.jpg",
+        epicure_desires: "assets/scenes/epicure/desires_classification.jpg",
+        socrate_dialogue: "assets/scenes/socrate/dialogue_agora.jpg",
+        socrate_revelation: "assets/scenes/socrate/revelation.jpg",
+        descartes_study: "assets/scenes/descartes/dark_study.jpg",
+        descartes_illusions: "assets/scenes/descartes/sensory_illusions.jpg",
+        descartes_cogito: "assets/scenes/descartes/cogito.jpg",
+        kant_dilemma: "assets/scenes/kant/moral_dilemma.jpg",
+        kant_law: "assets/scenes/kant/universal_law.jpg",
+        nietzsche_values: "assets/scenes/nietzsche/values_reversed.jpg",
+        nietzsche_ubermensch: "assets/scenes/nietzsche/ubermensch.jpg"
+      }
+    };
+
+    /** Scène dialogue : gameData.background → clé IMAGE_PATHS.backgrounds */
+    const BACKGROUND_KEY_ALIASES = {
+      athens_agora: "athens_agora",
+      academy: "plato_academy"
+    };
+
+    /** Midjourney / assets déjà présents : on charge le .jpg directement ; sinon placeholder .svg */
+    const REAL_JPG_ASSETS = new Set([
+      "assets/portraits/socrate.jpg",
+      "assets/portraits/platon.jpg",
+      "assets/portraits/aristote.jpg",
+      "assets/backgrounds/athens_agora_sunset.jpg",
+      "assets/backgrounds/plato_academy.jpg",
+      "assets/backgrounds/aristotle_lyceum.jpg",
+      "assets/scenes/caverne/01_prisoners_chained.jpg",
+      "assets/scenes/caverne/02_freed_prisoner.jpg",
+      "assets/scenes/caverne/03_cave_exit.jpg",
+      "assets/scenes/caverne/04_outside_world.jpg"
+    ]);
+
+    function svgFallbackForPath(jpgPath) {
+      return jpgPath.replace(/\.jpe?g$/i, ".svg");
+    }
+
+    function resolveFromJpgTarget(jpgPath) {
+      if (!jpgPath) return "";
+      if (REAL_JPG_ASSETS.has(jpgPath)) return jpgPath;
+      return svgFallbackForPath(jpgPath);
+    }
+
+    function getImagePath(type, key) {
+      const p = IMAGE_PATHS[type] && IMAGE_PATHS[type][key];
+      return p ? resolveFromJpgTarget(p) : "";
+    }
+
+    function escapeAttrSingle(v) {
+      return String(v).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+
+    /**
+     * Résout les chemins assets/... par rapport au dossier du fichier HTML (pas la racine du site).
+     * Indispensable si l’URL est du type http://localhost:8000/odyssee_philosophique/odyssee_philosophique.html
+     */
+    function assetUrl(relPath) {
+      if (!relPath) return "";
+      try {
+        return new URL(relPath, new URL(".", window.location.href).href).href;
+      } catch (e) {
+        return relPath;
+      }
+    }
+
+    /** Dégradé de secours si pas d'image ou clé inconnue (hors ligne, etc.) */
+    const BACKGROUNDS = {
+      athens_agora: "linear-gradient(160deg, #3d2c1a 0%, #8b5a2b 25%, #c9783c 45%, #2a2450 85%, #0e1028 100%)",
+      academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)",
+      plato_academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)"
+    };
+
+    const skillsMeta = {
+      clarte: { name: "Clarté", icon: "🔍", color: "#9F7AEA" },
+      justification: { name: "Justification", icon: "⚖️", color: "#D4AF37" },
+      examen: { name: "Examen", icon: "🎯", color: "#E63946" }
+    };
+
+    /**
+     * Données de jeu modulaires — ajouter ici philosophes, scènes, notions.
+     * Conventions :
+     *  - scenes[].type : "dialogue" | "minigame" | "transition" | "narrative_sequence" | "ending"
+     *  - dialogue : dialogues[] (speaker + text HTML léger), choices ou action/nextScene
+     *    — Sur choices[] : une seule entrée avec correct: true pour continuer ; toute autre option doit avoir correct: false + wrongExplanation.
+     *  - minigame : référence par id de scène ; items définis dans la scène ou dans miniGames (ici inline scène)
+     */
+    const gameData = {
+      philosophers: {
+        socrate: {
+          name: "Socrate",
+          title: "Le père de la philosophie (470-399 av. J.-C.)",
+          notions: ["verite", "langage", "raison", "justice"],
+          color: "#E8B892"
+        },
+        platon: {
+          name: "Platon",
+          title: "Élève de Socrate (428-348 av. J.-C.)",
+          notions: ["verite", "raison", "justice", "langage", "temps"],
+          color: "#9F7AEA"
+        }
+      },
+
+      scenes: [
+        {
+          id: "intro_1",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "narration", text: "Athènes, 399 av. J.-C. L'agora grouille de vie. Des marchands vantent leurs marchandises, des citoyens débattent avec passion. Soudain, un vieil homme au regard perçant vous interpelle..." },
+            { speaker: "socrate", text: "Ah ! Voilà quelqu'un de nouveau sur notre place publique. Dis-moi, jeune être, crois-tu <em>savoir</em> ce qu'est la vérité ? La justice ? Le bien ?" },
+            { speaker: "socrate", text: "Je vois dans ton regard que tu penses peut-être que oui... mais laisse-moi te poser une question : <strong>comment distingues-tu celui qui sait vraiment de celui qui fait seulement semblant de savoir ?</strong>" },
+            { speaker: "socrate", text: "Vois-tu ces orateurs là-bas ? Ils parlent avec assurance, séduisent les foules par leurs beaux discours. Mais leurs paroles cherchent-elles la vérité... ou simplement à plaire ?" }
+          ],
+          choices: [
+            {
+              text: "\"Celui qui sait peut prouver ce qu'il dit par des raisons.\"",
+              correct: true,
+              feedback: "Bien ! Tu touches quelque chose d'important : la différence entre persuader et convaincre. Allons plus loin…",
+              skillGain: { clarte: 10, justification: 5, examen: 12 },
+              nextScene: "intro_2"
+            },
+            {
+              text: "\"Celui qui parle le mieux est celui qui sait.\"",
+              correct: false,
+              wrongExplanation: "<p>C'est exactement l'idée que vendent les <strong>sophistes</strong> : confondre <em>l'art de convaincre</em> et <em>la possession du vrai</em>. En démocratie, celui qui parle le mieux remporte l'adhésion — pas forcément la vérité. Socrate t'invite à un autre critère.</p>"
+            },
+            {
+              text: "\"Je ne sais pas vraiment... c'est difficile à dire.\"",
+              correct: false,
+              wrongExplanation: "<p>Il n'y a pas de honte à hésiter, mais ici Socrate te demande d'<strong>essayer un critère</strong>, même simple : qu'est-ce qui, selon toi, aide à reconnaître un vrai savoir ? Réfléchis notamment à ce qui lie <em>affirmation</em>, <em>raisons</em> et <em>vérité</em>, plutôt que de t'arrêter tout de suite sur « je ne sais pas ».</p>"
+            }
+          ]
+        },
+        {
+          id: "intro_2",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Excellent début ! Maintenant, écoute-moi bien..." },
+            { speaker: "socrate", text: "Ces hommes que tu vois, ces <strong>sophistes</strong>, vendent leur art de parler contre de l'argent. Ils enseignent à transformer le discours faible en discours fort, le faux en vrai <em>en apparence</em>." },
+            { speaker: "socrate", text: "Moi, je ne demande rien en échange. Je ne prétends rien enseigner. <strong>Je questionne.</strong> Car la vraie philosophie commence par reconnaître qu'on ne sait pas." },
+            { speaker: "socrate", text: "Voici ma méthode : je vais te proposer une petite épreuve. Des affirmations vont apparaître. À toi de les classer selon leur nature : sont-elles de simples <em>opinions</em> ? Des <em>arguments</em> rationnels ? Ou des <em>sophismes</em> trompeurs ?" }
+          ],
+          action: "continue",
+          nextScene: "minigame_tri_1"
+        },
+        {
+          id: "minigame_tri_1",
+          type: "minigame",
+          gameType: "sorting",
+          title: "🎭 L'Épreuve de Socrate",
+          instruction: "Glisse chaque affirmation dans la bonne catégorie. Les sophistes mélangent tout pour tromper. À toi de démêler le vrai du faux !",
+          items: [
+            { id: 1, text: "Tout le monde dit que cette loi est juste, donc elle l'est.", correct: "opinion" },
+            { id: 2, text: "Si tous les hommes sont mortels et que Socrate est un homme, alors Socrate est mortel.", correct: "argument" },
+            { id: 3, text: "Le plus fort a toujours raison car personne ne peut le contredire.", correct: "sophisme" },
+            { id: 4, text: "Il fait chaud aujourd'hui à Athènes.", correct: "opinion" },
+            { id: 5, text: "Tu ne peux pas critiquer cette théorie si tu n'en proposes pas une meilleure.", correct: "sophisme" },
+            { id: 6, text: "Agir justement rend l'âme harmonieuse, donc la justice est préférable à l'injustice.", correct: "argument" }
+          ],
+          categories: [
+            { id: "opinion", label: "Opinion", description: "Croyance sans examen" },
+            { id: "argument", label: "Argument", description: "Raisonnement valide" },
+            { id: "sophisme", label: "Sophisme", description: "Faux raisonnement" }
+          ],
+          successThreshold: 1,
+          rewards: {
+            perfect: { clarte: 25, examen: 20, justification: 15 },
+            good: { clarte: 15, examen: 10 },
+            partial: { examen: 5 }
+          },
+          nextScene: "intro_3"
+        },
+        {
+          id: "intro_3",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Remarquable ! Tu commences à voir clair dans le brouillard des discours." },
+            { speaker: "socrate", text: "Retiens ceci : une <strong>opinion</strong> est ce que l'on croit sans l'avoir examiné. Un <strong>argument</strong> lie des raisons à une conclusion de manière logique. Un <strong>sophisme</strong> fait semblant d'être un argument mais repose sur une erreur ou une manipulation." },
+            { speaker: "socrate", text: "Ces distinctions sont essentielles. Car la philosophie, vois-tu, c'est l'art d'examiner nos croyances pour distinguer le <em>vrai</em> du <em>faux</em>, le <em>savoir</em> de l'<em>ignorance</em>, la <em>persuasion</em> de la <em>conviction</em>." },
+            { speaker: "socrate", text: "Mais je ne suis qu'un vieux bonhomme qui pose des questions. Pour comprendre vraiment ce qu'est la vérité, tu dois rencontrer mon meilleur élève..." }
+          ],
+          action: "continue",
+          nextScene: "transition_platon",
+          unlocksNotions: ["verite", "langage", "raison"]
+        },
+        {
+          id: "transition_platon",
+          type: "transition",
+          title: "Un nouvel enseignement",
+          content: "Socrate vous guide à travers les ruelles d'Athènes jusqu'à un jardin paisible. Là, sous les oliviers, un homme d'une quarantaine d'années médite, entouré de jeunes disciples. Son regard intense semble percer les apparences...",
+          nextScene: "platon_1"
+        },
+        {
+          id: "platon_1",
+          type: "dialogue",
+          philosopher: "platon",
+          background: "plato_academy",
+          dialogues: [
+            { speaker: "narration", text: "L'homme se lève et s'approche de vous avec grâce." },
+            { speaker: "platon", text: "Socrate m'a parlé de toi. Je suis <strong>Platon</strong>, et je poursuis son œuvre." },
+            { speaker: "platon", text: "Mon maître t'a appris à questionner. Moi, je vais t'apprendre à <em>voir</em>. Car la plupart des hommes ne voient que des ombres — ils prennent l'apparence pour la réalité." },
+            { speaker: "platon", text: "Laisse-moi te raconter une histoire : <em>L'Allégorie de la Caverne</em>. Elle te révélera ce qu'est vraiment la <strong>vérité</strong>, et pourquoi il est si difficile de la saisir…" }
+          ],
+          action: "continue",
+          nextScene: "caverne_intro"
+        },
+        {
+          id: "caverne_intro",
+          type: "narrative_sequence",
+          title: "L'Allégorie de la Caverne",
+          images: [
+            {
+              path: "assets/scenes/caverne/01_prisoners_chained.jpg",
+              text: "Imagine des hommes enchaînés depuis l'enfance au fond d'une caverne, ne voyant que les ombres projetées sur le mur devant eux…",
+              duration: 6000
+            },
+            {
+              path: "assets/scenes/caverne/02_freed_prisoner.jpg",
+              text: "Si l'un d'eux était libéré et forcé de se retourner vers le feu, la lumière lui ferait mal aux yeux. Il résisterait, voudrait retourner aux ombres familières…",
+              duration: 6000
+            },
+            {
+              path: "assets/scenes/caverne/03_cave_exit.jpg",
+              text: "Puis, si on le traînait de force vers la sortie, la lumière du jour serait d'abord insupportable, aveuglante…",
+              duration: 6000
+            },
+            {
+              path: "assets/scenes/caverne/04_outside_world.jpg",
+              text: "Mais peu à peu, ses yeux s'habitueraient. Il verrait enfin la réalité : le monde éclairé par le soleil, source de toute vérité.",
+              duration: 6000
+            }
+          ],
+          nextScene: "caverne_reflection"
+        },
+        {
+          id: "caverne_reflection",
+          type: "dialogue",
+          philosopher: "platon",
+          background: "plato_academy",
+          dialogues: [
+            { speaker: "platon", text: "Comprends-tu maintenant ? La plupart des hommes vivent dans la caverne, prisonniers des apparences." },
+            { speaker: "platon", text: "Le philosophe est celui qui s'est libéré, qui a vu la vérité. Mais s'il retourne dans la caverne pour libérer les autres, sera-t-il cru ?" },
+            { speaker: "platon", text: "Non ! On le prendra pour un fou. On le rejettera, peut-être même le tuera-t-on. Voilà le prix de la vérité." }
+          ],
+          action: "continue",
+          nextScene: "demo_end",
+          unlocksNotions: ["verite"]
+        },
+        {
+          id: "demo_end",
+          type: "ending",
+          title: "Fin de la démonstration",
+          content: `
+            <h2>🎓 Chapitre 1 : Platon</h2>
+            <p class="subtitle">La quête de la vérité commence...</p>
+            <div class="unlocked-notions">
+              <h3>Notions débloquées :</h3>
+              <ul>
+                <li><strong>Vérité</strong> — Distinction entre apparence et réalité</li>
+                <li><strong>Langage</strong> — Persuader vs convaincre</li>
+                <li><strong>Raison</strong> — Examiner, questionner, argumenter</li>
+              </ul>
+            </div>
+            <div class="demo-info">
+              <h3>🎮 Cette démo est terminée</h3>
+              <p>La suite du jeu explorera :</p>
+              <ul>
+                <li>Le mythe de l'anneau de Gygès (dilemme moral)</li>
+                <li>Aristote et la quête du bonheur</li>
+                <li>Épicure et les Stoïciens</li>
+                <li>Et 15+ autres philosophes jusqu'aux penseurs contemporains</li>
+              </ul>
+              <p class="extend-info">Pour étendre le jeu, modifiez la section <code>gameData</code> dans le code source.</p>
+            </div>
+          `
+        }
+      ],
+
+      notions: {
+        verite: {
+          name: "Vérité",
+          description: "Distinction entre apparence et réalité, opinion et savoir véritable.",
+          relatedPhilosophers: ["socrate", "platon", "descartes", "nietzsche"],
+          examples: ["L'allégorie de la caverne (Platon)", "Le doute méthodique (Descartes)", "La généalogie de la morale (Nietzsche)"]
+        },
+        langage: {
+          name: "Langage",
+          description: "Différence entre persuader (séduire) et convaincre (démontrer par la raison).",
+          relatedPhilosophers: ["socrate", "platon", "aristote"],
+          examples: ["Les sophistes vs Socrate", "La rhétorique (Aristote)"]
+        },
+        raison: {
+          name: "Raison",
+          description: "Capacité à examiner, questionner et argumenter de manière logique.",
+          relatedPhilosophers: ["socrate", "platon", "descartes", "kant"],
+          examples: ["La maïeutique socratique", "Le Cogito (Descartes)", "Les impératifs catégoriques (Kant)"]
+        },
+        justice: { name: "Justice", description: "À documenter dans une extension du jeu.", relatedPhilosophers: ["socrate", "platon"], examples: ["Le Gorgias", "La République"] },
+        temps: { name: "Temps", description: "À documenter.", relatedPhilosophers: ["platon", "augustin"], examples: ["Le Timée"] }
+      }
+    };
+
+    // --- État runtime (complété par load ou défaut) ---
+    const defaultState = () => ({
+      version: "1.0",
+      currentScene: "intro_1",
+      skills: { clarte: 15, justification: 15, examen: 15 },
+      notebookNotionKeys: [],
+      unlockedPhilosophers: ["socrate", "platon"],
+      settings: {}
+    });
+
+    let gameState = defaultState();
+
+    // --- Moteurs de mini-jeux extensibles ---
+    // Règle : ne jamais appeler goToScene tant que l'épreuve n'est pas réussie (ex. sorting : ratio >= successThreshold, défaut 1).
+    const miniGameEngines = {
+      sorting: {
+        state: null,
+        render(scene) {
+          const items = [...scene.items].sort(() => Math.random() - 0.5);
+          const cats = scene.categories;
+          this.state = { scene, placements: {} };
+          const gameScreen = document.getElementById("game-screen");
+          gameScreen.innerHTML = `
+            <div class="minigame-wrap">
+              <h2>${scene.title}</h2>
+              <p class="minigame-instruction">${scene.instruction}</p>
+              <div class="card-bank" id="sort-bank" aria-label="Affirmations à classer"></div>
+              <div class="sorting-grid" id="sort-zones"></div>
+              <div class="minigame-actions">
+                <button type="button" class="btn-continue" id="btn-validate-sort">Valider</button>
+              </div>
+            </div>`;
+          const bank = document.getElementById("sort-bank");
+          const zonesEl = document.getElementById("sort-zones");
+          cats.forEach((c) => {
+            zonesEl.innerHTML += `
+              <div class="drop-zone" data-category="${c.id}" aria-dropeffect="move">
+                <h3>${c.label}</h3>
+                <p class="hint">${c.description}</p>
+                <div class="zone-cards" data-zone="${c.id}"></div>
+              </div>`;
+          });
+          items.forEach((it) => {
+            const el = document.createElement("div");
+            el.className = "sort-card";
+            el.draggable = true;
+            el.dataset.itemId = String(it.id);
+            el.textContent = it.text;
+            el.addEventListener("dragstart", onSortDragStart);
+            bank.appendChild(el);
+          });
+          zonesEl.querySelectorAll(".drop-zone").forEach((z) => {
+            z.addEventListener("dragover", onSortDragOver);
+            z.addEventListener("dragleave", onSortDragLeave);
+            z.addEventListener("drop", onSortDrop);
+          });
+          document.getElementById("btn-validate-sort").addEventListener("click", () => this.validate());
+        },
+        validate() {
+          const { scene, placements } = this.state;
+          let correct = 0;
+          const n = scene.items.length;
+          scene.items.forEach((it) => {
+            if (placements[it.id] === it.correct) correct++;
+          });
+          const ratio = correct / n;
+          const th = scene.successThreshold ?? 1;
+
+          if (ratio < th) {
+            const wrap = document.querySelector(".minigame-wrap");
+            const body =
+              th >= 1
+                ? `<p>Tu as <strong>${correct} sur ${n}</strong> affirmations bien placées. Pour cette épreuve, il faut un classement <em>parfait</em> : chaque carte doit être dans la colonne qui correspond vraiment à sa nature (opinion, argument ou sophisme).</p><p>Repère les cartes qui « sonnent » comme un raisonnement valide mais cachent une ruse, ou celles qui ne sont qu'une croyance non examinée. Tu peux déplacer les cartes puis valider à nouveau.</p>`
+                : `<p>Résultat : <strong>${correct} / ${n}</strong>. Il te faut un meilleur score pour continuer. Ajuste les cartes dans les colonnes, puis valide de nouveau.</p>`;
+            if (wrap) {
+              showWrongAttemptPanel(wrap, {
+                title: "Classement à corriger",
+                bodyHtml: body
+              });
+            }
+            return;
+          }
+
+          let tier = ratio >= 1 ? "perfect" : "good";
+          const rewards = scene.rewards[tier] || {};
+          Object.keys(rewards).forEach((k) => updateSkill(k, rewards[k]));
+          showToast(
+            tier === "perfect"
+              ? `Bravo ! ${correct}/${n} — performance parfaite.`
+              : `Très bien ! ${correct}/${n} — tu peux poursuivre.`
+          );
+          gameState.currentScene = scene.nextScene;
+          saveGame();
+          setTimeout(() => renderScene(gameState.currentScene), 1600);
+        }
+      }
+    };
+
+    let draggedCard = null;
+
+    function onSortDragStart(e) {
+      draggedCard = e.target;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", e.target.dataset.itemId);
+    }
+    function onSortDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add("drag-over");
+    }
+    function onSortDragLeave(e) {
+      e.currentTarget.classList.remove("drag-over");
+    }
+    function onSortDrop(e) {
+      e.preventDefault();
+      const zone = e.currentTarget;
+      zone.classList.remove("drag-over");
+      const cat = zone.dataset.category;
+      const inner = zone.querySelector(".zone-cards");
+      if (!draggedCard || !inner) return;
+      const id = parseInt(draggedCard.dataset.itemId, 10);
+      const engine = miniGameEngines.sorting;
+      if (engine.state) engine.state.placements[id] = cat;
+      inner.appendChild(draggedCard);
+      draggedCard.classList.add("placed");
+    }
+
+    // --- Progression & carnet ---
+    function updateSkill(skillName, delta) {
+      if (!gameState.skills[skillName]) gameState.skills[skillName] = 0;
+      gameState.skills[skillName] = Math.min(100, gameState.skills[skillName] + (delta || 0));
+      refreshSkillBars();
+    }
+
+    function refreshSkillBars() {
+      ["clarte", "justification", "examen"].forEach((s) => {
+        const el = document.getElementById("skill-fill-" + s);
+        if (el) el.style.width = gameState.skills[s] + "%";
+      });
+    }
+
+    function addNotionsToNotebook(keys) {
+      if (!keys || !keys.length) return;
+      keys.forEach((k) => {
+        if (!gameData.notions[k]) return;
+        if (gameState.notebookNotionKeys.includes(k)) return;
+        gameState.notebookNotionKeys.push(k);
+        showToast("Notion débloquée : " + gameData.notions[k].name);
+      });
+      renderNotebook();
+    }
+
+    function renderNotebook() {
+      const list = document.getElementById("notebook-list");
+      if (!gameState.notebookNotionKeys.length) {
+        list.innerHTML = "<p class=\"notebook-empty\">Aucune notion encore. Progressez dans l'histoire pour remplir ce carnet.</p>";
+        return;
+      }
+      list.innerHTML = gameState.notebookNotionKeys.map((key) => {
+        const n = gameData.notions[key];
+        if (!n) return "";
+        const ex = (n.examples || []).slice(0, 2).map((e) => `<li>${e}</li>`).join("");
+        return `<div class="notebook-entry">
+          <strong>${n.name}</strong>
+          <p>${n.description}</p>
+          ${ex ? "<ul style='margin:0.4rem 0 0 1rem;font-size:0.82rem;opacity:0.9'>" + ex + "</ul>" : ""}
+        </div>`;
+      }).join("");
+    }
+
+    function saveGame() {
+      const payload = {
+        version: "1.0",
+        timestamp: Date.now(),
+        currentScene: gameState.currentScene,
+        skills: { ...gameState.skills },
+        notebookNotionKeys: [...gameState.notebookNotionKeys],
+        unlockedPhilosophers: [...gameState.unlockedPhilosophers],
+        settings: { ...gameState.settings }
+      };
+      try {
+        localStorage.setItem(STORAGE_KEYS.save, JSON.stringify(payload));
+        showToast("Partie sauvegardée.");
+      } catch (e) {
+        showToast("Impossible de sauvegarder (stockage plein ?).");
+      }
+    }
+
+    function loadGame() {
+      const raw = localStorage.getItem(STORAGE_KEYS.save);
+      if (!raw) {
+        showToast("Aucune sauvegarde trouvée.");
+        return false;
+      }
+      try {
+        const data = JSON.parse(raw);
+        gameState.currentScene = data.currentScene || "intro_1";
+        gameState.skills = { ...defaultState().skills, ...data.skills };
+        gameState.notebookNotionKeys = data.notebookNotionKeys || [];
+        gameState.unlockedPhilosophers = data.unlockedPhilosophers || defaultState().unlockedPhilosophers;
+        gameState.settings = data.settings || {};
+        refreshSkillBars();
+        renderNotebook();
+        renderScene(gameState.currentScene);
+        showToast("Partie chargée.");
+        return true;
+      } catch (e) {
+        showToast("Sauvegarde corrompue.");
+        return false;
+      }
+    }
+
+    function showToast(msg, durationMs) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("visible");
+      clearTimeout(showToast._h);
+      showToast._h = setTimeout(() => t.classList.remove("visible"), durationMs ?? 3200);
+    }
+
+    /**
+     * Panneau d'échec lisible + bouton « Réessayer » (retire le panneau ; ne change pas la scène).
+     */
+    function showWrongAttemptPanel(container, opts) {
+      if (!container) return;
+      const title = opts.title || "Pas tout à fait";
+      const bodyHtml = opts.bodyHtml || "<p>Réessaie avec une autre réponse.</p>";
+      const retryLabel = opts.retryLabel || "Réessayer";
+      container.querySelectorAll(".wrong-attempt-panel").forEach((el) => el.remove());
+      const panel = document.createElement("div");
+      panel.className = "wrong-attempt-panel";
+      panel.setAttribute("role", "alert");
+      panel.innerHTML =
+        `<h4 class="wrong-attempt-title">${title}</h4>` +
+        `<div class="wrong-attempt-body">${bodyHtml}</div>` +
+        `<button type="button" class="btn-retry-wrong">${retryLabel}</button>`;
+      panel.querySelector(".btn-retry-wrong").addEventListener("click", () => panel.remove());
+      container.appendChild(panel);
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function getSceneById(id) {
+      return gameData.scenes.find((s) => s.id === id);
+    }
+
+    function getBackgroundStyle(key) {
+      const k = BACKGROUND_KEY_ALIASES[key] || key;
+      return BACKGROUNDS[key] || BACKGROUNDS[k] || "linear-gradient(180deg, #1a1f3a, #0a0e27)";
+    }
+
+    /**
+     * Arrière-plan dialogue : image locale (jpg → repli svg) + voile lisible,
+     * ou uniquement le dégradé CSS si aucun fichier n'est défini pour cette clé.
+     */
+    function buildSceneBackgroundHtml(sceneBackgroundKey) {
+      const mapKey = BACKGROUND_KEY_ALIASES[sceneBackgroundKey] || sceneBackgroundKey;
+      const jpgTarget = IMAGE_PATHS.backgrounds[mapKey];
+      const grad = getBackgroundStyle(sceneBackgroundKey);
+      if (!jpgTarget) {
+        return `<div class="scene-bg-gradient" style="background:${grad}"></div>`;
+      }
+      const src = resolveFromJpgTarget(jpgTarget);
+      const svg = svgFallbackForPath(jpgTarget);
+      const isJpg = /\.jpe?g$/i.test(src);
+      const url = assetUrl(src);
+      const svgUrl = assetUrl(svg);
+      const oe = isJpg ? ` onerror="this.onerror=null;this.src='${escapeAttrSingle(svgUrl)}'"` : "";
+      return `<img class="scene-bg-img" src="${url}" alt="" decoding="async"${oe} /><div class="scene-bg-gradient"></div>`;
+    }
+
+    /** Portrait : voir getImagePath('portraits', clé) — .jpg réels ou .svg placeholder. */
+    function buildPortraitImgHtml(philosopherKey, altText) {
+      const jpgTarget = IMAGE_PATHS.portraits[philosopherKey];
+      if (!jpgTarget) {
+        const svg = "data:image/svg+xml," + encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="533"><rect fill="#2a2f4a" width="100%" height="100%"/><text x="50%" y="50%" fill="#D4AF37" font-family="serif" font-size="18" text-anchor="middle">Portrait</text></svg>`
+        );
+        return `<img class="portrait-img" src="${svg}" alt="${altText || ""}" loading="lazy" width="220" height="294" />`;
+      }
+      const src = resolveFromJpgTarget(jpgTarget);
+      const svg = svgFallbackForPath(jpgTarget);
+      const isJpg = /\.jpe?g$/i.test(src);
+      const url = assetUrl(src);
+      const svgUrl = assetUrl(svg);
+      const oe = isJpg ? ` onerror="this.onerror=null;this.src='${escapeAttrSingle(svgUrl)}'"` : "";
+      return `<img class="portrait-img" src="${url}" alt="${altText || ""}" loading="lazy" width="220" height="294"${oe} />`;
+    }
+
+    let narrativeSequenceTimer = null;
+    function clearNarrativeSequenceTimer() {
+      if (narrativeSequenceTimer) {
+        clearTimeout(narrativeSequenceTimer);
+        narrativeSequenceTimer = null;
+      }
+    }
+
+    function renderNarrativeSequence(scene) {
+      clearNarrativeSequenceTimer();
+      const screen = document.getElementById("game-screen");
+      const slides = scene.images || [];
+      let index = 0;
+
+      function finishSequence() {
+        clearNarrativeSequenceTimer();
+        goToScene(scene.nextScene);
+      }
+
+      function showSlide() {
+        if (index >= slides.length) {
+          finishSequence();
+          return;
+        }
+        const step = slides[index];
+        const relSrc = resolveFromJpgTarget(step.path);
+        const svg = svgFallbackForPath(step.path);
+        const isJpg = /\.jpe?g$/i.test(relSrc);
+        const imgUrl = assetUrl(relSrc);
+        const svgUrl = assetUrl(svg);
+        const oe = isJpg ? ` onerror="this.onerror=null;this.src='${escapeAttrSingle(svgUrl)}'"` : "";
+
+        screen.innerHTML = `
+          <div class="narrative-sequence fade-in">
+            <h2 class="narrative-title">${scene.title}</h2>
+            <div class="narrative-image-container">
+              <img class="narrative-image" src="${imgUrl}" alt="" decoding="async"${oe} />
+            </div>
+            <div class="narrative-text"><p>${step.text}</p></div>
+            <div class="narrative-progress">Image ${index + 1} / ${slides.length}</div>
+            <div class="narrative-actions">
+              <button type="button" class="btn-continue" id="narrative-next">Suivant →</button>
+              <button type="button" class="btn-ghost" id="narrative-skip">Passer la séquence</button>
+            </div>
+          </div>`;
+
+        const dur = Math.max(800, Number(step.duration) || 6000);
+        clearNarrativeSequenceTimer();
+        narrativeSequenceTimer = setTimeout(() => {
+          narrativeSequenceTimer = null;
+          index++;
+          showSlide();
+        }, dur);
+
+        document.getElementById("narrative-next").addEventListener("click", () => {
+          clearNarrativeSequenceTimer();
+          index++;
+          showSlide();
+        });
+        document.getElementById("narrative-skip").addEventListener("click", () => {
+          clearNarrativeSequenceTimer();
+          finishSequence();
+        });
+      }
+
+      showSlide();
+    }
+
+    /**
+     * Rendu principal : route selon scene.type.
+     * Pour ajouter un type : étendre ce switch + miniGameEngines ou un nouveau renderer.
+     */
+    function renderScene(sceneId) {
+      clearNarrativeSequenceTimer();
+      const scene = getSceneById(sceneId);
+      if (!scene) {
+        document.getElementById("game-screen").innerHTML = "<p style='padding:2rem'>Scène introuvable.</p>";
+        return;
+      }
+      gameState.currentScene = sceneId;
+
+      if (scene.type === "dialogue") renderDialogue(scene);
+      else if (scene.type === "minigame") {
+        const engine = miniGameEngines[scene.gameType];
+        if (engine && engine.render) engine.render(scene);
+        else document.getElementById("game-screen").innerHTML = "<p style='padding:2rem'>Mini-jeu non implémenté.</p>";
+      } else if (scene.type === "transition") renderTransition(scene);
+      else if (scene.type === "narrative_sequence") renderNarrativeSequence(scene);
+      else if (scene.type === "ending") renderEnding(scene);
+      else document.getElementById("game-screen").innerHTML = "<p style='padding:2rem'>Type de scène inconnu.</p>";
+
+      if (scene.type !== "narrative_sequence" && scene.unlocksNotions) addNotionsToNotebook(scene.unlocksNotions);
+      if (scene.type === "narrative_sequence") {
+        try {
+          localStorage.setItem(STORAGE_KEYS.save, JSON.stringify({
+            version: "1.0",
+            timestamp: Date.now(),
+            currentScene: gameState.currentScene,
+            skills: { ...gameState.skills },
+            notebookNotionKeys: [...gameState.notebookNotionKeys],
+            unlockedPhilosophers: [...gameState.unlockedPhilosophers],
+            settings: { ...gameState.settings }
+          }));
+        } catch (e) { /* ignore */ }
+      } else saveGame();
+    }
+
+    function renderDialogue(scene) {
+      const ph = gameData.philosophers[scene.philosopher];
+      const lines = (scene.dialogues || []).map((line, idx) => {
+        const isNarration = line.speaker === "narration";
+        const speakerLabel = isNarration ? "Narration" : (ph && line.speaker === scene.philosopher ? ph.name : line.speaker);
+        const cls = isNarration ? "dialogue-line speaker-narration" : "dialogue-line";
+        const tag = isNarration ? "" : `<div class="speaker-tag">${speakerLabel}</div>`;
+        return `<div class="${cls}" style="animation-delay:${0.05 + idx * 0.08}s">${tag}<div>${line.text}</div></div>`;
+      }).join("");
+
+      let choicesHtml = "";
+      if (scene.choices && scene.choices.length) {
+        choicesHtml = `<div class="choices">${scene.choices.map((c, i) =>
+          `<button type="button" class="choice-btn" data-scene="${scene.id}" data-index="${i}">${c.text}</button>`
+        ).join("")}</div>`;
+      } else if (scene.action === "continue") {
+        choicesHtml = `<button type="button" class="btn-continue" data-next="${scene.nextScene}">Continuer</button>`;
+      }
+
+      const bgInner = buildSceneBackgroundHtml(scene.background || "athens_agora");
+      const portraitImg = buildPortraitImgHtml(scene.philosopher, ph ? ph.name : "");
+
+      document.getElementById("game-screen").innerHTML = `
+        <div class="dialogue-scene fade-in">
+          <div class="scene-background">${bgInner}</div>
+          <div class="character-portrait">
+            <div class="portrait-frame">
+              ${portraitImg}
+            </div>
+            <div class="character-name">${ph ? ph.name : ""}</div>
+            <div class="character-title">${ph ? ph.title : ""}</div>
+          </div>
+          <div class="dialogue-box">
+            <div class="dialogue-text">${lines}</div>
+            ${choicesHtml}
+          </div>
+        </div>`;
+
+      document.querySelectorAll(".choice-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = parseInt(btn.dataset.index, 10);
+          selectChoice(scene.id, idx);
+        });
+      });
+      const cont = document.querySelector(".btn-continue[data-next]");
+      if (cont) cont.addEventListener("click", () => goToScene(cont.dataset.next));
+    }
+
+    function selectChoice(sceneId, choiceIndex) {
+      const scene = getSceneById(sceneId);
+      const ch = scene.choices[choiceIndex];
+      if (ch.correct !== true) {
+        const box = document.querySelector(".dialogue-box");
+        const body =
+          ch.wrongExplanation ||
+          (ch.feedback ? `<p>${ch.feedback}</p>` : "<p>Ce n'est pas la réponse attendue. Choisis une autre option.</p>");
+        if (box) {
+          showWrongAttemptPanel(box, {
+            title: "Pas tout à fait",
+            bodyHtml: body
+          });
+        }
+        return;
+      }
+      if (ch.skillGain) Object.keys(ch.skillGain).forEach((k) => updateSkill(k, ch.skillGain[k]));
+      if (ch.feedback) showToast(ch.feedback);
+      setTimeout(() => goToScene(ch.nextScene), ch.feedback ? 1800 : 400);
+    }
+
+    function goToScene(nextId) {
+      const next = getSceneById(nextId);
+      if (next && next.unlocksNotions) addNotionsToNotebook(next.unlocksNotions);
+      gameState.currentScene = nextId;
+      saveGame();
+      renderScene(nextId);
+    }
+
+    function renderTransition(scene) {
+      const bgHtml = buildSceneBackgroundHtml("athens_agora");
+      document.getElementById("game-screen").innerHTML = `
+        <div class="scene-background" style="position:absolute;inset:0">${bgHtml}</div>
+        <div class="panel-center glass-panel" style="position:relative;margin-top:10vh">
+          <h2>${scene.title}</h2>
+          <p style="text-align:left;font-size:1.05rem;line-height:1.65">${scene.content}</p>
+          <button type="button" class="btn-continue" style="margin-top:1.5rem" data-next="${scene.nextScene}">Continuer</button>
+        </div>`;
+      document.querySelector(".btn-continue[data-next]").addEventListener("click", (e) => goToScene(e.target.dataset.next));
+    }
+
+    function renderEnding(scene) {
+      document.getElementById("game-screen").innerHTML = `
+        <div class="panel-center glass-panel" style="margin-top:2rem">
+          <h2>${scene.title}</h2>
+          <div style="margin-top:1rem">${scene.content}</div>
+          <button type="button" class="btn-continue" style="margin-top:1.75rem" id="btn-restart-demo">Rejouer la démo</button>
+        </div>`;
+      document.getElementById("btn-restart-demo").addEventListener("click", () => {
+        gameState = defaultState();
+        localStorage.removeItem(STORAGE_KEYS.save);
+        renderNotebook();
+        refreshSkillBars();
+        renderScene("intro_1");
+      });
+    }
+
+    function bootstrapGame() {
+      renderNotebook();
+      refreshSkillBars();
+      const raw = localStorage.getItem(STORAGE_KEYS.save);
+      let loaded = false;
+      if (raw) {
+        try {
+          const data = JSON.parse(raw);
+          loaded = !!data.currentScene;
+        } catch (e) { /* ignore */ }
+      }
+      if (loaded) loadGame();
+      else renderScene(gameState.currentScene);
+    }
+
+    function initParticles() {
+      const root = document.getElementById("particles");
+      const n = 48;
+      for (let i = 0; i < n; i++) {
+        const p = document.createElement("span");
+        p.className = "particle";
+        p.style.left = Math.random() * 100 + "%";
+        p.style.top = Math.random() * 100 + "%";
+        p.style.animationDelay = Math.random() * 5 + "s";
+        p.style.animationDuration = 4 + Math.random() * 5 + "s";
+        root.appendChild(p);
+      }
+    }
+
+    function wireHeader() {
+      document.getElementById("btn-save").addEventListener("click", saveGame);
+      document.getElementById("btn-load").addEventListener("click", () => loadGame());
+      document.getElementById("btn-new").addEventListener("click", () => {
+        if (confirm("Recommencer une nouvelle partie ? La progression sauvegardée sera réinitialisée.")) {
+          gameState = defaultState();
+          localStorage.removeItem(STORAGE_KEYS.save);
+          renderNotebook();
+          refreshSkillBars();
+          renderScene("intro_1");
+        }
+      });
+    }
+
+    /** Point d'entrée : particules, en-tête, puis sauvegarde ou scène par défaut. */
+    function init() {
+      initParticles();
+      wireHeader();
+      bootstrapGame();
+    }
+
+    // Exposer pour onclick inline si besoin d'extension future
+    window.gameData = gameData;
+    window.renderScene = renderScene;
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  </script>
+</body>
+</html>
