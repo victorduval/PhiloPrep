@@ -860,6 +860,7 @@ function SvgIcon({ name, size = 17, color = "rgba(26,45,94,0.6)" }) {
     bookOpen: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
     fileText: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
     compass: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
+    mapPin: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
     target: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
     clipboard: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>,
     terminal: () => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>,
@@ -3748,7 +3749,70 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
           RECOMMANDÉ
         </div>
         
-        <button 
+        <button
+          type="button"
+          onClick={() => changeTab("mode-aventure")}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: "pointer",
+            width: "100%",
+            textAlign: "left",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            transition: "transform 0.2s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = "translateX(4px)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = "translateX(0)"; }}
+        >
+          <div style={{
+            width: "56px",
+            height: "56px",
+            borderRadius: "16px",
+            background: "linear-gradient(135deg, rgba(80, 190, 140, 0.25), rgba(80, 190, 140, 0.15))",
+            border: "1.5px solid rgba(80, 190, 140, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}>
+            <SvgIcon name="compass" size={26} color="#50be8c" />
+          </div>
+          <div style={{ flex: 1, paddingRight: "40px" }}>
+            <div style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: "17px",
+              fontWeight: 700,
+              color: "#50be8c",
+              marginBottom: "4px",
+              letterSpacing: "-0.3px",
+            }}>
+              Mode aventure
+            </div>
+            <div style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: "12px",
+              fontWeight: 400,
+              color: "rgba(80, 190, 140, 0.7)",
+              lineHeight: 1.4,
+            }}>
+              Progression, défis et récompenses à ton rythme
+            </div>
+          </div>
+        </button>
+        <div
+          role="presentation"
+          style={{
+            width: "100%",
+            height: "1px",
+            margin: "14px 0",
+            background: "linear-gradient(90deg, transparent, rgba(80, 190, 140, 0.35) 20%, rgba(80, 190, 140, 0.35) 80%, transparent)",
+          }}
+        />
+        <button
+          type="button"
           onClick={() => changeTab("parcours-guide")}
           style={{
             background: "none",
@@ -3979,7 +4043,9 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
             ? "S'entraîner avec l'IA"
             : tab === "parcours-guide"
               ? "Parcours guidé"
-              : "Jeux pédagogiques"
+              : tab === "mode-aventure"
+                ? "Mode aventure"
+                : "Jeux pédagogiques"
         }
         onBack={onBack}
       />
@@ -3987,6 +4053,63 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
         {tab === "jeux" && (
           <div style={{ flex: 1, minHeight: 0, overflow: "auto", WebkitOverflowScrolling: "touch" }}>
             {renderList(jeuxItems)}
+          </div>
+        )}
+        {tab === "mode-aventure" && (
+          <div style={{
+            flex: 1,
+            minHeight: 0,
+            overflow: "auto",
+            WebkitOverflowScrolling: "touch",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "32px 20px calc(32px + env(safe-area-inset-bottom, 0px))",
+            background: "linear-gradient(165deg, rgba(10, 30, 61, 0.94) 0%, rgba(18, 46, 85, 0.92) 35%, rgba(34, 90, 138, 0.9) 70%, rgba(46, 114, 164, 0.88) 100%)",
+          }}>
+            <div style={{
+              width: "100%",
+              maxWidth: 360,
+              padding: "28px 22px",
+              borderRadius: "20px",
+              background: "rgba(255, 255, 255, 0.1)",
+              border: "1px solid rgba(255, 255, 255, 0.22)",
+              backdropFilter: "blur(18px)",
+              WebkitBackdropFilter: "blur(18px)",
+              boxShadow: "0 14px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+              textAlign: "center",
+            }}>
+              <div style={{
+                width: 56,
+                height: 56,
+                margin: "0 auto 16px",
+                borderRadius: 16,
+                background: "linear-gradient(135deg, rgba(80, 190, 140, 0.35), rgba(80, 190, 140, 0.15))",
+                border: "1.5px solid rgba(80, 190, 140, 0.45)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                <SvgIcon name="compass" size={26} color="#50be8c" />
+              </div>
+              <h2 style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: "20px",
+                fontWeight: 700,
+                color: "#ffffff",
+                margin: "0 0 10px",
+                letterSpacing: "-0.3px",
+              }}>Mode aventure</h2>
+              <p style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: "14px",
+                fontWeight: 400,
+                color: "rgba(255, 255, 255, 0.78)",
+                lineHeight: 1.55,
+                margin: 0,
+              }}>Le parcours aventure complet arrive très bientôt. En attendant, utilise le parcours guidé pour réviser notion par notion.</p>
+            </div>
           </div>
         )}
         {tab === "parcours-guide" && (
@@ -5396,7 +5519,7 @@ function App() {
   const MAIN_RING_LEN = 5;
   const getMainCarouselIndex = () => {
     if (screen === "home") return 0;
-    if (screen === "sentrainer" && sentrainerSurfaceTab === "parcours-guide") return 1;
+    if (screen === "sentrainer" && (sentrainerSurfaceTab === "parcours-guide" || sentrainerSurfaceTab === "mode-aventure")) return 1;
     if (screen === "sentrainer" && sentrainerSurfaceTab === "exercices") return 2;
     if (screen === "simulation-bac") return 3;
     if (screen === "reviser" && reviserSurfaceTab === "auteurs") return 4;
@@ -5722,6 +5845,10 @@ function App() {
       } else if (p === "sentrainer-ia" || p === "sentrainer_ia") {
         setSentrainerInitialTab("exercices");
         setSentrainerSurfaceTab("exercices");
+        navigate("sentrainer", "right");
+      } else if (p === "mode-aventure" || p === "mode_aventure") {
+        setSentrainerInitialTab("mode-aventure");
+        setSentrainerSurfaceTab("mode-aventure");
         navigate("sentrainer", "right");
       } else if (p === "parcours" || p === "parcours-guide" || p === "parcours_guide") {
         setSentrainerInitialTab("parcours-guide");
