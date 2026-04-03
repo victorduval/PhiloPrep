@@ -1727,6 +1727,12 @@
      * =============================================================================
      */
 
+    /**
+     * Incrémenter quand le graphe de scènes change de façon incompatible (ex. ancienne fin « démo » juste après la caverne).
+     * Les sauvegardes sans ce champ ou avec une valeur inférieure sont migrées (voir applySaveData).
+     */
+    const ODYSSEE_STORY_VERSION = 2;
+
     /** Clé primaire par chemin (évite les collisions si plusieurs copies du jeu sur le même domaine) ; ancienne clé lue pour compatibilité. */
     const LEGACY_SAVE_KEY = "odyssee_save";
     function getPrimarySaveKey() {
@@ -3704,10 +3710,10 @@
         {
           id: "demo_end",
           type: "ending",
-          title: "Fin du chapitre 1 — Platon",
+          title: "Fin du prologue et du chapitre 1",
           content: `
-            <h2>Chapitre 1 : Platon</h2>
-            <p class="subtitle">Idées, aporie du Théétète, analogie du Soleil, Gygès, philosophe-roi et cité juste.</p>
+            <h2>Prologue + chapitre 1 : Platon</h2>
+            <p class="subtitle">Après le prologue (Athènes, Socrate, allégorie de la caverne) : Idées, Théétète, Soleil, Gygès, philosophe-roi, cité juste et exercice de texte.</p>
             <div class="unlocked-notions">
               <h3>Dans ton carnet</h3>
               <p style="text-align:left;line-height:1.6">Les <strong>notions</strong> et <strong>repères</strong> débloqués pendant le parcours apparaissent dans le jeu (menu carnet). Tu y retrouveras notamment la vérité, la raison, la justice, le Bien, la cité juste, le philosophe-roi, et les oppositions croire/savoir, opinion/vérité, apparence/réalité, etc.</p>
@@ -5305,6 +5311,7 @@
     function buildSavePayload() {
       return {
         version: "1.0",
+        storyVersion: ODYSSEE_STORY_VERSION,
         timestamp: Date.now(),
         currentScene: gameState.currentScene,
         skills: { ...gameState.skills },
@@ -5328,7 +5335,16 @@
     }
 
     function applySaveData(data) {
-      gameState.currentScene = resolveSceneId(data.currentScene) || "intro_panorama";
+      const storyV = typeof data.storyVersion === "number" ? data.storyVersion : 0;
+      let migratedDemo = false;
+      let scene = resolveSceneId(data.currentScene) || "intro_panorama";
+      // Anciennes parties : après la caverne on tombait tout de suite sur demo_end (« fin de la démonstration ») sans chapitre 1.
+      if (storyV < ODYSSEE_STORY_VERSION && scene === "demo_end") {
+        scene = "platon_recap_caverne";
+        data.resume = null;
+        migratedDemo = true;
+      }
+      gameState.currentScene = scene;
       gameState.skills = { ...defaultState().skills, ...data.skills };
       gameState.notebookNotionKeys = data.notebookNotionKeys || [];
       gameState.notebookRepereKeys = data.notebookRepereKeys || [];
@@ -5339,6 +5355,12 @@
       gameState.resume = resume;
       refreshSkillBars();
       renderNotebook();
+      if (migratedDemo) {
+        showToast(
+          "Suite du parcours restaurée : le chapitre 1 avec Platon (après la caverne) est disponible.",
+          5000
+        );
+      }
     }
 
     function loadGame() {
@@ -5943,7 +5965,7 @@
         <div class="panel-center glass-panel ending-screen" style="margin-top:2rem">
           <h2>${titleEsc}</h2>
           <div style="margin-top:1rem">${scene.content}</div>
-          <button type="button" class="btn-continue" style="margin-top:1.75rem" id="btn-restart-demo">Rejouer la démo</button>
+          <button type="button" class="btn-continue" style="margin-top:1.75rem" id="btn-restart-demo">Recommencer depuis le début</button>
         </div>`;
         bindRestart(screen);
         return;
@@ -5968,7 +5990,7 @@
             <span class="minigame-page-indicator">${pageIdx + 1} / ${chunks.length}</span>
             <button type="button" class="btn-ghost end-pager-next"${last ? " hidden" : ""}>›</button>
           </div>
-          <button type="button" class="btn-continue" style="margin-top:0.65rem" id="btn-restart-demo"${last ? "" : " hidden"}>Rejouer la démo</button>
+          <button type="button" class="btn-continue" style="margin-top:0.65rem" id="btn-restart-demo"${last ? "" : " hidden"}>Recommencer depuis le début</button>
         </div>`;
         screen.querySelector(".end-pager-prev")?.addEventListener("click", () => {
           if (pageIdx > 0) {

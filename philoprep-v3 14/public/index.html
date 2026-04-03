@@ -3674,9 +3674,11 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
       const path = segments.map(encodeURIComponent).join("/");
       const u = new URL(path, window.location.origin + "/");
       u.searchParams.set("parentHud", "1");
+      // Cache-bust : forcer le navigateur à recharger l’HTML après ajout du chapitre 1 (évite l’ancienne fin « démo »).
+      u.searchParams.set("o", "ch1v2");
       return u.href;
     } catch (e) {
-      return "/Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/odyssee_philosophique.html?parentHud=1";
+      return "/Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/odyssee_philosophique.html?parentHud=1&o=ch1v2";
     }
   }, []);
   const changeTab = (id) => {
