@@ -330,6 +330,11 @@
       height: 100%;
       animation: fadeIn 0.85s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    @media (min-width: 769px) {
+      .dialogue-scene.dialogue-scene--paged {
+        grid-template-columns: minmax(220px, 40%) 1fr;
+      }
+    }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(24px); }
       to { opacity: 1; transform: translateY(0); }
@@ -399,6 +404,21 @@
       justify-content: flex-end;
       padding: 1.25rem 1rem 1.5rem;
       gap: 0.5rem;
+      transition: opacity 0.3s ease;
+    }
+    .dialogue-scene.narration-page .character-portrait {
+      display: none;
+    }
+    .dialogue-scene.narration-page .dialogue-box {
+      grid-column: 1 / -1;
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+    @media (max-width: 768px) {
+      .dialogue-scene.dialogue-scene--paged.narration-page .dialogue-box {
+        margin-left: 0;
+        margin-right: 0;
+      }
     }
     .portrait-frame {
       width: min(220px, 85vw);
@@ -464,6 +484,19 @@
       line-height: 1.9;
       margin-bottom: 25px;
     }
+    .dialogue-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .dialogue-nav .btn-ghost:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
     @media (max-width: 768px) {
       .dialogue-scene {
         display: flex;
@@ -472,6 +505,45 @@
         gap: 15px;
         padding: 20px 15px;
         box-sizing: border-box;
+      }
+      .dialogue-scene.dialogue-scene--paged {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 14px 14px 18px;
+        gap: 12px;
+      }
+      .dialogue-scene.dialogue-scene--paged .character-portrait:not(.is-hidden) {
+        width: 100%;
+        flex-shrink: 0;
+        position: relative;
+        top: auto;
+        padding: 0;
+        justify-content: flex-start;
+      }
+      .dialogue-scene.dialogue-scene--paged .portrait-frame {
+        width: min(92vw, 320px);
+        max-height: min(42vh, 420px);
+        margin: 0 auto;
+      }
+      .dialogue-scene.dialogue-scene--paged .dialogue-box {
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .dialogue-scene.dialogue-scene--paged .dialogue-text {
+        font-size: 0.98rem;
+        line-height: 1.58;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        max-height: none;
+        overflow: visible;
+        flex-shrink: 0;
+      }
+      .dialogue-scene.dialogue-scene--paged .choices {
+        flex-shrink: 0;
       }
       .character-portrait {
         width: 35%;
@@ -716,7 +788,7 @@
     }
     .sorting-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
       gap: 0.65rem;
       margin-bottom: 1rem;
     }
@@ -780,11 +852,26 @@
       position: relative;
       z-index: 2;
       text-align: center;
-      padding: clamp(1rem, 3vw, 2.5rem);
+      padding: clamp(0.5rem, 2vw, 1.25rem) clamp(0.75rem, 2.5vw, 1.5rem) clamp(0.65rem, 2vw, 1rem);
       max-width: 1400px;
       margin: 0 auto;
-      min-height: 100%;
+      height: 100%;
+      max-height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
       animation: fadeIn 0.65s ease;
+    }
+    .narrative-sequence-header {
+      flex: 0 0 auto;
+    }
+    .narrative-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.35rem, 1.5vw, 0.75rem);
     }
     .narrative-title {
       font-family: var(--font-title);
@@ -808,35 +895,51 @@
       font-family: var(--font-title);
       font-size: clamp(1.1rem, 3vw, 1.8em);
       color: var(--gold-light);
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       text-align: center;
     }
     .narrative-image-container {
+      flex: 75 1 0;
+      min-height: 0;
       max-width: min(1200px, 100%);
-      margin: 0 auto clamp(1rem, 2.5vw, 1.85rem);
+      margin: 0 auto;
       border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
       border: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .narrative-image {
       width: 100%;
-      height: auto;
+      height: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      object-position: center;
       display: block;
       vertical-align: middle;
     }
     .narrative-text {
+      flex: 25 1 0;
+      min-height: 0;
       max-width: 900px;
-      margin: 0 auto 1rem;
-      font-size: clamp(1.02rem, 2.2vw, 1.25em);
-      line-height: 1.9;
+      width: 100%;
+      margin: 0 auto;
+      font-size: clamp(0.88rem, 2.8vw, 1.08rem);
+      line-height: 1.55;
       color: var(--marble);
-      padding: clamp(1rem, 2vw, 1.55rem);
+      padding: clamp(0.55rem, 1.8vw, 0.95rem) clamp(0.65rem, 2vw, 1.1rem);
       background: rgba(26, 31, 58, 0.6);
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-left: 4px solid var(--purple-light);
       text-align: left;
+      overflow: hidden;
+    }
+    .narrative-text-inner {
+      max-height: 100%;
+      overflow: hidden;
     }
     .narrative-text strong {
       color: var(--gold-light);
@@ -847,17 +950,24 @@
       font-style: italic;
     }
     .narrative-progress {
-      margin-top: clamp(0.85rem, 2vw, 1.55rem);
+      flex: 0 0 auto;
+      margin-top: 0.35rem;
       color: var(--gold);
       font-family: var(--font-title);
-      font-size: clamp(0.82rem, 2vw, 1.1em);
+      font-size: clamp(0.75rem, 2vw, 0.95em);
     }
     .narrative-actions {
-      margin-top: 1rem;
+      flex: 0 0 auto;
+      margin-top: 0.45rem;
       display: flex;
-      gap: 0.75rem;
+      gap: 0.5rem;
       justify-content: center;
       flex-wrap: wrap;
+    }
+    .narrative-actions .btn-ghost:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
     }
 
     /* Config modal & loading */
@@ -1191,7 +1301,36 @@
      * =============================================================================
      */
 
-    const STORAGE_KEYS = { save: "odyssee_save" };
+    /** Clé primaire par chemin (évite les collisions si plusieurs copies du jeu sur le même domaine) ; ancienne clé lue pour compatibilité. */
+    const LEGACY_SAVE_KEY = "odyssee_save";
+    function getPrimarySaveKey() {
+      try {
+        return "odyssee_save_v2:" + (location.pathname || "/");
+      } catch (e) {
+        return "odyssee_save_v2:/";
+      }
+    }
+    function readSaveRaw() {
+      const primary = getPrimarySaveKey();
+      let raw = localStorage.getItem(primary);
+      if (raw) return { raw, key: primary };
+      raw = localStorage.getItem(LEGACY_SAVE_KEY);
+      if (raw) return { raw, key: LEGACY_SAVE_KEY };
+      return null;
+    }
+    function migrateSaveToPrimaryIfNeeded(keyUsed, raw) {
+      if (keyUsed === LEGACY_SAVE_KEY && raw) {
+        try {
+          localStorage.setItem(getPrimarySaveKey(), raw);
+        } catch (e) { /* ignore */ }
+      }
+    }
+    function clearAllSaveSlots() {
+      try {
+        localStorage.removeItem(getPrimarySaveKey());
+        localStorage.removeItem(LEGACY_SAVE_KEY);
+      } catch (e) { /* ignore */ }
+    }
 
     /** Cibles .jpg — les placeholders .svg portent le même nom de base. */
     const IMAGE_PATHS = {
@@ -1398,7 +1537,37 @@
             { speaker: "socrate", text: "Excellent début ! Maintenant, écoute-moi bien..." },
             { speaker: "socrate", text: "Ces hommes que tu vois, ces <strong>sophistes</strong>, vendent leur art de parler contre de l'argent. Ils enseignent à transformer le discours faible en discours fort, le faux en vrai <em>en apparence</em>." },
             { speaker: "socrate", text: "Moi, je ne demande rien en échange. Je ne prétends rien enseigner. <strong>Je questionne.</strong> Car la vraie philosophie commence par reconnaître qu'on ne sait pas." },
-            { speaker: "socrate", text: "Voici ma méthode : je vais te proposer une petite épreuve. Des affirmations vont apparaître. À toi de les classer selon leur nature : sont-elles de simples <em>opinions</em> ? Des <em>arguments</em> rationnels ? Ou des <em>sophismes</em> trompeurs ?" }
+            { speaker: "socrate", text: "Voici ma méthode : je vais te proposer une petite épreuve. Des affirmations vont apparaître. À toi de les classer : <em>opinion</em>, <em>véridique</em>, <em>sophisme</em>… et aussi le <em>paralogisme</em>, que je t'explique juste avant de commencer." }
+          ],
+          action: "continue",
+          nextScene: "socrate_paralogisme_intro"
+        },
+        {
+          id: "socrate_paralogisme_intro",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            {
+              speaker: "socrate",
+              text: "Avant que nous commencions, laisse-moi t'enseigner une distinction importante : celle entre <strong>sophisme</strong> et <strong>paralogisme</strong>."
+            },
+            {
+              speaker: "socrate",
+              text: "Un <strong>sophisme</strong>, c'est une erreur de raisonnement <em>volontaire</em>. Le sophiste <em>sait</em> qu'il manipule, il cherche à tromper pour gagner le débat."
+            },
+            {
+              speaker: "socrate",
+              text: "Un <strong>paralogisme</strong>, c'est une erreur de raisonnement <em>involontaire</em>. La personne raisonne mal, mais de bonne foi. Elle croit vraiment à son raisonnement."
+            },
+            {
+              speaker: "socrate",
+              text: "Par exemple : « Si tous les chats sont mortels et Socrate est mortel, alors Socrate est un chat. » C'est un <strong>paralogisme</strong> — une erreur logique innocente."
+            },
+            {
+              speaker: "socrate",
+              text: "La différence est cruciale : on peut <em>corriger</em> un paralogisme par la réflexion, mais un sophisme cherche délibérément à éviter la vérité."
+            }
           ],
           action: "continue",
           nextScene: "minigame_tri_1"
@@ -1411,16 +1580,29 @@
           instruction: "Glisse chaque affirmation dans la bonne catégorie. Les sophistes mélangent tout pour tromper. À toi de démêler le vrai du faux !",
           items: [
             { id: 1, text: "Tout le monde dit que cette loi est juste, donc elle l'est.", correct: "opinion" },
-            { id: 2, text: "Si tous les hommes sont mortels et que Socrate est un homme, alors Socrate est mortel.", correct: "argument" },
+            { id: 2, text: "Si tous les hommes sont mortels et que Socrate est un homme, alors Socrate est mortel.", correct: "veridique" },
             { id: 3, text: "Le plus fort a toujours raison car personne ne peut le contredire.", correct: "sophisme" },
             { id: 4, text: "Il fait chaud aujourd'hui à Athènes.", correct: "opinion" },
             { id: 5, text: "Tu ne peux pas critiquer cette théorie si tu n'en proposes pas une meilleure.", correct: "sophisme" },
-            { id: 6, text: "Agir justement rend l'âme harmonieuse, donc la justice est préférable à l'injustice.", correct: "argument" }
+            { id: 6, text: "Agir justement rend l'âme harmonieuse, donc la justice est préférable à l'injustice.", correct: "veridique" },
+            {
+              id: 7,
+              text: "Si tous les chats sont mortels et Socrate est mortel, alors Socrate est un chat.",
+              correct: "paralogisme",
+              explanation: "Erreur logique involontaire (syllogisme invalide). La personne confond appartenance à une catégorie et partage d'une propriété."
+            },
+            {
+              id: 8,
+              text: "Le soleil se lève à l'est tous les jours, donc il se lèvera toujours à l'est.",
+              correct: "paralogisme",
+              explanation: "Induction naïve de bonne foi. La personne généralise sans comprendre que les lois naturelles pourraient théoriquement changer."
+            }
           ],
           categories: [
-            { id: "opinion", label: "Opinion", description: "Croyance sans examen" },
-            { id: "argument", label: "Argument", description: "Raisonnement valide" },
-            { id: "sophisme", label: "Sophisme", description: "Faux raisonnement" }
+            { id: "opinion", label: "OPINION", description: "Croyance sans examen" },
+            { id: "veridique", label: "VÉRIDIQUE", description: "Énoncé solidement étayé par un raisonnement valide" },
+            { id: "sophisme", label: "SOPHISME", description: "Faux raisonnement volontaire" },
+            { id: "paralogisme", label: "PARALOGISME", description: "Faux raisonnement involontaire" }
           ],
           successThreshold: 1,
           rewards: {
@@ -1437,7 +1619,7 @@
           background: "athens_agora",
           dialogues: [
             { speaker: "socrate", text: "Remarquable ! Tu commences à voir clair dans le brouillard des discours." },
-            { speaker: "socrate", text: "Retiens ceci : une <strong>opinion</strong> est ce que l'on croit sans l'avoir examiné. Un <strong>argument</strong> lie des raisons à une conclusion de manière logique. Un <strong>sophisme</strong> fait semblant d'être un argument mais repose sur une erreur ou une manipulation." },
+            { speaker: "socrate", text: "Retiens ceci : une <strong>opinion</strong> est ce que l'on croit sans l'avoir examiné. Le <strong>véridique</strong> désigne ici ce qui lie des raisons à une conclusion de manière logique et mérite d'être tenu pour bien fondé. Un <strong>sophisme</strong> repose sur une erreur ou une manipulation <em>volontaire</em>. Un <strong>paralogisme</strong>, lui, est une erreur de bonne foi — qu'on peut corriger par l'examen." },
             { speaker: "socrate", text: "Ces distinctions sont essentielles. Car la philosophie, vois-tu, c'est l'art d'examiner nos croyances pour distinguer le <em>vrai</em> du <em>faux</em>, le <em>savoir</em> de l'<em>ignorance</em>, la <em>persuasion</em> de la <em>conviction</em>." },
             { speaker: "socrate", text: "Mais je ne suis qu'un vieux bonhomme qui pose des questions. Pour comprendre vraiment ce qu'est la vérité, tu dois rencontrer mon meilleur élève..." }
           ],
@@ -1453,7 +1635,7 @@
           dialogues: [
             {
               speaker: "socrate",
-              text: "Bien ! Tu commences à distinguer opinion et argument. Mais il y a un sophiste encore plus redoutable que les autres..."
+              text: "Bien ! Tu commences à distinguer opinion et véridique. Mais il y a un sophiste encore plus redoutable que les autres..."
             },
             {
               speaker: "socrate",
@@ -1712,56 +1894,123 @@
             {
               path: "assets/scenes/caverne/01_prisoners_chained.jpg",
               title: "Les prisonniers enchaînés",
-              text: `« Représente-toi, dit Socrate, des hommes dans une habitation souterraine en forme de caverne. Ils y sont depuis leur enfance, les jambes et la nuque pris dans des liens qui les obligent à rester sur place et à ne regarder que vers l'avant, incapables de tourner la tête.<br><br>Derrière eux, plus haut, brûle un feu. Entre le feu et les prisonniers, un muret a été élevé, et des hommes portent des objets par-dessus ce muret : des statues d'hommes, d'animaux, en pierre, en bois. »`,
-              duration: 8000
+              text: `« Représente-toi, dit Socrate, des hommes dans une habitation souterraine en forme de caverne. Ils y sont depuis leur enfance, les jambes et la nuque pris dans des liens qui les obligent à rester sur place et à ne regarder que vers l'avant, incapables de tourner la tête.`
+            },
+            {
+              path: "assets/scenes/caverne/01_prisoners_chained.jpg",
+              text: `Derrière eux, plus haut, brûle un feu. Entre le feu et les prisonniers, un muret a été élevé, et des hommes portent des objets par-dessus ce muret : des statues d'hommes, d'animaux, en pierre, en bois. »`
             },
             {
               path: "assets/scenes/caverne/05_fire_in_cave.jpg",
               title: "Les ombres de la caverne",
-              text: `« Vois que ces hommes ne voient d'eux-mêmes et les uns des autres que les <strong>ombres</strong> qui, sous l'effet du feu, se projettent sur la paroi de la grotte en face d'eux. »<br><br>Pour ces prisonniers, les ombres sont la seule réalité. Ils donnent des noms aux ombres, ils débattent entre eux de ce qu'elles sont. Ils croient connaître les choses, alors qu'ils ne connaissent que des images.<br><br>Pour eux, <strong>la vérité, c'est l'ombre</strong>.`,
-              duration: 8000
+              text: `« Vois que ces hommes ne voient d'eux-mêmes et les uns des autres que les <strong>ombres</strong> qui, sous l'effet du feu, se projettent sur la paroi de la grotte en face d'eux. »`
+            },
+            {
+              path: "assets/scenes/caverne/05_fire_in_cave.jpg",
+              text: `Pour ces prisonniers, les ombres sont la seule réalité. Ils donnent des noms aux ombres, ils débattent entre eux de ce qu'elles sont. Ils croient connaître les choses, alors qu'ils ne connaissent que des images.`
+            },
+            {
+              path: "assets/scenes/caverne/05_fire_in_cave.jpg",
+              text: `Pour eux, <strong>la vérité, c'est l'ombre</strong>.`
             },
             {
               path: "assets/scenes/caverne/02_freed_prisoner.jpg",
               title: "La libération douloureuse",
-              text: `« Examine ce qui se passerait si on les détachait de leurs liens. Chaque fois que l'un d'eux serait détaché, et contraint de se lever, de retourner la tête, de marcher, et de regarder la lumière du feu, à chacun de ces gestes il <strong>souffrirait</strong>. L'éblouissement le rendrait incapable de distinguer les choses dont tout à l'heure il voyait les ombres. »<br><br>Il considérerait que ce qu'il voyait tout à l'heure était <em>plus vrai</em> que ce qu'on lui montre à présent. Il voudrait retourner vers les ombres familières.`,
-              duration: 8000
+              text: `« Examine ce qui se passerait si on les détachait de leurs liens. Chaque fois que l'un d'eux serait détaché, et contraint de se lever, de retourner la tête, de marcher, et de regarder la lumière du feu, à chacun de ces gestes il <strong>souffrirait</strong>. L'éblouissement le rendrait incapable de distinguer les choses dont tout à l'heure il voyait les ombres. »`
+            },
+            {
+              path: "assets/scenes/caverne/02_freed_prisoner.jpg",
+              text: `Il considérerait que ce qu'il voyait tout à l'heure était <em>plus vrai</em> que ce qu'on lui montre à présent. Il voudrait retourner vers les ombres familières.`
             },
             {
               path: "assets/scenes/caverne/03_cave_exit.jpg",
               title: "La montée forcée",
-              text: `« Et si on l'arrachait de là par la force, en le faisant monter par la pente rocailleuse et raide, et si on ne le lâchait pas avant de l'avoir tiré dehors jusqu'à la lumière du soleil, n'en souffrirait-il pas ? Ne s'indignerait-il pas d'être traîné de la sorte ? »<br><br>Lorsqu'il arriverait à la lumière, les yeux inondés de l'éclat du jour, serait-il capable de voir ne fût-ce qu'une seule des choses vraies ?<br><br><strong>Non, pas tout de suite.</strong>`,
-              duration: 8000
+              text: `« Et si on l'arrachait de là par la force, en le faisant monter par la pente rocailleuse et raide, et si on ne le lâchait pas avant de l'avoir tiré dehors jusqu'à la lumière du soleil, n'en souffrirait-il pas ? Ne s'indignerait-il pas d'être traîné de la sorte ? »`
+            },
+            {
+              path: "assets/scenes/caverne/03_cave_exit.jpg",
+              text: `Lorsqu'il arriverait à la lumière, les yeux inondés de l'éclat du jour, serait-il capable de voir ne fût-ce qu'une seule des choses vraies ?`
+            },
+            {
+              path: "assets/scenes/caverne/03_cave_exit.jpg",
+              text: `<strong>Non, pas tout de suite.</strong>`
             },
             {
               path: "assets/scenes/caverne/06_adaptation.jpg",
               title: "L'adaptation progressive",
-              text: `D'abord, il aurait besoin de s'habituer.<br><br>Il verrait <strong>d'abord</strong> les ombres des choses extérieures,<br><strong>ensuite</strong> les reflets des choses dans l'eau,<br><strong>puis</strong> les choses elles-mêmes.<br><br>Enfin, il pourrait contempler le ciel, la lune, les étoiles...`,
-              duration: 7000
+              text: `D'abord, il aurait besoin de s'habituer.`
+            },
+            {
+              path: "assets/scenes/caverne/06_adaptation.jpg",
+              text: `Il verrait <strong>d'abord</strong> les ombres des choses extérieures,<br><strong>ensuite</strong> les reflets des choses dans l'eau,<br><strong>puis</strong> les choses elles-mêmes.`
+            },
+            {
+              path: "assets/scenes/caverne/06_adaptation.jpg",
+              text: `Enfin, il pourrait contempler le ciel, la lune, les étoiles...`
             },
             {
               path: "assets/scenes/caverne/07_sun_contemplation.jpg",
               title: "La contemplation du soleil",
-              text: `« Alors il conclurait que c'est le <strong>soleil</strong> qui produit les saisons et les années, qui gouverne tout dans le monde visible, et qui est en quelque sorte la cause de toutes les choses qu'il avait vues autrefois. »<br><br>Ce monde extérieur est le <strong>monde sensible</strong> : il est réel, mais encore perçu par les sens.`,
-              duration: 7000
+              text: `« Alors il conclurait que c'est le <strong>soleil</strong> qui produit les saisons et les années, qui gouverne tout dans le monde visible, et qui est en quelque sorte la cause de toutes les choses qu'il avait vues autrefois. »`
+            },
+            {
+              path: "assets/scenes/caverne/07_sun_contemplation.jpg",
+              text: `Ce monde extérieur est le <strong>monde sensible</strong> : il est réel, mais encore perçu par les sens.`
             },
             {
               path: "assets/scenes/caverne/04_outside_world.jpg",
               title: "La compréhension",
-              text: `« De même, lorsque l'âme se tourne vers le <strong>monde intelligible</strong>, elle voit les <strong>Idées</strong>, et comprend que l'Idée du <strong>Bien</strong> est la cause de tout ce qui est droit et beau. »<br><br>Le soleil est l'<em>image</em> de l'Idée du Bien.<br><br>Les ombres de la caverne étaient des copies dégradées des objets du monde sensible ; les objets du monde sensible sont eux-mêmes des copies des Idées du monde intelligible.`,
-              duration: 9000
+              text: `« De même, lorsque l'âme se tourne vers le <strong>monde intelligible</strong>, elle voit les <strong>Idées</strong>, et comprend que l'Idée du <strong>Bien</strong> est la cause de tout ce qui est droit et beau. »`
+            },
+            {
+              path: "assets/scenes/caverne/04_outside_world.jpg",
+              text: `Le soleil est l'<em>image</em> de l'Idée du Bien.`
+            },
+            {
+              path: "assets/scenes/caverne/04_outside_world.jpg",
+              text: `Les ombres de la caverne étaient des copies dégradées des objets du monde sensible ; les objets du monde sensible sont eux-mêmes des copies des Idées du monde intelligible.`
             },
             {
               path: "assets/scenes/caverne/08_hostile_return.jpg",
               title: "Le retour dans la caverne",
-              text: `« Mais le philosophe doit redescendre dans la caverne, et prendre part aux travaux de la cité, même s'il en souffre. Car c'est son devoir. »<br><br>Si le libéré redescend, ses yeux habitués à la lumière sont éblouis par l'obscurité. Il ne voit plus bien les ombres.<br><br>Les prisonniers se moquent de lui : <em>« Il est parti en haut, il est revenu avec les yeux gâtés. Mieux vaut ne pas monter là-haut. »</em><br><br>S'il essaie de les libérer, <strong>ils veulent le tuer</strong>.`,
-              duration: 9000
+              text: `« Mais le philosophe doit redescendre dans la caverne, et prendre part aux travaux de la cité, même s'il en souffre. Car c'est son devoir. »`
+            },
+            {
+              path: "assets/scenes/caverne/08_hostile_return.jpg",
+              text: `Si le libéré redescend, ses yeux habitués à la lumière sont éblouis par l'obscurité. Il ne voit plus bien les ombres.`
+            },
+            {
+              path: "assets/scenes/caverne/08_hostile_return.jpg",
+              text: `Les prisonniers se moquent de lui : <em>« Il est parti en haut, il est revenu avec les yeux gâtés. Mieux vaut ne pas monter là-haut. »</em>`
+            },
+            {
+              path: "assets/scenes/caverne/08_hostile_return.jpg",
+              text: `S'il essaie de les libérer, <strong>ils veulent le tuer</strong>.`
             },
             {
               path: "assets/scenes/caverne/09_three_worlds_diagram.jpg",
               title: "La leçon du mythe",
-              text: `« Cette image s'applique tout entière à notre condition. »<br><br><strong>Trois niveaux de réalité :</strong><br><br>1. <strong>La caverne</strong> = monde de l'opinion (doxa), où l'on ne voit que des ombres<br><br>2. <strong>Le monde extérieur</strong> = monde sensible, perçu par les sens, éclairé par le soleil<br><br>3. <strong>Le monde intelligible</strong> = monde des Idées, accessible par la raison seule, gouverné par le Bien<br><br>L'ascension de l'âme va de l'opinion (doxa) à la connaissance (epistèmè).<br><br><em>« Il faut voir l'Idée du Bien pour se conduire avec sagesse dans la vie privée et dans la vie publique. »</em>`,
-              duration: 12000
+              text: `« Cette image s'applique tout entière à notre condition. »<br><br><strong>Trois niveaux de réalité :</strong>`
+            },
+            {
+              path: "assets/scenes/caverne/09_three_worlds_diagram.jpg",
+              text: `1. <strong>La caverne</strong> = monde de l'opinion (doxa), où l'on ne voit que des ombres`
+            },
+            {
+              path: "assets/scenes/caverne/09_three_worlds_diagram.jpg",
+              text: `2. <strong>Le monde extérieur</strong> = monde sensible, perçu par les sens, éclairé par le soleil`
+            },
+            {
+              path: "assets/scenes/caverne/09_three_worlds_diagram.jpg",
+              text: `3. <strong>Le monde intelligible</strong> = monde des Idées, accessible par la raison seule, gouverné par le Bien`
+            },
+            {
+              path: "assets/scenes/caverne/09_three_worlds_diagram.jpg",
+              text: `L'ascension de l'âme va de l'opinion (doxa) à la connaissance (epistèmè).`
+            },
+            {
+              path: "assets/scenes/caverne/09_three_worlds_diagram.jpg",
+              text: `<em>« Il faut voir l'Idée du Bien pour se conduire avec sagesse dans la vie privée et dans la vie publique. »</em>`
             }
           ],
           nextScene: "caverne_reflection"
@@ -1876,7 +2125,9 @@
       skills: { clarte: 15, justification: 15, examen: 15 },
       notebookNotionKeys: [],
       unlockedPhilosophers: ["socrate", "platon"],
-      settings: {}
+      settings: {},
+      /** Reprise fine (ex. slide d'une narrative_sequence) ; consommé quand la scène se termine. */
+      resume: null
     });
 
     let gameState = defaultState();
@@ -1941,7 +2192,7 @@
             const wrap = document.querySelector(".minigame-wrap");
             const body =
               th >= 1
-                ? `<p>Tu as <strong>${correct} sur ${n}</strong> affirmations bien placées. Pour cette épreuve, il faut un classement <em>parfait</em> : chaque carte doit être dans la colonne qui correspond vraiment à sa nature (opinion, argument ou sophisme).</p><p>Repère les cartes qui « sonnent » comme un raisonnement valide mais cachent une ruse, ou celles qui ne sont qu'une croyance non examinée. Tu peux déplacer les cartes puis valider à nouveau.</p>`
+                ? `<p>Tu as <strong>${correct} sur ${n}</strong> affirmations bien placées. Pour cette épreuve, il faut un classement <em>parfait</em> : chaque carte doit être dans la colonne qui correspond vraiment à sa nature (opinion, véridique, sophisme ou paralogisme).</p><p>Repère les cartes qui « sonnent » comme un raisonnement valide mais cachent une ruse, ou celles qui ne sont qu'une croyance non examinée. Tu peux déplacer les cartes puis valider à nouveau.</p>`
                 : `<p>Résultat : <strong>${correct} / ${n}</strong>. Il te faut un meilleur score pour continuer. Ajuste les cartes dans les colonnes, puis valide de nouveau.</p>`;
             if (wrap) {
               showWrongAttemptPanel(wrap, {
@@ -2233,39 +2484,57 @@
       }).join("");
     }
 
-    function saveGame() {
-      const payload = {
+    function buildSavePayload() {
+      return {
         version: "1.0",
         timestamp: Date.now(),
         currentScene: gameState.currentScene,
         skills: { ...gameState.skills },
         notebookNotionKeys: [...gameState.notebookNotionKeys],
         unlockedPhilosophers: [...gameState.unlockedPhilosophers],
-        settings: { ...gameState.settings }
+        settings: { ...gameState.settings },
+        resume: gameState.resume && typeof gameState.resume === "object" ? gameState.resume : null
       };
+    }
+
+    /** Sauvegarde : `notify: true` uniquement depuis le menu « Sauver » (évite un toast à chaque changement de scène). */
+    function saveGame(opts) {
+      const notify = !!(opts && opts.notify);
       try {
-        localStorage.setItem(STORAGE_KEYS.save, JSON.stringify(payload));
-        showToast("Partie sauvegardée.");
+        localStorage.setItem(getPrimarySaveKey(), JSON.stringify(buildSavePayload()));
+        if (notify) showToast("Partie sauvegardée.");
       } catch (e) {
-        showToast("Impossible de sauvegarder (stockage plein ?).");
+        if (notify) showToast("Impossible de sauvegarder (stockage plein ?).");
       }
     }
 
+    function applySaveData(data) {
+      gameState.currentScene = data.currentScene || "intro_1";
+      gameState.skills = { ...defaultState().skills, ...data.skills };
+      gameState.notebookNotionKeys = data.notebookNotionKeys || [];
+      gameState.unlockedPhilosophers = data.unlockedPhilosophers || defaultState().unlockedPhilosophers;
+      gameState.settings = data.settings || {};
+      let resume = data.resume && typeof data.resume === "object" ? data.resume : null;
+      if (resume && resume.narrative && resume.narrative.sceneId !== gameState.currentScene) resume = null;
+      gameState.resume = resume;
+      refreshSkillBars();
+      renderNotebook();
+    }
+
     function loadGame() {
-      const raw = localStorage.getItem(STORAGE_KEYS.save);
-      if (!raw) {
+      const entry = readSaveRaw();
+      if (!entry) {
         showToast("Aucune sauvegarde trouvée.");
         return false;
       }
       try {
-        const data = JSON.parse(raw);
-        gameState.currentScene = data.currentScene || "intro_1";
-        gameState.skills = { ...defaultState().skills, ...data.skills };
-        gameState.notebookNotionKeys = data.notebookNotionKeys || [];
-        gameState.unlockedPhilosophers = data.unlockedPhilosophers || defaultState().unlockedPhilosophers;
-        gameState.settings = data.settings || {};
-        refreshSkillBars();
-        renderNotebook();
+        const data = JSON.parse(entry.raw);
+        if (!data.currentScene || !getSceneById(data.currentScene)) {
+          showToast("Sauvegarde incomplète ou scène inconnue.");
+          return false;
+        }
+        migrateSaveToPrimaryIfNeeded(entry.key, entry.raw);
+        applySaveData(data);
         renderScene(gameState.currentScene);
         showToast("Partie chargée.");
         return true;
@@ -2273,6 +2542,12 @@
         showToast("Sauvegarde corrompue.");
         return false;
       }
+    }
+
+    function persistStateBeforeUnload() {
+      try {
+        localStorage.setItem(getPrimarySaveKey(), JSON.stringify(buildSavePayload()));
+      } catch (e) { /* ignore */ }
     }
 
     function showToast(msg, durationMs) {
@@ -2364,9 +2639,16 @@
       const screen = document.getElementById("game-screen");
       const slides = scene.images || [];
       let index = 0;
+      const r = gameState.resume && gameState.resume.narrative;
+      if (r && r.sceneId === scene.id && slides.length > 0 && typeof r.slideIndex === "number") {
+        index = Math.max(0, Math.min(r.slideIndex, slides.length - 1));
+      }
 
       function finishSequence() {
         clearNarrativeSequenceTimer();
+        if (gameState.resume && gameState.resume.narrative && gameState.resume.narrative.sceneId === scene.id) {
+          gameState.resume = null;
+        }
         goToScene(scene.nextScene);
       }
 
@@ -2375,6 +2657,8 @@
           finishSequence();
           return;
         }
+        gameState.resume = { narrative: { sceneId: scene.id, slideIndex: index } };
+        saveGame();
         const step = slides[index];
         const relSrc = resolveFromJpgTarget(step.path);
         const svg = svgFallbackForPath(step.path);
@@ -2391,32 +2675,38 @@
           : "";
         const altImg = escapeHtml(step.title || "Illustration — " + (index + 1));
 
+        const atLast = index >= slides.length - 1;
         screen.innerHTML = `
           <div class="narrative-sequence fade-in">
-            <h2 class="narrative-title">${escapeHtml(scene.title)}</h2>
-            ${sub}
-            ${stepTitle}
-            <div class="narrative-image-container">
-              <img class="narrative-image" src="${imgUrl}" alt="${altImg}" decoding="async"${oe} />
+            <div class="narrative-sequence-header">
+              <h2 class="narrative-title">${escapeHtml(scene.title)}</h2>
+              ${sub}
+              ${stepTitle}
             </div>
-            <div class="narrative-text"><div class="narrative-text-inner">${step.text}</div></div>
+            <div class="narrative-body">
+              <div class="narrative-image-container">
+                <img class="narrative-image" src="${imgUrl}" alt="${altImg}" decoding="async"${oe} />
+              </div>
+              <div class="narrative-text"><div class="narrative-text-inner">${step.text}</div></div>
+            </div>
             <div class="narrative-progress">${index + 1} / ${slides.length}</div>
             <div class="narrative-actions">
-              <button type="button" class="btn-continue" id="narrative-next">Suivant →</button>
+              <button type="button" class="btn-ghost" id="narrative-prev"${index <= 0 ? " disabled" : ""}>← Précédent</button>
+              <button type="button" class="btn-continue" id="narrative-next">${atLast ? "Terminer →" : "Suivant →"}</button>
               <button type="button" class="btn-ghost" id="narrative-skip">Passer la séquence</button>
             </div>
           </div>`;
 
-        const dur = Math.max(800, Number(step.duration) || 6000);
-        clearNarrativeSequenceTimer();
-        narrativeSequenceTimer = setTimeout(() => {
-          narrativeSequenceTimer = null;
-          index++;
+        document.getElementById("narrative-prev").addEventListener("click", () => {
+          if (index <= 0) return;
+          index--;
           showSlide();
-        }, dur);
-
+        });
         document.getElementById("narrative-next").addEventListener("click", () => {
-          clearNarrativeSequenceTimer();
+          if (atLast) {
+            finishSequence();
+            return;
+          }
           index++;
           showSlide();
         });
@@ -2441,6 +2731,9 @@
         return;
       }
       gameState.currentScene = sceneId;
+      if (scene.type !== "narrative_sequence" && gameState.resume && gameState.resume.narrative) {
+        gameState.resume = null;
+      }
 
       if (scene.type === "dialogue") renderDialogue(scene);
       else if (scene.type === "minigame") {
@@ -2453,67 +2746,172 @@
       else document.getElementById("game-screen").innerHTML = "<p style='padding:2rem'>Type de scène inconnu.</p>";
 
       if (scene.type !== "narrative_sequence" && scene.unlocksNotions) addNotionsToNotebook(scene.unlocksNotions);
-      if (scene.type === "narrative_sequence") {
-        try {
-          localStorage.setItem(STORAGE_KEYS.save, JSON.stringify({
-            version: "1.0",
-            timestamp: Date.now(),
-            currentScene: gameState.currentScene,
-            skills: { ...gameState.skills },
-            notebookNotionKeys: [...gameState.notebookNotionKeys],
-            unlockedPhilosophers: [...gameState.unlockedPhilosophers],
-            settings: { ...gameState.settings }
-          }));
-        } catch (e) { /* ignore */ }
-      } else saveGame();
+      saveGame();
+    }
+
+    function renderDialogueLineHtml(line, scene, ph) {
+      const isNarration = line.speaker === "narration";
+      const speakerLabel = isNarration ? "Narration" : (ph && line.speaker === scene.philosopher ? ph.name : line.speaker);
+      const cls = isNarration ? "dialogue-line speaker-narration" : "dialogue-line";
+      const tag = isNarration ? "" : `<div class="speaker-tag">${speakerLabel}</div>`;
+      return `<div class="${cls}" style="animation-delay:0.08s">${tag}<div>${line.text}</div></div>`;
     }
 
     function renderDialogue(scene) {
       const ph = gameData.philosophers[scene.philosopher];
-      const lines = (scene.dialogues || []).map((line, idx) => {
-        const isNarration = line.speaker === "narration";
-        const speakerLabel = isNarration ? "Narration" : (ph && line.speaker === scene.philosopher ? ph.name : line.speaker);
-        const cls = isNarration ? "dialogue-line speaker-narration" : "dialogue-line";
-        const tag = isNarration ? "" : `<div class="speaker-tag">${speakerLabel}</div>`;
-        return `<div class="${cls}" style="animation-delay:${0.05 + idx * 0.08}s">${tag}<div>${line.text}</div></div>`;
-      }).join("");
+      const dialogues = scene.dialogues || [];
+      const choices = scene.choices || [];
+      const continueOnly = scene.action === "continue" && choices.length === 0;
 
-      let choicesHtml = "";
-      if (scene.choices && scene.choices.length) {
-        choicesHtml = `<div class="choices">${scene.choices.map((c, i) =>
-          `<button type="button" class="choice-btn" data-scene="${scene.id}" data-index="${i}">${c.text}</button>`
-        ).join("")}</div>`;
-      } else if (scene.action === "continue") {
-        choicesHtml = `<button type="button" class="btn-continue" data-next="${scene.nextScene}">Continuer</button>`;
+      if (scene.dialoguePaging === false) {
+        const lines = dialogues.map((line, idx) => {
+          const isNarration = line.speaker === "narration";
+          const speakerLabel = isNarration ? "Narration" : (ph && line.speaker === scene.philosopher ? ph.name : line.speaker);
+          const cls = isNarration ? "dialogue-line speaker-narration" : "dialogue-line";
+          const tag = isNarration ? "" : `<div class="speaker-tag">${speakerLabel}</div>`;
+          return `<div class="${cls}" style="animation-delay:${0.05 + idx * 0.08}s">${tag}<div>${line.text}</div></div>`;
+        }).join("");
+
+        let choicesHtml = "";
+        if (choices.length) {
+          choicesHtml = `<div class="choices">${choices.map((c, i) =>
+            `<button type="button" class="choice-btn" data-scene="${scene.id}" data-index="${i}">${c.text}</button>`
+          ).join("")}</div>`;
+        } else if (continueOnly) {
+          choicesHtml = `<button type="button" class="btn-continue" data-next="${scene.nextScene}">Continuer</button>`;
+        }
+
+        const bgInner = buildSceneBackgroundHtml(scene.background || "athens_agora");
+        const portraitImg = buildPortraitImgHtml(scene.philosopher, ph ? ph.name : "");
+
+        document.getElementById("game-screen").innerHTML = `
+          <div class="dialogue-scene fade-in">
+            <div class="scene-background">${bgInner}</div>
+            <div class="character-portrait">
+              <div class="portrait-frame">
+                ${portraitImg}
+              </div>
+              <div class="character-name">${ph ? ph.name : ""}</div>
+              <div class="character-title">${ph ? ph.title : ""}</div>
+            </div>
+            <div class="dialogue-box">
+              <div class="dialogue-text">${lines}</div>
+              ${choicesHtml}
+            </div>
+          </div>`;
+
+        document.querySelectorAll(".choice-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.index, 10);
+            selectChoice(scene.id, idx);
+          });
+        });
+        const cont = document.querySelector(".btn-continue[data-next]");
+        if (cont) cont.addEventListener("click", () => goToScene(cont.dataset.next));
+        return;
       }
 
-      const bgInner = buildSceneBackgroundHtml(scene.background || "athens_agora");
-      const portraitImg = buildPortraitImgHtml(scene.philosopher, ph ? ph.name : "");
+      const choicePageIndex = choices.length > 0 ? dialogues.length : -1;
+      const multiStep = dialogues.length + (choices.length ? 1 : 0) > 1;
+      let page = 0;
 
-      document.getElementById("game-screen").innerHTML = `
-        <div class="dialogue-scene fade-in">
-          <div class="scene-background">${bgInner}</div>
-          <div class="character-portrait">
-            <div class="portrait-frame">
-              ${portraitImg}
+      function mountDialoguePage() {
+        const isChoicePage = choicePageIndex >= 0 && page === choicePageIndex;
+        const line = !isChoicePage && page < dialogues.length ? dialogues[page] : null;
+        const isNarration = line && line.speaker === "narration";
+        const sceneClass = `dialogue-scene fade-in dialogue-scene--paged${isNarration ? " narration-page" : ""}`;
+
+        let linesHtml = "";
+        if (line) {
+          linesHtml = `<div class="dialogue-text">${renderDialogueLineHtml(line, scene, ph)}</div>`;
+        }
+
+        let choicesHtml = "";
+        if (isChoicePage && choices.length) {
+          choicesHtml = `<div class="choices">${choices.map((c, i) =>
+            `<button type="button" class="choice-btn" data-scene="${scene.id}" data-index="${i}">${c.text}</button>`
+          ).join("")}</div>`;
+        }
+
+        const atLastDialogue = !isChoicePage && dialogues.length > 0 && page === dialogues.length - 1;
+        const canPrev = page > 0;
+
+        let primaryRight = "";
+        if (isChoicePage) {
+          primaryRight = "";
+        } else if (atLastDialogue && continueOnly) {
+          primaryRight = `<button type="button" class="btn-continue dialogue-step-continue" data-next="${scene.nextScene}">Continuer</button>`;
+        } else if (atLastDialogue && choices.length) {
+          primaryRight = `<button type="button" class="btn-gold dialogue-step-next">Suivant →</button>`;
+        } else if (!isChoicePage && page < dialogues.length - 1) {
+          primaryRight = `<button type="button" class="btn-gold dialogue-step-next">Suivant →</button>`;
+        }
+
+        let navHtml = "";
+        if (multiStep) {
+          navHtml = `
+            <div class="dialogue-nav">
+              <button type="button" class="btn-ghost dialogue-step-prev"${canPrev ? "" : " disabled"}>← Précédent</button>
+              <span style="flex:1"></span>
+              ${primaryRight}
+            </div>`;
+        } else if (continueOnly) {
+          navHtml = `
+            <div class="dialogue-nav">
+              <span style="flex:1"></span>
+              <button type="button" class="btn-continue dialogue-step-continue" data-next="${scene.nextScene}">Continuer</button>
+            </div>`;
+        }
+
+        const bgInner = buildSceneBackgroundHtml(scene.background || "athens_agora");
+        const portraitImg = buildPortraitImgHtml(scene.philosopher, ph ? ph.name : "");
+
+        document.getElementById("game-screen").innerHTML = `
+          <div class="${sceneClass}">
+            <div class="scene-background">${bgInner}</div>
+            <div class="character-portrait">
+              <div class="portrait-frame">
+                ${portraitImg}
+              </div>
+              <div class="character-name">${ph ? ph.name : ""}</div>
+              <div class="character-title">${ph ? ph.title : ""}</div>
             </div>
-            <div class="character-name">${ph ? ph.name : ""}</div>
-            <div class="character-title">${ph ? ph.title : ""}</div>
-          </div>
-          <div class="dialogue-box">
-            <div class="dialogue-text">${lines}</div>
-            ${choicesHtml}
-          </div>
-        </div>`;
+            <div class="dialogue-box">
+              ${linesHtml}
+              ${choicesHtml}
+              ${navHtml}
+            </div>
+          </div>`;
 
-      document.querySelectorAll(".choice-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const idx = parseInt(btn.dataset.index, 10);
-          selectChoice(scene.id, idx);
+        document.querySelectorAll(".choice-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.index, 10);
+            selectChoice(scene.id, idx);
+          });
         });
-      });
-      const cont = document.querySelector(".btn-continue[data-next]");
-      if (cont) cont.addEventListener("click", () => goToScene(cont.dataset.next));
+
+        const prevBtn = document.querySelector(".dialogue-step-prev");
+        if (prevBtn && !prevBtn.disabled) {
+          prevBtn.addEventListener("click", () => {
+            page -= 1;
+            mountDialoguePage();
+          });
+        }
+
+        const nextBtn = document.querySelector(".dialogue-step-next");
+        if (nextBtn) {
+          nextBtn.addEventListener("click", () => {
+            page += 1;
+            mountDialoguePage();
+          });
+        }
+
+        document.querySelectorAll(".dialogue-step-continue[data-next]").forEach((btn) => {
+          btn.addEventListener("click", () => goToScene(btn.dataset.next));
+        });
+      }
+
+      mountDialoguePage();
     }
 
     function selectChoice(sceneId, choiceIndex) {
@@ -2568,7 +2966,7 @@
         </div>`;
       document.getElementById("btn-restart-demo").addEventListener("click", () => {
         gameState = defaultState();
-        localStorage.removeItem(STORAGE_KEYS.save);
+        clearAllSaveSlots();
         renderNotebook();
         refreshSkillBars();
         renderScene("intro_1");
@@ -2578,16 +2976,23 @@
     function bootstrapGame() {
       renderNotebook();
       refreshSkillBars();
-      const raw = localStorage.getItem(STORAGE_KEYS.save);
-      let loaded = false;
-      if (raw) {
-        try {
-          const data = JSON.parse(raw);
-          loaded = !!data.currentScene;
-        } catch (e) { /* ignore */ }
+      const entry = readSaveRaw();
+      if (!entry) {
+        renderScene(gameState.currentScene);
+        return;
       }
-      if (loaded) loadGame();
-      else renderScene(gameState.currentScene);
+      try {
+        const data = JSON.parse(entry.raw);
+        if (!data.currentScene || !getSceneById(data.currentScene)) {
+          renderScene(gameState.currentScene);
+          return;
+        }
+        migrateSaveToPrimaryIfNeeded(entry.key, entry.raw);
+        applySaveData(data);
+        renderScene(gameState.currentScene);
+      } catch (e) {
+        renderScene(gameState.currentScene);
+      }
     }
 
     function initParticles() {
@@ -2711,12 +3116,12 @@
     }
 
     function wireHeader() {
-      document.getElementById("btn-save").addEventListener("click", saveGame);
+      document.getElementById("btn-save").addEventListener("click", () => saveGame({ notify: true }));
       document.getElementById("btn-load").addEventListener("click", () => loadGame());
       document.getElementById("btn-new").addEventListener("click", () => {
         if (confirm("Recommencer une nouvelle partie ? La progression sauvegardée sera réinitialisée.")) {
           gameState = defaultState();
-          localStorage.removeItem(STORAGE_KEYS.save);
+          clearAllSaveSlots();
           renderNotebook();
           refreshSkillBars();
           renderScene("intro_1");
@@ -2731,6 +3136,10 @@
       initParticles();
       wireGameMenu();
       wireHeader();
+      window.addEventListener("pagehide", persistStateBeforeUnload);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") persistStateBeforeUnload();
+      });
       bootstrapGame();
     }
 

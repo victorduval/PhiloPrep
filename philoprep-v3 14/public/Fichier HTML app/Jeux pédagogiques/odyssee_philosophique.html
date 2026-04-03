@@ -716,7 +716,7 @@
     }
     .sorting-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
       gap: 0.65rem;
       margin-bottom: 1rem;
     }
@@ -1191,7 +1191,36 @@
      * =============================================================================
      */
 
-    const STORAGE_KEYS = { save: "odyssee_save" };
+    /** Clé primaire par chemin ; ancienne clé lue pour compatibilité. */
+    const LEGACY_SAVE_KEY = "odyssee_save";
+    function getPrimarySaveKey() {
+      try {
+        return "odyssee_save_v2:" + (location.pathname || "/");
+      } catch (e) {
+        return "odyssee_save_v2:/";
+      }
+    }
+    function readSaveRaw() {
+      const primary = getPrimarySaveKey();
+      let raw = localStorage.getItem(primary);
+      if (raw) return { raw, key: primary };
+      raw = localStorage.getItem(LEGACY_SAVE_KEY);
+      if (raw) return { raw, key: LEGACY_SAVE_KEY };
+      return null;
+    }
+    function migrateSaveToPrimaryIfNeeded(keyUsed, raw) {
+      if (keyUsed === LEGACY_SAVE_KEY && raw) {
+        try {
+          localStorage.setItem(getPrimarySaveKey(), raw);
+        } catch (e) { /* ignore */ }
+      }
+    }
+    function clearAllSaveSlots() {
+      try {
+        localStorage.removeItem(getPrimarySaveKey());
+        localStorage.removeItem(LEGACY_SAVE_KEY);
+      } catch (e) { /* ignore */ }
+    }
 
     /** Cibles .jpg — les placeholders .svg portent le même nom de base. */
     const IMAGE_PATHS = {
@@ -1398,7 +1427,37 @@
             { speaker: "socrate", text: "Excellent début ! Maintenant, écoute-moi bien..." },
             { speaker: "socrate", text: "Ces hommes que tu vois, ces <strong>sophistes</strong>, vendent leur art de parler contre de l'argent. Ils enseignent à transformer le discours faible en discours fort, le faux en vrai <em>en apparence</em>." },
             { speaker: "socrate", text: "Moi, je ne demande rien en échange. Je ne prétends rien enseigner. <strong>Je questionne.</strong> Car la vraie philosophie commence par reconnaître qu'on ne sait pas." },
-            { speaker: "socrate", text: "Voici ma méthode : je vais te proposer une petite épreuve. Des affirmations vont apparaître. À toi de les classer selon leur nature : sont-elles de simples <em>opinions</em> ? Des <em>arguments</em> rationnels ? Ou des <em>sophismes</em> trompeurs ?" }
+            { speaker: "socrate", text: "Voici ma méthode : je vais te proposer une petite épreuve. Des affirmations vont apparaître. À toi de les classer : <em>opinion</em>, <em>véridique</em>, <em>sophisme</em>… et aussi le <em>paralogisme</em>, que je t'explique juste avant de commencer." }
+          ],
+          action: "continue",
+          nextScene: "socrate_paralogisme_intro"
+        },
+        {
+          id: "socrate_paralogisme_intro",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            {
+              speaker: "socrate",
+              text: "Avant que nous commencions, laisse-moi t'enseigner une distinction importante : celle entre <strong>sophisme</strong> et <strong>paralogisme</strong>."
+            },
+            {
+              speaker: "socrate",
+              text: "Un <strong>sophisme</strong>, c'est une erreur de raisonnement <em>volontaire</em>. Le sophiste <em>sait</em> qu'il manipule, il cherche à tromper pour gagner le débat."
+            },
+            {
+              speaker: "socrate",
+              text: "Un <strong>paralogisme</strong>, c'est une erreur de raisonnement <em>involontaire</em>. La personne raisonne mal, mais de bonne foi. Elle croit vraiment à son raisonnement."
+            },
+            {
+              speaker: "socrate",
+              text: "Par exemple : « Si tous les chats sont mortels et Socrate est mortel, alors Socrate est un chat. » C'est un <strong>paralogisme</strong> — une erreur logique innocente."
+            },
+            {
+              speaker: "socrate",
+              text: "La différence est cruciale : on peut <em>corriger</em> un paralogisme par la réflexion, mais un sophisme cherche délibérément à éviter la vérité."
+            }
           ],
           action: "continue",
           nextScene: "minigame_tri_1"
@@ -1411,16 +1470,29 @@
           instruction: "Glisse chaque affirmation dans la bonne catégorie. Les sophistes mélangent tout pour tromper. À toi de démêler le vrai du faux !",
           items: [
             { id: 1, text: "Tout le monde dit que cette loi est juste, donc elle l'est.", correct: "opinion" },
-            { id: 2, text: "Si tous les hommes sont mortels et que Socrate est un homme, alors Socrate est mortel.", correct: "argument" },
+            { id: 2, text: "Si tous les hommes sont mortels et que Socrate est un homme, alors Socrate est mortel.", correct: "veridique" },
             { id: 3, text: "Le plus fort a toujours raison car personne ne peut le contredire.", correct: "sophisme" },
             { id: 4, text: "Il fait chaud aujourd'hui à Athènes.", correct: "opinion" },
             { id: 5, text: "Tu ne peux pas critiquer cette théorie si tu n'en proposes pas une meilleure.", correct: "sophisme" },
-            { id: 6, text: "Agir justement rend l'âme harmonieuse, donc la justice est préférable à l'injustice.", correct: "argument" }
+            { id: 6, text: "Agir justement rend l'âme harmonieuse, donc la justice est préférable à l'injustice.", correct: "veridique" },
+            {
+              id: 7,
+              text: "Si tous les chats sont mortels et Socrate est mortel, alors Socrate est un chat.",
+              correct: "paralogisme",
+              explanation: "Erreur logique involontaire (syllogisme invalide). La personne confond appartenance à une catégorie et partage d'une propriété."
+            },
+            {
+              id: 8,
+              text: "Le soleil se lève à l'est tous les jours, donc il se lèvera toujours à l'est.",
+              correct: "paralogisme",
+              explanation: "Induction naïve de bonne foi. La personne généralise sans comprendre que les lois naturelles pourraient théoriquement changer."
+            }
           ],
           categories: [
-            { id: "opinion", label: "Opinion", description: "Croyance sans examen" },
-            { id: "argument", label: "Argument", description: "Raisonnement valide" },
-            { id: "sophisme", label: "Sophisme", description: "Faux raisonnement" }
+            { id: "opinion", label: "OPINION", description: "Croyance sans examen" },
+            { id: "veridique", label: "VÉRIDIQUE", description: "Énoncé solidement étayé par un raisonnement valide" },
+            { id: "sophisme", label: "SOPHISME", description: "Faux raisonnement volontaire" },
+            { id: "paralogisme", label: "PARALOGISME", description: "Faux raisonnement involontaire" }
           ],
           successThreshold: 1,
           rewards: {
@@ -1437,7 +1509,7 @@
           background: "athens_agora",
           dialogues: [
             { speaker: "socrate", text: "Remarquable ! Tu commences à voir clair dans le brouillard des discours." },
-            { speaker: "socrate", text: "Retiens ceci : une <strong>opinion</strong> est ce que l'on croit sans l'avoir examiné. Un <strong>argument</strong> lie des raisons à une conclusion de manière logique. Un <strong>sophisme</strong> fait semblant d'être un argument mais repose sur une erreur ou une manipulation." },
+            { speaker: "socrate", text: "Retiens ceci : une <strong>opinion</strong> est ce que l'on croit sans l'avoir examiné. Le <strong>véridique</strong> désigne ici ce qui lie des raisons à une conclusion de manière logique et mérite d'être tenu pour bien fondé. Un <strong>sophisme</strong> repose sur une erreur ou une manipulation <em>volontaire</em>. Un <strong>paralogisme</strong>, lui, est une erreur de bonne foi — qu'on peut corriger par l'examen." },
             { speaker: "socrate", text: "Ces distinctions sont essentielles. Car la philosophie, vois-tu, c'est l'art d'examiner nos croyances pour distinguer le <em>vrai</em> du <em>faux</em>, le <em>savoir</em> de l'<em>ignorance</em>, la <em>persuasion</em> de la <em>conviction</em>." },
             { speaker: "socrate", text: "Mais je ne suis qu'un vieux bonhomme qui pose des questions. Pour comprendre vraiment ce qu'est la vérité, tu dois rencontrer mon meilleur élève..." }
           ],
@@ -1453,7 +1525,7 @@
           dialogues: [
             {
               speaker: "socrate",
-              text: "Bien ! Tu commences à distinguer opinion et argument. Mais il y a un sophiste encore plus redoutable que les autres..."
+              text: "Bien ! Tu commences à distinguer opinion et véridique. Mais il y a un sophiste encore plus redoutable que les autres..."
             },
             {
               speaker: "socrate",
@@ -1876,7 +1948,8 @@
       skills: { clarte: 15, justification: 15, examen: 15 },
       notebookNotionKeys: [],
       unlockedPhilosophers: ["socrate", "platon"],
-      settings: {}
+      settings: {},
+      resume: null
     });
 
     let gameState = defaultState();
@@ -1941,7 +2014,7 @@
             const wrap = document.querySelector(".minigame-wrap");
             const body =
               th >= 1
-                ? `<p>Tu as <strong>${correct} sur ${n}</strong> affirmations bien placées. Pour cette épreuve, il faut un classement <em>parfait</em> : chaque carte doit être dans la colonne qui correspond vraiment à sa nature (opinion, argument ou sophisme).</p><p>Repère les cartes qui « sonnent » comme un raisonnement valide mais cachent une ruse, ou celles qui ne sont qu'une croyance non examinée. Tu peux déplacer les cartes puis valider à nouveau.</p>`
+                ? `<p>Tu as <strong>${correct} sur ${n}</strong> affirmations bien placées. Pour cette épreuve, il faut un classement <em>parfait</em> : chaque carte doit être dans la colonne qui correspond vraiment à sa nature (opinion, véridique, sophisme ou paralogisme).</p><p>Repère les cartes qui « sonnent » comme un raisonnement valide mais cachent une ruse, ou celles qui ne sont qu'une croyance non examinée. Tu peux déplacer les cartes puis valider à nouveau.</p>`
                 : `<p>Résultat : <strong>${correct} / ${n}</strong>. Il te faut un meilleur score pour continuer. Ajuste les cartes dans les colonnes, puis valide de nouveau.</p>`;
             if (wrap) {
               showWrongAttemptPanel(wrap, {
@@ -2233,39 +2306,56 @@
       }).join("");
     }
 
-    function saveGame() {
-      const payload = {
+    function buildSavePayload() {
+      return {
         version: "1.0",
         timestamp: Date.now(),
         currentScene: gameState.currentScene,
         skills: { ...gameState.skills },
         notebookNotionKeys: [...gameState.notebookNotionKeys],
         unlockedPhilosophers: [...gameState.unlockedPhilosophers],
-        settings: { ...gameState.settings }
+        settings: { ...gameState.settings },
+        resume: gameState.resume && typeof gameState.resume === "object" ? gameState.resume : null
       };
+    }
+
+    function saveGame(opts) {
+      const notify = !!(opts && opts.notify);
       try {
-        localStorage.setItem(STORAGE_KEYS.save, JSON.stringify(payload));
-        showToast("Partie sauvegardée.");
+        localStorage.setItem(getPrimarySaveKey(), JSON.stringify(buildSavePayload()));
+        if (notify) showToast("Partie sauvegardée.");
       } catch (e) {
-        showToast("Impossible de sauvegarder (stockage plein ?).");
+        if (notify) showToast("Impossible de sauvegarder (stockage plein ?).");
       }
     }
 
+    function applySaveData(data) {
+      gameState.currentScene = data.currentScene || "intro_1";
+      gameState.skills = { ...defaultState().skills, ...data.skills };
+      gameState.notebookNotionKeys = data.notebookNotionKeys || [];
+      gameState.unlockedPhilosophers = data.unlockedPhilosophers || defaultState().unlockedPhilosophers;
+      gameState.settings = data.settings || {};
+      let resume = data.resume && typeof data.resume === "object" ? data.resume : null;
+      if (resume && resume.narrative && resume.narrative.sceneId !== gameState.currentScene) resume = null;
+      gameState.resume = resume;
+      refreshSkillBars();
+      renderNotebook();
+    }
+
     function loadGame() {
-      const raw = localStorage.getItem(STORAGE_KEYS.save);
-      if (!raw) {
+      const entry = readSaveRaw();
+      if (!entry) {
         showToast("Aucune sauvegarde trouvée.");
         return false;
       }
       try {
-        const data = JSON.parse(raw);
-        gameState.currentScene = data.currentScene || "intro_1";
-        gameState.skills = { ...defaultState().skills, ...data.skills };
-        gameState.notebookNotionKeys = data.notebookNotionKeys || [];
-        gameState.unlockedPhilosophers = data.unlockedPhilosophers || defaultState().unlockedPhilosophers;
-        gameState.settings = data.settings || {};
-        refreshSkillBars();
-        renderNotebook();
+        const data = JSON.parse(entry.raw);
+        if (!data.currentScene || !getSceneById(data.currentScene)) {
+          showToast("Sauvegarde incomplète ou scène inconnue.");
+          return false;
+        }
+        migrateSaveToPrimaryIfNeeded(entry.key, entry.raw);
+        applySaveData(data);
         renderScene(gameState.currentScene);
         showToast("Partie chargée.");
         return true;
@@ -2273,6 +2363,12 @@
         showToast("Sauvegarde corrompue.");
         return false;
       }
+    }
+
+    function persistStateBeforeUnload() {
+      try {
+        localStorage.setItem(getPrimarySaveKey(), JSON.stringify(buildSavePayload()));
+      } catch (e) { /* ignore */ }
     }
 
     function showToast(msg, durationMs) {
@@ -2364,9 +2460,16 @@
       const screen = document.getElementById("game-screen");
       const slides = scene.images || [];
       let index = 0;
+      const r = gameState.resume && gameState.resume.narrative;
+      if (r && r.sceneId === scene.id && slides.length > 0 && typeof r.slideIndex === "number") {
+        index = Math.max(0, Math.min(r.slideIndex, slides.length - 1));
+      }
 
       function finishSequence() {
         clearNarrativeSequenceTimer();
+        if (gameState.resume && gameState.resume.narrative && gameState.resume.narrative.sceneId === scene.id) {
+          gameState.resume = null;
+        }
         goToScene(scene.nextScene);
       }
 
@@ -2375,6 +2478,8 @@
           finishSequence();
           return;
         }
+        gameState.resume = { narrative: { sceneId: scene.id, slideIndex: index } };
+        saveGame();
         const step = slides[index];
         const relSrc = resolveFromJpgTarget(step.path);
         const svg = svgFallbackForPath(step.path);
@@ -2441,6 +2546,9 @@
         return;
       }
       gameState.currentScene = sceneId;
+      if (scene.type !== "narrative_sequence" && gameState.resume && gameState.resume.narrative) {
+        gameState.resume = null;
+      }
 
       if (scene.type === "dialogue") renderDialogue(scene);
       else if (scene.type === "minigame") {
@@ -2453,19 +2561,7 @@
       else document.getElementById("game-screen").innerHTML = "<p style='padding:2rem'>Type de scène inconnu.</p>";
 
       if (scene.type !== "narrative_sequence" && scene.unlocksNotions) addNotionsToNotebook(scene.unlocksNotions);
-      if (scene.type === "narrative_sequence") {
-        try {
-          localStorage.setItem(STORAGE_KEYS.save, JSON.stringify({
-            version: "1.0",
-            timestamp: Date.now(),
-            currentScene: gameState.currentScene,
-            skills: { ...gameState.skills },
-            notebookNotionKeys: [...gameState.notebookNotionKeys],
-            unlockedPhilosophers: [...gameState.unlockedPhilosophers],
-            settings: { ...gameState.settings }
-          }));
-        } catch (e) { /* ignore */ }
-      } else saveGame();
+      saveGame();
     }
 
     function renderDialogue(scene) {
@@ -2568,7 +2664,7 @@
         </div>`;
       document.getElementById("btn-restart-demo").addEventListener("click", () => {
         gameState = defaultState();
-        localStorage.removeItem(STORAGE_KEYS.save);
+        clearAllSaveSlots();
         renderNotebook();
         refreshSkillBars();
         renderScene("intro_1");
@@ -2578,16 +2674,23 @@
     function bootstrapGame() {
       renderNotebook();
       refreshSkillBars();
-      const raw = localStorage.getItem(STORAGE_KEYS.save);
-      let loaded = false;
-      if (raw) {
-        try {
-          const data = JSON.parse(raw);
-          loaded = !!data.currentScene;
-        } catch (e) { /* ignore */ }
+      const entry = readSaveRaw();
+      if (!entry) {
+        renderScene(gameState.currentScene);
+        return;
       }
-      if (loaded) loadGame();
-      else renderScene(gameState.currentScene);
+      try {
+        const data = JSON.parse(entry.raw);
+        if (!data.currentScene || !getSceneById(data.currentScene)) {
+          renderScene(gameState.currentScene);
+          return;
+        }
+        migrateSaveToPrimaryIfNeeded(entry.key, entry.raw);
+        applySaveData(data);
+        renderScene(gameState.currentScene);
+      } catch (e) {
+        renderScene(gameState.currentScene);
+      }
     }
 
     function initParticles() {
@@ -2711,12 +2814,12 @@
     }
 
     function wireHeader() {
-      document.getElementById("btn-save").addEventListener("click", saveGame);
+      document.getElementById("btn-save").addEventListener("click", () => saveGame({ notify: true }));
       document.getElementById("btn-load").addEventListener("click", () => loadGame());
       document.getElementById("btn-new").addEventListener("click", () => {
         if (confirm("Recommencer une nouvelle partie ? La progression sauvegardée sera réinitialisée.")) {
           gameState = defaultState();
-          localStorage.removeItem(STORAGE_KEYS.save);
+          clearAllSaveSlots();
           renderNotebook();
           refreshSkillBars();
           renderScene("intro_1");
@@ -2731,6 +2834,10 @@
       initParticles();
       wireGameMenu();
       wireHeader();
+      window.addEventListener("pagehide", persistStateBeforeUnload);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") persistStateBeforeUnload();
+      });
       bootstrapGame();
     }
 
