@@ -44,13 +44,16 @@
     }
 
     html, body {
+      height: 100%;
+      margin: 0;
       min-height: 100%;
+      min-height: 100dvh;
       background: radial-gradient(ellipse 120% 80% at 50% 0%, #1e2448 0%, var(--night-deep) 55%, #05060f 100%);
       color: var(--marble);
       font-family: var(--font-body);
       font-size: 18px;
       line-height: 1.55;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
     /* Arrière-plan : particules dorées (léger, performant) */
@@ -82,85 +85,168 @@
       z-index: 1;
       max-width: 1280px;
       margin: 0 auto;
-      padding: 1rem 1rem 2rem;
-      min-height: 100vh;
+      padding: 0;
+      height: 100%;
+      max-height: 100dvh;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      min-height: 0;
     }
 
-    /* Header : titre + compétences */
-    header.game-header {
+    .game-stage {
+      flex: 1;
+      min-height: 0;
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 0.85rem 1.25rem;
-      border-radius: 14px;
-      background: rgba(26, 31, 58, 0.72);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      flex-direction: column;
+      position: relative;
     }
-    .brand h1 {
+
+    .btn-game-menu {
+      position: absolute;
+      top: max(0.4rem, env(safe-area-inset-top, 0px));
+      right: max(0.45rem, env(safe-area-inset-right, 0px));
+      z-index: 40;
       font-family: var(--font-title);
-      font-size: clamp(1.1rem, 3vw, 1.45rem);
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      background: linear-gradient(120deg, var(--gold-light), var(--gold), var(--bronze));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .brand .tagline {
-      font-size: 0.8rem;
-      opacity: 0.75;
-      margin-top: 0.15rem;
-    }
-
-    .skills-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.65rem;
-      align-items: flex-end;
-    }
-    .skill-pill {
-      min-width: 100px;
-    }
-    .skill-pill label {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
       font-size: 0.72rem;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.9;
-      margin-bottom: 0.2rem;
-      font-family: var(--font-title);
+      padding: 0.55rem 0.95rem;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      background: rgba(10, 14, 39, 0.88);
+      color: var(--gold-light);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
-    .skill-bar-track {
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.35);
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .btn-game-menu:active {
+      transform: scale(0.98);
     }
-    .skill-bar-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .skill-clarte .skill-bar-fill { background: linear-gradient(90deg, #7c5cbf, var(--purple-light)); }
-    .skill-justification .skill-bar-fill { background: linear-gradient(90deg, var(--gold-dark), var(--gold-light)); }
-    .skill-examen .skill-bar-fill { background: linear-gradient(90deg, #a83232, #ff6b6b); }
 
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+    .modal-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 350;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: max(0.75rem, env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px)) max(0.75rem, env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
+      box-sizing: border-box;
     }
+    .modal-layer.is-open {
+      display: flex;
+    }
+    .modal-layer-notebook {
+      z-index: 360;
+    }
+    .modal-scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 8, 20, 0.78);
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+    .modal-panel-menu {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 16px;
+      padding: 1.35rem 1.25rem;
+      background: rgba(26, 31, 58, 0.96);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+    }
+    .modal-panel-menu h2 {
+      font-family: var(--font-title);
+      color: var(--gold);
+      font-size: 1.05rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 1rem;
+      text-align: center;
+    }
+    .menu-actions-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .menu-actions-stack .btn-menu-item {
+      width: 100%;
+      font-family: var(--font-title);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--marble);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .menu-actions-stack .btn-menu-item:hover {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: rgba(212, 175, 55, 0.35);
+    }
+    .btn-menu-secondary {
+      margin-top: 0.35rem;
+      background: transparent !important;
+      border-style: dashed !important;
+      opacity: 0.9;
+    }
+    .btn-menu-close {
+      margin-top: 0.85rem;
+      width: 100%;
+      padding: 0.6rem;
+      border: none;
+      background: transparent;
+      color: rgba(245, 245, 220, 0.55);
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .modal-panel-notebook {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      max-height: min(85dvh, 640px);
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      padding: 1.15rem 1.1rem 1rem;
+      background: rgba(26, 31, 58, 0.96);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+    }
+    .modal-panel-notebook h2 {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      margin: 0 0 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      flex-shrink: 0;
+    }
+    .modal-panel-notebook #notebook-list {
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      padding-right: 0.25rem;
+    }
+
     .btn-ghost, .btn-gold {
       font-family: var(--font-title);
       font-size: 0.7rem;
@@ -182,52 +268,29 @@
     }
     .btn-gold:hover { transform: translateY(-1px); }
 
-    /* Zone principale + carnet */
-    .main-row {
-      display: grid;
-      grid-template-columns: 1fr minmax(260px, 300px);
-      gap: 1rem;
-      flex: 1;
-      align-items: stretch;
-    }
-    @media (max-width: 960px) {
-      .main-row { grid-template-columns: 1fr; }
-      #notebook { order: 2; max-height: 280px; }
-    }
-
     #game-screen {
-      min-height: 420px;
-      border-radius: 16px;
+      flex: 1 1 0;
+      min-height: 0;
+      border-radius: 0;
       position: relative;
       overflow: hidden;
       background: rgba(10, 14, 39, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: none;
       box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.35);
     }
+    @media (min-width: 900px) {
+      #game-screen {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        margin: 0.5rem;
+        max-height: calc(100dvh - 1rem);
+      }
+      #game-container {
+        padding: 0.25rem 0;
+      }
+    }
 
-    /* Panneau carnet */
-    #notebook {
-      border-radius: 14px;
-      padding: 1rem;
-      background: rgba(26, 31, 58, 0.75);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      display: flex;
-      flex-direction: column;
-      max-height: min(70vh, 640px);
-    }
-    #notebook h2 {
-      font-family: var(--font-title);
-      font-size: 0.95rem;
-      letter-spacing: 0.1em;
-      color: var(--gold);
-      margin-bottom: 0.75rem;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
-      padding-bottom: 0.5rem;
-    }
     #notebook-list {
-      overflow-y: auto;
-      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 0.65rem;
@@ -256,12 +319,14 @@
       display: grid;
       grid-template-columns: minmax(200px, 32%) 1fr;
       grid-template-rows: 1fr auto;
+      height: 100%;
       animation: fadeIn 0.85s cubic-bezier(0.4, 0, 0.2, 1);
     }
     @media (max-width: 720px) {
       .dialogue-scene {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
+        grid-template-rows: auto minmax(0, 1fr);
+        height: 100%;
       }
     }
     @keyframes fadeIn {
@@ -335,7 +400,15 @@
       gap: 0.5rem;
     }
     @media (max-width: 720px) {
-      .character-portrait { grid-row: 1; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      .character-portrait {
+        grid-row: 1;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: flex-end;
+        padding: 0.45rem 0.5rem 0.35rem;
+        max-height: 32vh;
+      }
     }
     .portrait-frame {
       width: min(220px, 85vw);
@@ -390,7 +463,21 @@
       box-shadow: none;
     }
     @media (max-width: 720px) {
-      .dialogue-box { grid-column: 1; grid-row: 2; margin: 0 0.75rem 0.75rem; max-height: calc(100% - 1.5rem); }
+      .portrait-frame {
+        width: min(112px, 30vw);
+      }
+      .character-name { font-size: 0.95rem; }
+      .character-title { font-size: 0.68rem; max-width: 200px; }
+      .dialogue-box {
+        grid-column: 1;
+        grid-row: 2;
+        margin: 0 0.5rem 0.5rem;
+        min-height: 0;
+        max-height: none;
+        align-self: stretch;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
     }
     .dialogue-text {
       max-height: none;
@@ -403,6 +490,18 @@
       font-size: 1.2em;
       line-height: 1.9;
       margin-bottom: 25px;
+    }
+    @media (max-width: 720px) {
+      .dialogue-text {
+        padding: 14px 14px 16px;
+        font-size: 1rem;
+        line-height: 1.65;
+        margin-bottom: 12px;
+      }
+      .choice-btn {
+        font-size: 0.95rem;
+        padding: 0.75rem 0.95rem;
+      }
     }
     .dialogue-text p,
     .dialogue-text .dialogue-line {
@@ -809,7 +908,7 @@
       bottom: 1.25rem;
       left: 50%;
       transform: translateX(-50%) translateY(120px);
-      z-index: 200;
+      z-index: 500;
       padding: 0.75rem 1.25rem;
       border-radius: 12px;
       background: rgba(26, 31, 58, 0.95);
@@ -825,6 +924,39 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* Barre « Quitter » quand le jeu est intégré en iframe (ex. PhiloPrep) */
+    .odyssee-embed-quit-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 400;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px 12px;
+      padding-top: max(10px, env(safe-area-inset-top, 0px));
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(10, 14, 39, 0.65) 0%, transparent 100%);
+    }
+    .odyssee-embed-quit-btn {
+      pointer-events: auto;
+      font-family: var(--font-title);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.55rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      cursor: pointer;
+      background: rgba(26, 31, 58, 0.92);
+      color: var(--gold-light);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    .odyssee-embed-quit-btn:hover {
+      background: rgba(40, 46, 88, 0.95);
+    }
   </style>
 </head>
 <body>
@@ -832,38 +964,32 @@
   <div id="toast" role="status"></div>
 
   <div id="game-container">
-    <header class="game-header">
-      <div class="brand">
-        <h1>L'Odyssée philosophique</h1>
-        <p class="tagline">Visual novel — Terminale · Philosophie</p>
-      </div>
-      <div class="skills-bar" id="skills-bar">
-        <div class="skill-pill skill-clarte" data-skill="clarte">
-          <label><span aria-hidden="true">🔍</span> Clarté</label>
-          <div class="skill-bar-track"><div class="skill-bar-fill" id="skill-fill-clarte"></div></div>
-        </div>
-        <div class="skill-pill skill-justification" data-skill="justification">
-          <label><span aria-hidden="true">⚖️</span> Justification</label>
-          <div class="skill-bar-track"><div class="skill-bar-fill" id="skill-fill-justification"></div></div>
-        </div>
-        <div class="skill-pill skill-examen" data-skill="examen">
-          <label><span aria-hidden="true">🎯</span> Examen</label>
-          <div class="skill-bar-track"><div class="skill-bar-fill" id="skill-fill-examen"></div></div>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button type="button" class="btn-ghost" id="btn-save" title="Sauvegarder">Sauver</button>
-        <button type="button" class="btn-ghost" id="btn-load" title="Charger">Charger</button>
-        <button type="button" class="btn-ghost" id="btn-new" title="Nouvelle partie">Nouvelle partie</button>
-      </div>
-    </header>
-
-    <div class="main-row">
+    <div class="game-stage">
+      <button type="button" class="btn-game-menu" id="btn-game-menu" aria-haspopup="dialog" aria-controls="game-menu-panel" aria-expanded="false">Menu</button>
       <div id="game-screen"></div>
-      <aside id="notebook" aria-label="Carnet philosophique">
-        <h2>Carnet</h2>
-        <div id="notebook-list"></div>
-      </aside>
+    </div>
+  </div>
+
+  <div id="game-menu-layer" class="modal-layer" aria-hidden="true">
+    <button type="button" class="modal-scrim" id="game-menu-scrim" aria-label="Fermer le menu"></button>
+    <div class="modal-panel-menu" id="game-menu-panel" role="dialog" aria-modal="true" aria-labelledby="game-menu-title">
+      <h2 id="game-menu-title">Menu</h2>
+      <div class="menu-actions-stack">
+        <button type="button" class="btn-menu-item" id="btn-save" title="Sauvegarder">Sauver</button>
+        <button type="button" class="btn-menu-item" id="btn-load" title="Charger">Charger</button>
+        <button type="button" class="btn-menu-item" id="btn-new" title="Nouvelle partie">Nouvelle partie</button>
+        <button type="button" class="btn-menu-item btn-menu-secondary" id="btn-open-notebook">Carnet</button>
+      </div>
+      <button type="button" class="btn-menu-close" id="btn-menu-dismiss">Fermer</button>
+    </div>
+  </div>
+
+  <div id="notebook-layer" class="modal-layer modal-layer-notebook" aria-hidden="true">
+    <button type="button" class="modal-scrim" id="notebook-scrim" aria-label="Fermer le carnet"></button>
+    <div class="modal-panel-notebook" role="dialog" aria-modal="true" aria-labelledby="notebook-modal-title">
+      <h2 id="notebook-modal-title">Carnet</h2>
+      <div id="notebook-list"></div>
+      <button type="button" class="btn-menu-close" id="btn-notebook-dismiss" style="margin-top: 0.75rem">Fermer</button>
     </div>
   </div>
 
@@ -1002,12 +1128,6 @@
       athens_agora: "linear-gradient(160deg, #3d2c1a 0%, #8b5a2b 25%, #c9783c 45%, #2a2450 85%, #0e1028 100%)",
       academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)",
       plato_academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)"
-    };
-
-    const skillsMeta = {
-      clarte: { name: "Clarté", icon: "🔍", color: "#9F7AEA" },
-      justification: { name: "Justification", icon: "⚖️", color: "#D4AF37" },
-      examen: { name: "Examen", icon: "🎯", color: "#E63946" }
     };
 
     /**
@@ -1373,10 +1493,7 @@
     }
 
     function refreshSkillBars() {
-      ["clarte", "justification", "examen"].forEach((s) => {
-        const el = document.getElementById("skill-fill-" + s);
-        if (el) el.style.width = gameState.skills[s] + "%";
-      });
+      /* Barres de compétences retirées de l’interface ; les scores restent dans gameState. */
     }
 
     function addNotionsToNotebook(keys) {
@@ -1767,6 +1884,100 @@
       }
     }
 
+    function installOdysseeEmbedQuit() {
+      try {
+        if (new URLSearchParams(window.location.search).get("parentHud") === "1") return;
+      } catch (e) { /* ignore */ }
+      try {
+        if (window.self === window.top) return;
+      } catch (e) {
+        return;
+      }
+      if (document.getElementById("odyssee-embed-quit-bar")) return;
+      const bar = document.createElement("div");
+      bar.id = "odyssee-embed-quit-bar";
+      bar.className = "odyssee-embed-quit-bar";
+      bar.innerHTML =
+        "<button type=\"button\" class=\"odyssee-embed-quit-btn\" id=\"odyssee-embed-quit-btn\">Quitter le mode aventure</button>";
+      document.body.insertBefore(bar, document.body.firstChild);
+      document.getElementById("odyssee-embed-quit-btn").addEventListener("click", () => {
+        try {
+          window.parent.postMessage({ type: "odyssee-quit" }, window.location.origin);
+        } catch (err) {
+          try {
+            window.parent.postMessage({ type: "odyssee-quit" }, "*");
+          } catch (e2) { /* ignore */ }
+        }
+      });
+    }
+
+    const gameMenuApi = { close: () => {} };
+
+    function wireGameMenu() {
+      const menuLayer = document.getElementById("game-menu-layer");
+      const notebookLayer = document.getElementById("notebook-layer");
+      const btnMenu = document.getElementById("btn-game-menu");
+      if (!menuLayer || !notebookLayer || !btnMenu) return;
+
+      const closeGameMenu = () => {
+        menuLayer.classList.remove("is-open");
+        menuLayer.setAttribute("aria-hidden", "true");
+        btnMenu.setAttribute("aria-expanded", "false");
+      };
+      gameMenuApi.close = closeGameMenu;
+      const openGameMenu = () => {
+        menuLayer.classList.add("is-open");
+        menuLayer.setAttribute("aria-hidden", "false");
+        btnMenu.setAttribute("aria-expanded", "true");
+      };
+      const closeNotebookModal = () => {
+        notebookLayer.classList.remove("is-open");
+        notebookLayer.setAttribute("aria-hidden", "true");
+      };
+      const openNotebookModal = () => {
+        renderNotebook();
+        notebookLayer.classList.add("is-open");
+        notebookLayer.setAttribute("aria-hidden", "false");
+      };
+
+      btnMenu.addEventListener("click", () => openGameMenu());
+      const scrimMenu = document.getElementById("game-menu-scrim");
+      const dismissMenu = document.getElementById("btn-menu-dismiss");
+      if (scrimMenu) scrimMenu.addEventListener("click", closeGameMenu);
+      if (dismissMenu) dismissMenu.addEventListener("click", closeGameMenu);
+
+      const btnNb = document.getElementById("btn-open-notebook");
+      if (btnNb) {
+        btnNb.addEventListener("click", () => {
+          closeGameMenu();
+          openNotebookModal();
+        });
+      }
+
+      const scrimNb = document.getElementById("notebook-scrim");
+      const dismissNb = document.getElementById("btn-notebook-dismiss");
+      if (scrimNb) scrimNb.addEventListener("click", closeNotebookModal);
+      if (dismissNb) dismissNb.addEventListener("click", closeNotebookModal);
+
+      ["btn-save", "btn-load"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("click", closeGameMenu);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        if (notebookLayer.classList.contains("is-open")) {
+          closeNotebookModal();
+          e.preventDefault();
+          return;
+        }
+        if (menuLayer.classList.contains("is-open")) {
+          closeGameMenu();
+          e.preventDefault();
+        }
+      });
+    }
+
     function wireHeader() {
       document.getElementById("btn-save").addEventListener("click", saveGame);
       document.getElementById("btn-load").addEventListener("click", () => loadGame());
@@ -1777,13 +1988,16 @@
           renderNotebook();
           refreshSkillBars();
           renderScene("intro_1");
+          gameMenuApi.close();
         }
       });
     }
 
     /** Point d'entrée : particules, en-tête, puis sauvegarde ou scène par défaut. */
     function init() {
+      installOdysseeEmbedQuit();
       initParticles();
+      wireGameMenu();
       wireHeader();
       bootstrapGame();
     }
