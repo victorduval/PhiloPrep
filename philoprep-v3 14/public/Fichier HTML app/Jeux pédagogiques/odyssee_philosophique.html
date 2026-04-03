@@ -1582,6 +1582,10 @@
       list-style: decimal;
       padding-left: 1.25rem;
       margin: 0.5rem 0 1rem;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -webkit-touch-callout: none;
     }
     .mg-recon-li {
       padding: 0.65rem 0.75rem;
@@ -1591,8 +1595,12 @@
       border: 1px solid rgba(159, 122, 234, 0.35);
       cursor: grab;
       touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -webkit-touch-callout: none;
     }
-    .mg-recon-li.dragging { opacity: 0.6; }
+    .mg-recon-li.dragging { opacity: 0.6; cursor: grabbing; }
     .mg-hint { font-size: 0.82rem; opacity: 0.75; margin: 0 0 0.75rem; }
     .mg-analyze { margin-top: 0.5rem; font-size: 0.72rem; }
     .mg-analyse { margin-top: 0.5rem; font-size: 0.88rem; line-height: 1.45; }
@@ -3383,7 +3391,7 @@
             .join("");
           const playChunk = `
               <ol id="recon-list" class="mg-recon-list">${lis}</ol>
-              <p class="mg-hint">Astuce : glisse les lignes pour les réordonner (ou long press mobile).</p>
+              <p class="mg-hint">Astuce : maintiens et fais glisser une ligne pour la déplacer (mobile et ordinateur).</p>
               <div class="minigame-actions">
                 <button type="button" class="btn-continue" id="btn-recon-val">Vérifier l'ordre</button>
               </div>
@@ -3395,21 +3403,7 @@
             bodyChunks: isMobileGameViewport() ? [introChunk, playChunk] : [playChunk],
             afterMount(root) {
               const list = root.querySelector("#recon-list");
-              if (!list) return;
-              let dragEl = null;
-              list.querySelectorAll("li").forEach((li) => {
-                li.addEventListener("dragstart", () => { dragEl = li; li.classList.add("dragging"); });
-                li.addEventListener("dragend", () => li.classList.remove("dragging"));
-                li.addEventListener("dragover", (ev) => { ev.preventDefault(); });
-                li.addEventListener("drop", (ev) => {
-                  ev.preventDefault();
-                  if (!dragEl || dragEl === li) return;
-                  const rect = li.getBoundingClientRect();
-                  const before = ev.clientY < rect.top + rect.height / 2;
-                  if (before) list.insertBefore(dragEl, li);
-                  else list.insertBefore(dragEl, li.nextSibling);
-                });
-              });
+              initReorderableList(list);
               const btn = root.querySelector("#btn-recon-val");
               if (btn) btn.addEventListener("click", () => validateReconScene());
             }
@@ -3544,21 +3538,7 @@
             bodyChunks: isMobileGameViewport() ? [introChunk, playChunk] : [playChunk],
             afterMount(root) {
               const list = root.querySelector("#chaine-list");
-              if (!list) return;
-              let dragEl = null;
-              list.querySelectorAll("li").forEach((li) => {
-                li.addEventListener("dragstart", () => { dragEl = li; li.classList.add("dragging"); });
-                li.addEventListener("dragend", () => li.classList.remove("dragging"));
-                li.addEventListener("dragover", (ev) => { ev.preventDefault(); });
-                li.addEventListener("drop", (ev) => {
-                  ev.preventDefault();
-                  if (!dragEl || dragEl === li) return;
-                  const rect = li.getBoundingClientRect();
-                  const before = ev.clientY < rect.top + rect.height / 2;
-                  if (before) list.insertBefore(dragEl, li);
-                  else list.insertBefore(dragEl, li.nextSibling);
-                });
-              });
+              initReorderableList(list);
               const btn = root.querySelector("#btn-chaine-val");
               if (btn) btn.addEventListener("click", () => validateChaineScene());
             }
@@ -4009,6 +3989,91 @@
       if (engine.state) engine.state.placements[id] = cat;
       inner.appendChild(draggedCard);
       draggedCard.classList.add("placed");
+    }
+
+    /**
+     * Réordonnancement des <li> (reconstruction du raisonnement, chaîne causale).
+     * Le drag HTML5 est inutilisable sur beaucoup de navigateurs mobiles ; on combine
+     * drag (desktop) + touch avec écouteurs document pour le suivi du doigt.
+     */
+    function initReorderableList(list) {
+      if (!list) return;
+      let dragEl = null;
+      let touchActive = false;
+
+      function insertBeforeNeighbor(clientY) {
+        if (!dragEl) return;
+        const siblings = [...list.querySelectorAll(":scope > li")].filter((x) => x !== dragEl);
+        let placed = false;
+        for (const li of siblings) {
+          const rect = li.getBoundingClientRect();
+          const mid = rect.top + rect.height / 2;
+          if (clientY < mid) {
+            list.insertBefore(dragEl, li);
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) list.appendChild(dragEl);
+      }
+
+      function onDocTouchMove(e) {
+        if (!touchActive || !dragEl || e.touches.length !== 1) return;
+        e.preventDefault();
+        insertBeforeNeighbor(e.touches[0].clientY);
+      }
+
+      function onDocTouchEnd() {
+        document.removeEventListener("touchmove", onDocTouchMove);
+        document.removeEventListener("touchend", onDocTouchEnd);
+        document.removeEventListener("touchcancel", onDocTouchEnd);
+        if (touchActive && dragEl) dragEl.classList.remove("dragging");
+        touchActive = false;
+        dragEl = null;
+      }
+
+      list.querySelectorAll(":scope > li").forEach((li) => {
+        li.addEventListener("dragstart", (e) => {
+          dragEl = li;
+          li.classList.add("dragging");
+          if (e.dataTransfer) {
+            try {
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", String(li.dataset.ordre || ""));
+            } catch (err) {}
+          }
+        });
+        li.addEventListener("dragend", () => {
+          li.classList.remove("dragging");
+          dragEl = null;
+        });
+        li.addEventListener("dragover", (ev) => {
+          ev.preventDefault();
+        });
+        li.addEventListener("drop", (ev) => {
+          ev.preventDefault();
+          if (!dragEl || dragEl === li) return;
+          const rect = li.getBoundingClientRect();
+          const before = ev.clientY < rect.top + rect.height / 2;
+          if (before) list.insertBefore(dragEl, li);
+          else list.insertBefore(dragEl, li.nextSibling);
+        });
+
+        li.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length !== 1) return;
+            onDocTouchEnd();
+            touchActive = true;
+            dragEl = li;
+            li.classList.add("dragging");
+            document.addEventListener("touchmove", onDocTouchMove, { passive: false });
+            document.addEventListener("touchend", onDocTouchEnd);
+            document.addEventListener("touchcancel", onDocTouchEnd);
+          },
+          { passive: true }
+        );
+      });
     }
 
     // --- Progression & carnet ---
