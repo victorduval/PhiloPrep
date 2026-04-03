@@ -3691,9 +3691,11 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
       /* Même orthographe que dans Git (é NFC) : évite 404 Linux/Netlify si l’URL utilisait NFD (%CC%81). */
       const segments = ["Fichier HTML app", "Jeux pédagogiques", "odyssee_philosophique.html"];
       const path = segments.map(encodeURIComponent).join("/");
-      return new URL(path, window.location.origin + "/").href;
+      const u = new URL(path, window.location.origin + "/");
+      u.searchParams.set("parentHud", "1");
+      return u.href;
     } catch (e) {
-      return "/Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/odyssee_philosophique.html";
+      return "/Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/odyssee_philosophique.html?parentHud=1";
     }
   }, []);
   const changeTab = (id) => {
@@ -3705,6 +3707,14 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
     setTab(t);
     if (onTabChange) onTabChange(t);
   }, [initialTab]);
+  React.useEffect(() => {
+    if (tab !== "mode-aventure") return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [tab]);
   const jeuxItems = [
     { name: "PhiloSophia", svgIcon: "compass", onClick: onPhilosophia },
     { name: "PhiloQuest", svgIcon: "target", onClick: onPhiloquest },
@@ -4046,6 +4056,77 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
     </div>
     );
   };
+
+  const quitOdysseeToJeux = () => {
+    changeTab("jeux");
+  };
+
+  if (tab === "mode-aventure") {
+    return ReactDOM.createPortal(
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="L'Odyssée philosophique"
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          maxHeight: "100dvh",
+          zIndex: 200000,
+          background: "#0a0e27",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px))",
+            background: "linear-gradient(180deg, rgba(10,14,39,0.98) 0%, rgba(10,14,39,0.92) 100%)",
+            borderBottom: "1px solid rgba(212, 175, 55, 0.35)",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={quitOdysseeToJeux}
+            style={{
+              padding: "10px 18px",
+              borderRadius: "12px",
+              border: "1px solid rgba(212, 175, 55, 0.45)",
+              background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(139,92,46,0.18) 100%)",
+              color: "#f5e6c8",
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: "14px",
+              fontWeight: 600,
+              cursor: "pointer",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+            }}
+          >
+            ← Quitter · Jeux pédagogiques
+          </button>
+        </div>
+        <iframe
+          title="L'Odyssée philosophique"
+          src={odysseeSrc}
+          style={{
+            flex: 1,
+            minHeight: 0,
+            width: "100%",
+            border: "none",
+            display: "block",
+          }}
+        />
+      </div>,
+      document.body
+    );
+  }
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
       <SubHeader
@@ -4054,9 +4135,7 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
             ? "S'entraîner avec l'IA"
             : tab === "parcours-guide"
               ? "Parcours guidé"
-              : tab === "mode-aventure"
-                ? "L'Odyssée philosophique"
-                : "Jeux pédagogiques"
+              : "Jeux pédagogiques"
         }
         onBack={onBack}
       />
@@ -4064,35 +4143,6 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
         {tab === "jeux" && (
           <div style={{ flex: 1, minHeight: 0, overflow: "auto", WebkitOverflowScrolling: "touch" }}>
             {renderList(jeuxItems)}
-          </div>
-        )}
-        {tab === "mode-aventure" && (
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              position: "relative",
-              overflow: "hidden",
-              background: "#0a0e27",
-            }}
-          >
-            {/*
-              Iframe avec URL absolue depuis l’origine du site pour éviter de charger index.html par erreur.
-              Les chemins assets/ du jeu restent relatifs à odyssee_philosophique.html (voir assetUrl dans le jeu).
-            */}
-            <iframe
-              title="L'Odyssée philosophique"
-              src={odysseeSrc}
-              style={{
-                position: "absolute",
-                left: 0,
-                top: 0,
-                width: "100%",
-                height: "100%",
-                border: "none",
-                display: "block",
-              }}
-            />
           </div>
         )}
         {tab === "parcours-guide" && (

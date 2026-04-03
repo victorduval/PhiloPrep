@@ -1802,6 +1802,9 @@
 
     function installOdysseeEmbedQuit() {
       try {
+        if (new URLSearchParams(window.location.search).get("parentHud") === "1") return;
+      } catch (e) { /* ignore */ }
+      try {
         if (window.self === window.top) return;
       } catch (e) {
         return;
