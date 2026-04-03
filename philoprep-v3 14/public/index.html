@@ -413,7 +413,11 @@ function DecompressIframe({ dataOrPromise, title, style, cacheKey, getData }) {
         if (cancelled) return;
         if (html) {
           if (typeof html === "string") {
-            html = html.replace(/https:\/\/extraordinary-cocada-84e0cf\.netlify\.app\/\.netlify\/functions\/anthropic/g, "/.netlify/functions/anthropic");
+            // Anciens builds pointaient vers un autre site Netlify : forcer la fonction du déploiement actuel.
+            html = html.replace(
+              /https?:\/\/[a-zA-Z0-9.-]+\.netlify\.app\/\.netlify\/functions\/anthropic\b/g,
+              "/.netlify/functions/anthropic"
+            );
           }
           const bridgeScript = "<script>(function(){try{if(window.__philoprepBridgeInstalled)return;window.__philoprepBridgeInstalled=true;function post(type,payload){try{if(window.parent&&window.parent.postMessage){var p=payload||{};p.type=type;window.parent.postMessage(p,'*');}}catch(e){}}window.philoprepXP={addXP:function(amount,meta){try{if(window.parent&&window.parent.__philoprepAddGlobalXP)window.parent.__philoprepAddGlobalXP(amount,meta||{});}catch(e){}post('philoprep:addXP',{amount:amount,meta:meta||{}});},awardQuiz:function(quizId,score,totalQuestions,meta){try{if(window.parent&&window.parent.__philoprepAwardQuizXP)window.parent.__philoprepAwardQuizXP(quizId,score,totalQuestions,meta||{});}catch(e){}post('philoprep:quizComplete',{quizId:quizId,score:score,totalQuestions:totalQuestions,meta:meta||{}});},unlockBadge:function(badgeId,meta){try{if(window.parent&&window.parent.__philoprepUnlockBadge)window.parent.__philoprepUnlockBadge(badgeId,meta||{});}catch(e){}post('philoprep:unlockBadge',{badgeId:badgeId,meta:meta||{}});},redactionComplete:function(exerciseType,score,hintsUsed,meta){post('philoprep:redactionComplete',{exerciseType:exerciseType,score:score,hintsUsed:hintsUsed||0,meta:meta||{}});},simulationComplete:function(mode,qualityScore,meta){post('philoprep:simulationComplete',{mode:mode,qualityScore:qualityScore||0,meta:meta||{}});},parcoursStep:function(parcoursId,stepIndex,totalSteps,totalParcours){post('philoprep:parcoursStep',{parcoursId:parcoursId,stepIndex:stepIndex,totalSteps:totalSteps,totalParcours:totalParcours});}};}catch(e){}})();<\/script>";
           if (typeof html === "string" && html.indexOf("__philoprepBridgeInstalled") < 0) {
@@ -6045,7 +6049,17 @@ function App() {
       }
       if (event.data && event.data.type === 'api_request') {
         try {
-          const response = await fetch(event.data.url, event.data.options);
+          if (!event.source || typeof event.source.postMessage !== "function") return;
+          let apiUrl = event.data.url;
+          if (typeof apiUrl === "string" && /\.netlify\/functions\/anthropic\b/.test(apiUrl)) {
+            try {
+              const u = new URL(apiUrl, window.location.origin);
+              apiUrl = "/.netlify/functions/anthropic" + u.search;
+            } catch (e) {
+              apiUrl = "/.netlify/functions/anthropic";
+            }
+          }
+          const response = await fetch(apiUrl, event.data.options);
           const text = await response.text();
           const fullText = extractAnthropicMessageTextFromBody(text);
           event.source.postMessage({
