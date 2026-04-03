@@ -268,6 +268,56 @@
     }
     .btn-gold:hover { transform: translateY(-1px); }
 
+    /* Navigation latérale (dialogue paginé + séquence narrative) — pas de scroll, tactile */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 12;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      margin: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(212, 175, 55, 0.55);
+      background: rgba(10, 14, 39, 0.72);
+      color: var(--gold-light);
+      font-size: 1.85rem;
+      line-height: 1;
+      font-family: var(--font-title), serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    }
+    .nav-arrow:not(:disabled):active {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: var(--gold-light);
+    }
+    .nav-arrow:disabled {
+      opacity: 0.22;
+      cursor: not-allowed;
+    }
+    .nav-arrow--prev {
+      left: max(4px, env(safe-area-inset-left, 4px));
+    }
+    .nav-arrow--next {
+      right: max(4px, env(safe-area-inset-right, 4px));
+    }
+    @media (min-width: 769px) {
+      .nav-arrow {
+        width: 46px;
+        height: 46px;
+        font-size: 1.65rem;
+      }
+      .nav-arrow--prev { left: 10px; }
+      .nav-arrow--next { right: 10px; }
+    }
+
     #game-screen {
       flex: 1 1 0;
       min-height: 0;
@@ -324,6 +374,8 @@
       position: absolute;
       inset: 0;
       z-index: 1;
+      overflow: hidden;
+      box-sizing: border-box;
       display: grid;
       grid-template-columns: minmax(200px, 32%) 1fr;
       grid-template-rows: 1fr auto;
@@ -410,9 +462,29 @@
       display: none;
     }
     .dialogue-scene.narration-page .dialogue-box {
-      grid-column: 1 / -1;
       margin-left: 1rem;
       margin-right: 1rem;
+    }
+    .dialogue-scene.dialogue-scene--paged .dialogue-main {
+      grid-column: 2;
+      grid-row: 1 / -1;
+      min-height: 0;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+    }
+    .dialogue-scene.dialogue-scene--paged .dialogue-box {
+      grid-column: unset;
+      grid-row: unset;
+      align-self: stretch;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+      overflow: hidden;
+      overflow-y: hidden;
+    }
+    .dialogue-scene.dialogue-scene--paged.narration-page .dialogue-main {
+      grid-column: 1 / -1;
     }
     @media (max-width: 768px) {
       .dialogue-scene.dialogue-scene--paged.narration-page .dialogue-box {
@@ -484,6 +556,25 @@
       line-height: 1.9;
       margin-bottom: 25px;
     }
+    .dialogue-scene--paged .dialogue-nav--footer {
+      display: none;
+    }
+    .dialogue-scene--paged .dialogue-main {
+      padding-left: 56px;
+      padding-right: 56px;
+      box-sizing: border-box;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (min-width: 769px) {
+      .dialogue-scene--paged .dialogue-main {
+        padding-left: 52px;
+        padding-right: 52px;
+      }
+    }
     .dialogue-nav {
       display: flex;
       flex-wrap: wrap;
@@ -510,40 +601,73 @@
         flex-direction: column;
         align-items: stretch;
         justify-content: flex-start;
-        padding: 14px 14px 18px;
-        gap: 12px;
+        padding: 10px 0 12px;
+        gap: 8px;
+        height: 100%;
+        max-height: 100%;
       }
       .dialogue-scene.dialogue-scene--paged .character-portrait:not(.is-hidden) {
         width: 100%;
         flex-shrink: 0;
         position: relative;
         top: auto;
-        padding: 0;
+        padding: 0 56px;
         justify-content: flex-start;
       }
       .dialogue-scene.dialogue-scene--paged .portrait-frame {
-        width: min(92vw, 320px);
-        max-height: min(42vh, 420px);
+        width: min(78vw, 260px);
+        max-height: min(30vh, 320px);
         margin: 0 auto;
+      }
+      .dialogue-scene.dialogue-scene--paged .dialogue-main {
+        grid-column: unset;
+        grid-row: unset;
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+        padding-left: 0;
+        padding-right: 0;
       }
       .dialogue-scene.dialogue-scene--paged .dialogue-box {
         width: 100%;
         flex: 1 1 auto;
         min-height: 0;
+        max-height: 100%;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
       }
       .dialogue-scene.dialogue-scene--paged .dialogue-text {
-        font-size: 0.98rem;
-        line-height: 1.58;
-        padding: 14px 16px;
-        margin-bottom: 10px;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        padding: 10px 12px;
+        margin-bottom: 6px;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
         max-height: none;
-        overflow: visible;
-        flex-shrink: 0;
+        -webkit-overflow-scrolling: auto;
+      }
+      .dialogue-scene.dialogue-scene--paged.narration-page .dialogue-text {
+        font-size: 0.88rem;
+        line-height: 1.42;
+      }
+      .dialogue-scene.dialogue-scene--paged .dialogue-text .dialogue-line > div {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 14;
+        overflow: hidden;
       }
       .dialogue-scene.dialogue-scene--paged .choices {
-        flex-shrink: 0;
+        flex: 0 1 auto;
+        min-height: 0;
+        overflow: hidden;
+        gap: 0.4rem;
+      }
+      .dialogue-scene.dialogue-scene--paged .choice-btn {
+        font-size: 0.82rem;
+        padding: 0.55rem 0.65rem;
+        line-height: 1.35;
       }
       .character-portrait {
         width: 35%;
@@ -592,6 +716,12 @@
         -webkit-overflow-scrolling: touch;
         line-height: 1.65;
         margin-bottom: 12px;
+      }
+      /* Annule le scroll pour le mode paginé (règles plus spécifiques au-dessus) */
+      .dialogue-scene.dialogue-scene--paged .dialogue-text {
+        max-height: none;
+        overflow: hidden;
+        overflow-y: hidden;
       }
       .choice-btn {
         font-size: 0.95rem;
@@ -949,25 +1079,55 @@
       color: var(--purple-light);
       font-style: italic;
     }
-    .narrative-progress {
+    .narrative-footer {
       flex: 0 0 auto;
       margin-top: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 0 52px;
+      box-sizing: border-box;
+    }
+    .narrative-progress {
+      margin: 0;
       color: var(--gold);
       font-family: var(--font-title);
       font-size: clamp(0.75rem, 2vw, 0.95em);
     }
-    .narrative-actions {
-      flex: 0 0 auto;
-      margin-top: 0.45rem;
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
+    .narrative-skip {
+      font-size: 0.65rem !important;
+      padding: 0.4rem 0.65rem !important;
     }
-    .narrative-actions .btn-ghost:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      pointer-events: none;
+    @media (max-width: 768px) {
+      .narrative-sequence {
+        position: relative;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .narrative-title {
+        font-size: clamp(1.05rem, 5.2vw, 1.4rem);
+        margin-bottom: 0.15rem;
+      }
+      .narrative-subtitle {
+        margin-bottom: 0.4rem;
+        font-size: 0.82rem;
+      }
+      .narrative-step-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+      }
+      .narrative-footer {
+        padding: 0 52px;
+        justify-content: center;
+      }
+      .narrative-text-inner {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 9;
+      }
     }
 
     /* Config modal & loading */
@@ -1503,10 +1663,13 @@
           philosopher: "socrate",
           background: "athens_agora",
           dialogues: [
-            { speaker: "narration", text: "Athènes, 399 av. J.-C. L'agora grouille de vie. Des marchands vantent leurs marchandises, des citoyens débattent avec passion. Soudain, un vieil homme au regard perçant vous interpelle..." },
+            { speaker: "narration", text: "Athènes, 399 av. J.-C. L'agora grouille de vie. Des marchands vantent leurs marchandises, des citoyens débattent avec passion." },
+            { speaker: "narration", text: "Soudain, un vieil homme au regard perçant vous interpelle..." },
             { speaker: "socrate", text: "Ah ! Voilà quelqu'un de nouveau sur notre place publique. Dis-moi, jeune être, crois-tu <em>savoir</em> ce qu'est la vérité ? La justice ? Le bien ?" },
-            { speaker: "socrate", text: "Je vois dans ton regard que tu penses peut-être que oui... mais laisse-moi te poser une question : <strong>comment distingues-tu celui qui sait vraiment de celui qui fait seulement semblant de savoir ?</strong>" },
-            { speaker: "socrate", text: "Vois-tu ces orateurs là-bas ? Ils parlent avec assurance, séduisent les foules par leurs beaux discours. Mais leurs paroles cherchent-elles la vérité... ou simplement à plaire ?" }
+            { speaker: "socrate", text: "Je vois dans ton regard que tu penses peut-être que oui... mais laisse-moi te poser une question :" },
+            { speaker: "socrate", text: "<strong>Comment distingues-tu celui qui sait vraiment de celui qui fait seulement semblant de savoir ?</strong>" },
+            { speaker: "socrate", text: "Vois-tu ces orateurs là-bas ? Ils parlent avec assurance, séduisent les foules par leurs beaux discours." },
+            { speaker: "socrate", text: "Mais leurs paroles cherchent-elles la vérité... ou simplement à plaire ?" }
           ],
           choices: [
             {
@@ -2678,6 +2841,8 @@
         const atLast = index >= slides.length - 1;
         screen.innerHTML = `
           <div class="narrative-sequence fade-in">
+            <button type="button" class="nav-arrow nav-arrow--prev" id="narrative-prev"${index <= 0 ? " disabled" : ""} aria-label="Précédent">‹</button>
+            <button type="button" class="nav-arrow nav-arrow--next" id="narrative-next" aria-label="${atLast ? "Terminer" : "Suivant"}">›</button>
             <div class="narrative-sequence-header">
               <h2 class="narrative-title">${escapeHtml(scene.title)}</h2>
               ${sub}
@@ -2689,11 +2854,9 @@
               </div>
               <div class="narrative-text"><div class="narrative-text-inner">${step.text}</div></div>
             </div>
-            <div class="narrative-progress">${index + 1} / ${slides.length}</div>
-            <div class="narrative-actions">
-              <button type="button" class="btn-ghost" id="narrative-prev"${index <= 0 ? " disabled" : ""}>← Précédent</button>
-              <button type="button" class="btn-continue" id="narrative-next">${atLast ? "Terminer →" : "Suivant →"}</button>
-              <button type="button" class="btn-ghost" id="narrative-skip">Passer la séquence</button>
+            <div class="narrative-footer">
+              <span class="narrative-progress">${index + 1} / ${slides.length}</span>
+              <button type="button" class="btn-ghost narrative-skip" id="narrative-skip">Passer</button>
             </div>
           </div>`;
 
@@ -2834,34 +2997,35 @@
         }
 
         const atLastDialogue = !isChoicePage && dialogues.length > 0 && page === dialogues.length - 1;
-        const canPrev = page > 0;
+        const prevDisabled = multiStep && page === 0 && !isChoicePage;
+        const showPrevArrow = multiStep;
 
-        let primaryRight = "";
-        if (isChoicePage) {
-          primaryRight = "";
-        } else if (atLastDialogue && continueOnly) {
-          primaryRight = `<button type="button" class="btn-continue dialogue-step-continue" data-next="${scene.nextScene}">Continuer</button>`;
-        } else if (atLastDialogue && choices.length) {
-          primaryRight = `<button type="button" class="btn-gold dialogue-step-next">Suivant →</button>`;
-        } else if (!isChoicePage && page < dialogues.length - 1) {
-          primaryRight = `<button type="button" class="btn-gold dialogue-step-next">Suivant →</button>`;
+        let showNextArrow = false;
+        let nextIsContinue = false;
+        if (!isChoicePage) {
+          if (atLastDialogue && continueOnly) {
+            showNextArrow = true;
+            nextIsContinue = true;
+          } else if (atLastDialogue && choices.length) {
+            showNextArrow = true;
+          } else if (dialogues.length > 0 && page < dialogues.length - 1) {
+            showNextArrow = true;
+          }
+        }
+        if (!multiStep && continueOnly) {
+          showNextArrow = true;
+          nextIsContinue = true;
         }
 
-        let navHtml = "";
-        if (multiStep) {
-          navHtml = `
-            <div class="dialogue-nav">
-              <button type="button" class="btn-ghost dialogue-step-prev"${canPrev ? "" : " disabled"}>← Précédent</button>
-              <span style="flex:1"></span>
-              ${primaryRight}
-            </div>`;
-        } else if (continueOnly) {
-          navHtml = `
-            <div class="dialogue-nav">
-              <span style="flex:1"></span>
-              <button type="button" class="btn-continue dialogue-step-continue" data-next="${scene.nextScene}">Continuer</button>
-            </div>`;
-        }
+        const nextSceneId = scene.nextScene ? String(scene.nextScene) : "";
+        const prevArrowHtml = showPrevArrow
+          ? `<button type="button" class="nav-arrow nav-arrow--prev dialogue-step-prev"${prevDisabled ? " disabled" : ""} aria-label="Précédent">‹</button>`
+          : "";
+        const nextArrowHtml = showNextArrow
+          ? (nextIsContinue && nextSceneId
+              ? `<button type="button" class="nav-arrow nav-arrow--next dialogue-step-continue" data-next="${escapeHtml(nextSceneId)}" aria-label="Continuer">›</button>`
+              : `<button type="button" class="nav-arrow nav-arrow--next dialogue-step-next" aria-label="Suivant">›</button>`)
+          : "";
 
         const bgInner = buildSceneBackgroundHtml(scene.background || "athens_agora");
         const portraitImg = buildPortraitImgHtml(scene.philosopher, ph ? ph.name : "");
@@ -2869,6 +3033,8 @@
         document.getElementById("game-screen").innerHTML = `
           <div class="${sceneClass}">
             <div class="scene-background">${bgInner}</div>
+            ${prevArrowHtml}
+            ${nextArrowHtml}
             <div class="character-portrait">
               <div class="portrait-frame">
                 ${portraitImg}
@@ -2876,10 +3042,11 @@
               <div class="character-name">${ph ? ph.name : ""}</div>
               <div class="character-title">${ph ? ph.title : ""}</div>
             </div>
-            <div class="dialogue-box">
-              ${linesHtml}
-              ${choicesHtml}
-              ${navHtml}
+            <div class="dialogue-main">
+              <div class="dialogue-box">
+                ${linesHtml}
+                ${choicesHtml}
+              </div>
             </div>
           </div>`;
 
