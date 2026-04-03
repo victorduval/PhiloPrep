@@ -330,13 +330,6 @@
       height: 100%;
       animation: fadeIn 0.85s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @media (max-width: 720px) {
-      .dialogue-scene {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(0, 1fr);
-        height: 100%;
-      }
-    }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(24px); }
       to { opacity: 1; transform: translateY(0); }
@@ -407,17 +400,6 @@
       padding: 1.25rem 1rem 1.5rem;
       gap: 0.5rem;
     }
-    @media (max-width: 720px) {
-      .character-portrait {
-        grid-row: 1;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: flex-end;
-        padding: 0.45rem 0.5rem 0.35rem;
-        max-height: 32vh;
-      }
-    }
     .portrait-frame {
       width: min(220px, 85vw);
       aspect-ratio: 3/4;
@@ -470,23 +452,6 @@
       border-radius: 0;
       box-shadow: none;
     }
-    @media (max-width: 720px) {
-      .portrait-frame {
-        width: min(112px, 30vw);
-      }
-      .character-name { font-size: 0.95rem; }
-      .character-title { font-size: 0.68rem; max-width: 200px; }
-      .dialogue-box {
-        grid-column: 1;
-        grid-row: 2;
-        margin: 0 0.5rem 0.5rem;
-        min-height: 0;
-        max-height: none;
-        align-self: stretch;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-    }
     .dialogue-text {
       max-height: none;
       overflow-y: visible;
@@ -499,10 +464,60 @@
       line-height: 1.9;
       margin-bottom: 25px;
     }
-    @media (max-width: 720px) {
+    @media (max-width: 768px) {
+      .dialogue-scene {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 15px;
+        box-sizing: border-box;
+      }
+      .character-portrait {
+        width: 35%;
+        flex-shrink: 0;
+        position: sticky;
+        top: 20px;
+        grid-column: unset;
+        grid-row: unset;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 0;
+        max-height: none;
+      }
+      .portrait-frame {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 3 / 4;
+      }
+      .character-name {
+        font-size: 1em;
+        margin-top: 8px;
+      }
+      .character-title {
+        font-size: 0.75em;
+        max-width: 100%;
+      }
+      .dialogue-box {
+        grid-column: unset;
+        grid-row: unset;
+        width: 65%;
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        max-height: none;
+        align-self: stretch;
+        overflow: visible;
+        -webkit-overflow-scrolling: touch;
+      }
       .dialogue-text {
-        padding: 14px 14px 16px;
-        font-size: 1rem;
+        font-size: 1em;
+        padding: 15px;
+        max-height: 70vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         line-height: 1.65;
         margin-bottom: 12px;
       }
