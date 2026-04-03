@@ -3356,26 +3356,8 @@
             { speaker: "platon", text: "Le <strong>philosophe</strong> est celui qui se « convertit » — qui tourne son regard — vers cette lumière, au prix d'une ascension douloureuse. C'est ce que raconte l'allégorie de la Caverne." }
           ],
           action: "continue",
-          nextScene: "minigame_analogie_solaire",
+          nextScene: "transition_gyges",
           unlocksNotions: ["le_bien"]
-        },
-        {
-          id: "minigame_analogie_solaire",
-          type: "minigame",
-          gameType: "completer_analogie",
-          title: "☀️ L'Analogie du Soleil",
-          instruction: "Complète le parallèle entre le monde visible et le monde intelligible.",
-          analogie: {
-            monde_intelligible: [
-              { correspondance: "Soleil", reponse_correcte: "Le Bien", options: ["La Raison", "Le Bien", "La Vérité", "Les Idées"] },
-              { correspondance: "Œil", reponse_correcte: "L'intelligence", options: ["L'opinion", "L'intelligence", "La mémoire", "L'imagination"] },
-              { correspondance: "Objets sensibles", reponse_correcte: "Les Idées", options: ["Les Idées", "Les concepts", "Les pensées", "Les sensations"] },
-              { correspondance: "Lumière", reponse_correcte: "La vérité", options: ["La logique", "La vérité", "La démonstration", "La dialectique"] }
-            ]
-          },
-          feedback_complet: { speaker: "platon", text: "Parfait ! Tu as compris l'analogie. De même que le Soleil illumine le monde sensible, le Bien illumine le monde intelligible. Sans cette « lumière », l'intelligence ne pourrait rien connaître." },
-          skillGain: { clarte: 25, justification: 20 },
-          nextScene: "transition_gyges"
         },
         {
           id: "transition_gyges",
@@ -4355,31 +4337,6 @@
         }
       },
 
-      completer_analogie: {
-        render(scene) {
-          window.analogieCompleteScene = scene;
-          const rows = (scene.analogie && scene.analogie.monde_intelligible) || [];
-          const chunks = rows.map((row, idx) => {
-            const opts = row.options
-              .map((o) => `<option value="${escapeAttrSingle(o)}">${escapeHtml(o)}</option>`)
-              .join("");
-            return `<div class="mg-panel">
-              <p>Comme <strong>${escapeHtml(row.correspondance)}</strong> dans le monde visible…</p>
-              <select class="mg-select" data-aid="${idx}"><option value="">— Choisir —</option>${opts}</select>
-            </div>`;
-          });
-          mountMinigameTabbedPages({
-            title: scene.title,
-            instruction: scene.instruction,
-            bodyChunks: chunks,
-            footerHtml: `<div class="minigame-actions"><button type="button" class="btn-continue" id="btn-analog-val">Valider</button></div>`,
-            afterMount(root) {
-              root.querySelector("#btn-analog-val").addEventListener("click", () => validateCompleterAnalogie());
-            }
-          });
-        }
-      },
-
       dilemme_moral_gyges: {
         render(scene) {
           window.gygesDilemmeScene = scene;
@@ -4755,33 +4712,6 @@
       showToast(fc.text ? String(fc.text).replace(/<[^>]+>/g, "").slice(0, 120) : "Circularité comprise !");
       applyMinigameUnlocksFromScene(scene);
       setTimeout(() => goToScene(scene.nextScene), 1100);
-    }
-
-    function validateCompleterAnalogie() {
-      const scene = window.analogieCompleteScene;
-      const rows = (scene.analogie && scene.analogie.monde_intelligible) || [];
-      let allOk = true;
-      rows.forEach((row, idx) => {
-        const sel = document.querySelector(`select[data-aid="${idx}"]`);
-        const v = sel ? sel.value : "";
-        if (v !== row.reponse_correcte) allOk = false;
-      });
-      if (!allOk) {
-        const wrap = document.querySelector(".minigame-wrap");
-        if (wrap) {
-          showWrongAttemptPanel(wrap, {
-            title: "Parallèle incomplet",
-            bodyHtml: "<p>Chaque ligne doit correspondre exactement au parallèle platonicien Soleil / Bien, œil / intelligence, etc.</p>"
-          });
-        }
-        return;
-      }
-      const g = scene.skillGain || {};
-      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
-      applyMinigameUnlocksFromScene(scene);
-      const fb = scene.feedback_complet || {};
-      if (fb.text) showToast(fb.text.replace(/<[^>]+>/g, "").slice(0, 140));
-      setTimeout(() => goToScene(scene.nextScene), 1000);
     }
 
     function onGygesFirstChoice(choiceId) {
@@ -5426,7 +5356,8 @@
     const LEGACY_SCENE_IDS = {
       aporie_conclusion: "aporie_conclusion_finale",
       transition_platon: "platon_herite",
-      protagoras_intro: "sophistes_intro"
+      protagoras_intro: "sophistes_intro",
+      minigame_analogie_solaire: "transition_gyges"
     };
 
     function resolveSceneId(id) {
