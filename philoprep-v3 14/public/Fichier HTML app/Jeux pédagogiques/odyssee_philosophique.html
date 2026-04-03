@@ -1783,7 +1783,10 @@
         sartre: "assets/portraits/sartre.jpg",
         beauvoir: "assets/portraits/beauvoir.jpg",
         arendt: "assets/portraits/arendt.jpg",
-        foucault: "assets/portraits/foucault.jpg"
+        foucault: "assets/portraits/foucault.jpg",
+        protagoras: "assets/portraits/protagoras.jpg",
+        gorgias: "assets/portraits/gorgias.jpg",
+        citoyen: "assets/portraits/citoyen_grec.jpg"
       },
       backgrounds: {
         athens_agora: "assets/backgrounds/athens_agora_sunset.jpg",
@@ -1798,6 +1801,8 @@
         industrial_factory: "assets/backgrounds/industrial_factory.jpg",
         modern_library: "assets/backgrounds/modern_library.jpg",
         paris_cafe: "assets/backgrounds/paris_cafe.jpg",
+        grece_panorama: "assets/backgrounds/grece_antique_athenes.png",
+        grece_ruines: "assets/backgrounds/grece_antique_athenes_2.png",
         tribunal_athenien: "assets/backgrounds/tribunal_athenien.jpg"
       },
       scenes: {
@@ -1834,14 +1839,20 @@
       academy: "plato_academy"
     };
 
-    /** Midjourney / assets déjà présents : on charge le .jpg directement ; sinon placeholder .svg */
-    const REAL_JPG_ASSETS = new Set([
+    /** Raster local (.jpg / .png) : chargement direct ; sinon placeholder .svg pour les cibles .jpg */
+    const REAL_RASTER_ASSETS = new Set([
       "assets/portraits/socrate.jpg",
       "assets/portraits/platon.jpg",
       "assets/portraits/aristote.jpg",
+      "assets/portraits/protagoras.jpg",
+      "assets/portraits/gorgias.jpg",
+      "assets/portraits/citoyen_grec.jpg",
       "assets/backgrounds/athens_agora_sunset.jpg",
       "assets/backgrounds/plato_academy.jpg",
       "assets/backgrounds/aristotle_lyceum.jpg",
+      "assets/backgrounds/grece_antique_athenes.png",
+      "assets/backgrounds/grece_antique_athenes_2.png",
+      "assets/backgrounds/tribunal_athenien.jpg",
       "assets/scenes/caverne/01_prisoners_chained.jpg",
       "assets/scenes/caverne/02_freed_prisoner.jpg",
       "assets/scenes/caverne/05_fire_in_cave.jpg",
@@ -1859,7 +1870,7 @@
 
     function resolveFromJpgTarget(jpgPath) {
       if (!jpgPath) return "";
-      if (REAL_JPG_ASSETS.has(jpgPath)) return jpgPath;
+      if (REAL_RASTER_ASSETS.has(jpgPath)) return jpgPath;
       return svgFallbackForPath(jpgPath);
     }
 
@@ -2000,7 +2011,9 @@
       athens_agora: "linear-gradient(160deg, #3d2c1a 0%, #8b5a2b 25%, #c9783c 45%, #2a2450 85%, #0e1028 100%)",
       academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)",
       plato_academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)",
-      tribunal_athenien: "linear-gradient(165deg, #2a2450 0%, #4a3a6a 40%, #1a1530 100%)"
+      tribunal_athenien: "linear-gradient(165deg, #2a2450 0%, #4a3a6a 40%, #1a1530 100%)",
+      grece_panorama: "linear-gradient(165deg, #3d5a7a 0%, #c9a66b 45%, #8b4513 100%)",
+      grece_ruines: "linear-gradient(165deg, #2c3544 0%, #8b7355 50%, #4a3728 100%)"
     };
 
     /**
@@ -2015,7 +2028,7 @@
       philosophers: {
         socrate: {
           name: "Socrate",
-          title: "Le père de la philosophie (470-399 av. J.-C.)",
+          title: "Philosophe athénien (470-399 av. J.-C.)",
           notions: ["verite", "langage", "raison", "justice"],
           color: "#E8B892"
         },
@@ -2024,10 +2037,48 @@
           title: "Élève de Socrate (428-348 av. J.-C.)",
           notions: ["verite", "raison", "justice", "langage", "temps"],
           color: "#9F7AEA"
+        },
+        protagoras: {
+          name: "Protagoras",
+          title: "Le sophiste (490-420 av. J.-C.)",
+          era: "Grèce classique",
+          color: "#C4A77D"
+        },
+        gorgias: {
+          name: "Gorgias",
+          title: "Maître de rhétorique (485-380 av. J.-C.)",
+          era: "Grèce classique",
+          color: "#A8967A"
+        },
+        citoyen: {
+          name: "Citoyen athénien",
+          title: "",
+          era: "Grèce classique",
+          color: "#B8A88A"
         }
       },
 
       scenes: [
+        {
+          id: "intro_panorama",
+          type: "narrative_sequence",
+          title: "Athènes, 399 av. J.-C.",
+          images: [
+            {
+              path: "assets/backgrounds/grece_antique_athenes.png",
+              title: "La cité d'Athènes",
+              text: "Athènes, berceau de la démocratie et de la philosophie. L'Acropole domine la cité. Les temples brillent sous le soleil méditerranéen.<br><br>C'est ici, sur l'agora — la place publique — que va naître la philosophie occidentale.",
+              duration: 6000
+            },
+            {
+              path: "assets/backgrounds/grece_antique_athenes_2.png",
+              title: "Les ruines du temps",
+              text: "Les colonnes anciennes témoignent de la grandeur passée. Mais ce qui va se jouer ici changera l'histoire de la pensée pour toujours.<br><br>Car un homme va oser questionner toutes les certitudes...",
+              duration: 6000
+            }
+          ],
+          nextScene: "intro_1"
+        },
         {
           id: "intro_1",
           type: "dialogue",
@@ -2162,7 +2213,7 @@
         {
           id: "sophistes_intro",
           type: "dialogue",
-          philosopher: "socrate",
+          philosopher: "protagoras",
           background: "athens_agora",
           dialogues: [
             { speaker: "narration", text: "Un homme élégamment vêtu s'approche. C'est Protagoras, le sophiste le plus célèbre d'Athènes. Une foule de jeunes aristocrates le suit." },
@@ -2195,7 +2246,7 @@
         {
           id: "gorgias_intro",
           type: "dialogue",
-          philosopher: "socrate",
+          philosopher: "gorgias",
           background: "athens_agora",
           dialogues: [
             { speaker: "narration", text: "Un autre sophiste s'avance. C'est Gorgias, maître de rhétorique, connu pour sa capacité à plaider le pour et le contre avec une égale force." },
@@ -2210,7 +2261,7 @@
         {
           id: "sophistes_vente",
           type: "dialogue",
-          philosopher: "socrate",
+          philosopher: "gorgias",
           background: "athens_agora",
           dialogues: [
             { speaker: "gorgias", text: "Jeune homme, pour dix drachmes, je t'apprends à persuader l'Assemblée de voter n'importe quelle loi. Pour vingt, je t'apprends à gagner tous tes procès. Pour cinquante, je fais de toi un maître de la parole !" },
@@ -2509,7 +2560,7 @@
         {
           id: "langage_socrate_sophiste",
           type: "dialogue",
-          philosopher: "socrate",
+          philosopher: "gorgias",
           background: "athens_agora",
           dialogues: [
             { speaker: "gorgias", text: "Socrate, le langage sert le <strong>pouvoir</strong>, pas la vérité. Qui maîtrise les mots maîtrise les hommes." },
@@ -3163,7 +3214,7 @@
     // --- État runtime (complété par load ou défaut) ---
     const defaultState = () => ({
       version: "1.0",
-      currentScene: "intro_1",
+      currentScene: "intro_panorama",
       skills: { clarte: 15, justification: 15, examen: 15 },
       notebookNotionKeys: [],
       unlockedPhilosophers: ["socrate", "platon"],
@@ -4143,7 +4194,7 @@
     }
 
     function applySaveData(data) {
-      gameState.currentScene = resolveSceneId(data.currentScene) || "intro_1";
+      gameState.currentScene = resolveSceneId(data.currentScene) || "intro_panorama";
       gameState.skills = { ...defaultState().skills, ...data.skills };
       gameState.notebookNotionKeys = data.notebookNotionKeys || [];
       gameState.unlockedPhilosophers = data.unlockedPhilosophers || defaultState().unlockedPhilosophers;
@@ -4301,6 +4352,7 @@
       }
 
       function showSlide() {
+        clearNarrativeSequenceTimer();
         if (index >= slides.length) {
           finishSequence();
           return;
@@ -4347,10 +4399,12 @@
 
         document.getElementById("narrative-prev").addEventListener("click", () => {
           if (index <= 0) return;
+          clearNarrativeSequenceTimer();
           index--;
           showSlide();
         });
         document.getElementById("narrative-next").addEventListener("click", () => {
+          clearNarrativeSequenceTimer();
           if (atLast) {
             finishSequence();
             return;
@@ -4362,6 +4416,18 @@
           clearNarrativeSequenceTimer();
           finishSequence();
         });
+
+        const dur = typeof step.duration === "number" && step.duration > 0 ? step.duration : 0;
+        if (dur > 0) {
+          narrativeSequenceTimer = setTimeout(() => {
+            narrativeSequenceTimer = null;
+            if (atLast) finishSequence();
+            else {
+              index++;
+              showSlide();
+            }
+          }, dur);
+        }
       }
 
       showSlide();
@@ -4401,18 +4467,50 @@
     const DIALOGUE_SPEAKER_LABELS = {
       protagoras: "Protagoras",
       gorgias: "Gorgias",
-      citoyen: "Citoyen",
+      citoyen: "Citoyen athénien",
       accusateur: "Accusateur"
     };
 
+    function getDialogueSpeakerLabel(line, scene, ph) {
+      if (!line || line.speaker === "narration") return "Narration";
+      if (gameData.philosophers[line.speaker]) return gameData.philosophers[line.speaker].name;
+      if (DIALOGUE_SPEAKER_LABELS[line.speaker]) return DIALOGUE_SPEAKER_LABELS[line.speaker];
+      if (ph && line.speaker === scene.philosopher) return ph.name;
+      return line.speaker.charAt(0).toUpperCase() + line.speaker.slice(1);
+    }
+
+    function lastNonNarrationLine(lines) {
+      for (let i = lines.length - 1; i >= 0; i--) {
+        if (lines[i].speaker !== "narration") return lines[i];
+      }
+      return null;
+    }
+
+    /** Portrait / entête : locuteur de la réplique courante (ou dernière réplique avant choix). */
+    function resolveDialoguePortraitUi(line, scene) {
+      if (!line || line.speaker === "narration") {
+        return { portraitKey: "", name: "", title: "", isNarration: true };
+      }
+      const sp = line.speaker;
+      const phEntry = gameData.philosophers[sp];
+      if (phEntry) {
+        return { portraitKey: sp, name: phEntry.name, title: phEntry.title || "", isNarration: false };
+      }
+      if (IMAGE_PATHS.portraits[sp]) {
+        const name =
+          DIALOGUE_SPEAKER_LABELS[sp] ||
+          sp.charAt(0).toUpperCase() + sp.slice(1);
+        return { portraitKey: sp, name, title: "", isNarration: false };
+      }
+      const name =
+        DIALOGUE_SPEAKER_LABELS[sp] ||
+        sp.charAt(0).toUpperCase() + sp.slice(1);
+      return { portraitKey: "", name, title: "", isNarration: false };
+    }
+
     function renderDialogueLineHtml(line, scene, ph) {
       const isNarration = line.speaker === "narration";
-      let speakerLabel = "Narration";
-      if (!isNarration) {
-        if (DIALOGUE_SPEAKER_LABELS[line.speaker]) speakerLabel = DIALOGUE_SPEAKER_LABELS[line.speaker];
-        else if (ph && line.speaker === scene.philosopher) speakerLabel = ph.name;
-        else speakerLabel = line.speaker.charAt(0).toUpperCase() + line.speaker.slice(1);
-      }
+      const speakerLabel = getDialogueSpeakerLabel(line, scene, ph);
       const cls = isNarration ? "dialogue-line speaker-narration" : "dialogue-line";
       const tag = isNarration ? "" : `<div class="speaker-tag">${speakerLabel}</div>`;
       return `<div class="${cls}" style="animation-delay:0.08s">${tag}<div>${line.text}</div></div>`;
@@ -4427,7 +4525,7 @@
       if (scene.dialoguePaging === false) {
         const lines = dialogues.map((line, idx) => {
           const isNarration = line.speaker === "narration";
-          const speakerLabel = isNarration ? "Narration" : (ph && line.speaker === scene.philosopher ? ph.name : line.speaker);
+          const speakerLabel = getDialogueSpeakerLabel(line, scene, ph);
           const cls = isNarration ? "dialogue-line speaker-narration" : "dialogue-line";
           const tag = isNarration ? "" : `<div class="speaker-tag">${speakerLabel}</div>`;
           return `<div class="${cls}" style="animation-delay:${0.05 + idx * 0.08}s">${tag}<div>${line.text}</div></div>`;
@@ -4443,7 +4541,9 @@
         }
 
         const bgInner = buildSceneBackgroundHtml(scene.background || "athens_agora");
-        const portraitImg = buildPortraitImgHtml(scene.philosopher, ph ? ph.name : "");
+        const portraitRefLine = lastNonNarrationLine(dialogues) || { speaker: scene.philosopher };
+        const portraitUiNp = resolveDialoguePortraitUi(portraitRefLine, scene);
+        const portraitImg = buildPortraitImgHtml(portraitUiNp.portraitKey, portraitUiNp.name);
 
         document.getElementById("game-screen").innerHTML = `
           <div class="dialogue-scene fade-in">
@@ -4452,8 +4552,8 @@
               <div class="portrait-frame">
                 ${portraitImg}
               </div>
-              <div class="character-name">${ph ? ph.name : ""}</div>
-              <div class="character-title">${ph ? ph.title : ""}</div>
+              <div class="character-name">${escapeHtml(portraitUiNp.name)}</div>
+              <div class="character-title">${escapeHtml(portraitUiNp.title)}</div>
             </div>
             <div class="dialogue-box">
               <div class="dialogue-text">${lines}</div>
@@ -4526,7 +4626,11 @@
           : "";
 
         const bgInner = buildSceneBackgroundHtml(scene.background || "athens_agora");
-        const portraitImg = buildPortraitImgHtml(scene.philosopher, ph ? ph.name : "");
+        const portraitLine =
+          (isChoicePage && dialogues.length ? lastNonNarrationLine(dialogues) : line) ||
+          { speaker: scene.philosopher };
+        const portraitUi = resolveDialoguePortraitUi(portraitLine, scene);
+        const portraitImg = buildPortraitImgHtml(portraitUi.portraitKey, portraitUi.name);
 
         document.getElementById("game-screen").innerHTML = `
           <div class="${sceneClass}">
@@ -4537,8 +4641,8 @@
               <div class="portrait-frame">
                 ${portraitImg}
               </div>
-              <div class="character-name">${ph ? ph.name : ""}</div>
-              <div class="character-title">${ph ? ph.title : ""}</div>
+              <div class="character-name">${escapeHtml(portraitUi.name)}</div>
+              <div class="character-title">${escapeHtml(portraitUi.title)}</div>
             </div>
             <div class="dialogue-main">
               <div class="dialogue-box">
@@ -4694,7 +4798,7 @@
             clearAllSaveSlots();
             renderNotebook();
             refreshSkillBars();
-            renderScene("intro_1");
+            renderScene("intro_panorama");
           });
         }
       }
@@ -4901,7 +5005,7 @@
           clearAllSaveSlots();
           renderNotebook();
           refreshSkillBars();
-          renderScene("intro_1");
+          renderScene("intro_panorama");
           gameMenuApi.close();
         }
       });
