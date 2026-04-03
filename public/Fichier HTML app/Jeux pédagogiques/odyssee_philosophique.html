@@ -327,6 +327,8 @@
       background: rgba(10, 14, 39, 0.5);
       border: none;
       box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
     }
     @media (min-width: 900px) {
       #game-screen {
@@ -901,9 +903,145 @@
       position: relative;
       z-index: 2;
       padding: 1rem;
-      height: 100%;
-      overflow-y: auto;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
       animation: fadeIn 0.6s ease;
+      box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
+      .minigame-wrap {
+        padding: 0.65rem 0.7rem max(0.65rem, env(safe-area-inset-bottom, 0px));
+        overflow: hidden;
+      }
+      .minigame-wrap--tabbed .minigame-instruction {
+        font-size: 0.86rem;
+        margin-bottom: 0.35rem;
+        line-height: 1.4;
+      }
+    }
+    @media (min-width: 769px) {
+      .minigame-wrap {
+        height: 100%;
+        overflow-y: auto;
+      }
+    }
+    .minigame-body-grow {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    @media (min-width: 769px) {
+      .minigame-body-grow {
+        flex: none;
+      }
+    }
+    .minigame-wrap--tabbed .minigame-tab-panels {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .minigame-wrap--tabbed .minigame-page {
+      max-height: 100%;
+      overflow: hidden;
+    }
+    .minigame-page[hidden] {
+      display: none !important;
+    }
+    .minigame-pager-controls {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.25rem 0 0.15rem;
+      margin-top: 0.15rem;
+    }
+    .minigame-page-indicator {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: var(--font-title);
+      color: rgba(212, 175, 55, 0.9);
+    }
+    .minigame-footer-slot[hidden] {
+      display: none !important;
+    }
+    .minigame-footer-slot {
+      flex: 0 0 auto;
+      padding-top: 0.35rem;
+    }
+    .transition-screen {
+      position: relative;
+      z-index: 2;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      max-width: 640px;
+      width: calc(100% - 1.25rem);
+      margin: max(0.35rem, env(safe-area-inset-top, 0px)) auto max(0.5rem, env(safe-area-inset-bottom, 0px));
+      padding: clamp(0.65rem, 3vw, 1.35rem);
+      overflow: hidden;
+      text-align: center;
+      animation: fadeIn 0.65s ease;
+    }
+    .transition-screen > h2 {
+      flex: 0 0 auto;
+      font-family: var(--font-title);
+      color: var(--gold);
+      font-size: clamp(1.05rem, 4vw, 1.5rem);
+      margin-bottom: 0.45rem;
+    }
+    .transition-screen .minigame-tab-panels {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      text-align: left;
+    }
+    .transition-screen .minigame-page {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      max-height: 100%;
+      overflow: hidden;
+    }
+    .transition-screen .btn-continue {
+      flex: 0 0 auto;
+      margin-top: 0.65rem;
+    }
+    .ending-screen-wrap {
+      position: relative;
+      z-index: 2;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-width: 640px;
+      width: calc(100% - 1.1rem);
+      margin: max(0.35rem, env(safe-area-inset-top, 0px)) auto max(0.45rem, env(safe-area-inset-bottom, 0px));
+      padding: clamp(0.65rem, 3vw, 1.35rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      text-align: center;
+    }
+    .ending-screen-wrap > h2 {
+      flex: 0 0 auto;
+      font-family: var(--font-title);
+      color: var(--gold);
+      font-size: clamp(1.05rem, 4vw, 1.45rem);
+      margin-bottom: 0.35rem;
+    }
+    .ending-screen-wrap .minigame-tab-panels {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      text-align: left;
+    }
+    .ending-screen-wrap .ending-page {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      max-height: 100%;
+      overflow: hidden;
     }
     .minigame-wrap h2 {
       font-family: var(--font-title);
@@ -1341,6 +1479,58 @@
       border: 1px solid rgba(231, 76, 60, 0.2);
     }
 
+    .mg-panel {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.75rem;
+      border-radius: 12px;
+      border-left: 4px solid rgba(212, 175, 55, 0.45);
+      text-align: left;
+    }
+    .mg-h3 {
+      font-family: var(--font-title);
+      color: var(--gold-light);
+      font-size: 0.9rem;
+      margin: 0 0 0.5rem;
+    }
+    .mg-arg {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      margin: 0 0 0.6rem;
+      color: var(--marble);
+    }
+    .mg-select {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border-radius: 10px;
+      border: 2px solid rgba(159, 122, 234, 0.55);
+      background: rgba(10, 14, 39, 0.45);
+      color: var(--marble);
+      font-family: var(--font-body);
+    }
+    .mg-stack { display: flex; flex-direction: column; gap: 0.5rem; }
+    .mg-check { display: block; margin: 0.4rem 0; font-size: 0.92rem; cursor: pointer; }
+    .mg-recon-list {
+      list-style: decimal;
+      padding-left: 1.25rem;
+      margin: 0.5rem 0 1rem;
+    }
+    .mg-recon-li {
+      padding: 0.65rem 0.75rem;
+      margin: 0.35rem 0;
+      background: rgba(107, 70, 193, 0.18);
+      border-radius: 10px;
+      border: 1px solid rgba(159, 122, 234, 0.35);
+      cursor: grab;
+      touch-action: none;
+    }
+    .mg-recon-li.dragging { opacity: 0.6; }
+    .mg-hint { font-size: 0.82rem; opacity: 0.75; margin: 0 0 0.75rem; }
+    .mg-analyze { margin-top: 0.5rem; font-size: 0.72rem; }
+    .mg-analyse { margin-top: 0.5rem; font-size: 0.88rem; line-height: 1.45; }
+    .mg-q { margin: 1rem 0 0.5rem; }
+    .mg-opinion-acc { font-size: 1.05rem; line-height: 1.5; margin: 0.5rem 0 1rem; }
+
     .aporie-step, .aporie-conclusion {
       padding: 1rem 0.75rem 1.25rem;
     }
@@ -1531,7 +1721,8 @@
         enlightenment_salon: "assets/backgrounds/enlightenment_salon.jpg",
         industrial_factory: "assets/backgrounds/industrial_factory.jpg",
         modern_library: "assets/backgrounds/modern_library.jpg",
-        paris_cafe: "assets/backgrounds/paris_cafe.jpg"
+        paris_cafe: "assets/backgrounds/paris_cafe.jpg",
+        tribunal_athenien: "assets/backgrounds/tribunal_athenien.jpg"
       },
       scenes: {
         caverne_prisoners: "assets/scenes/caverne/01_prisoners_chained.jpg",
@@ -1550,6 +1741,7 @@
         epicure_desires: "assets/scenes/epicure/desires_classification.jpg",
         socrate_dialogue: "assets/scenes/socrate/dialogue_agora.jpg",
         socrate_revelation: "assets/scenes/socrate/revelation.jpg",
+        mort_socrate: "assets/scenes/socrate/mort_socrate.jpg",
         descartes_study: "assets/scenes/descartes/dark_study.jpg",
         descartes_illusions: "assets/scenes/descartes/sensory_illusions.jpg",
         descartes_cogito: "assets/scenes/descartes/cogito.jpg",
@@ -1612,6 +1804,108 @@
         .replace(/"/g, "&quot;");
     }
 
+    function isMobileGameViewport() {
+      return typeof window.matchMedia !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+    }
+
+    /**
+     * Découpe un texte / HTML léger de transition en pages pour mobile (évite le scroll).
+     */
+    function splitTransitionContentToPages(html) {
+      const s = String(html || "").trim();
+      if (!s) return [];
+      const blockPs = s.match(/<p\b[\s\S]*?<\/p>/gi);
+      if (blockPs && blockPs.length > 1) return blockPs.map((x) => x.trim());
+      if (blockPs && blockPs.length === 1) return blockPs;
+      return s.split(/\n{2,}/).map((x) => x.trim()).filter(Boolean);
+    }
+
+    /**
+     * Mini-jeux : sur mobile, plusieurs blocs HTML coexistent dans le DOM ; un seul est affiché (pas de défilement du cadre).
+     */
+    function mountMinigameTabbedPages(opts) {
+      const wrapClass = opts.wrapClass || "";
+      const title = opts.title || "";
+      const instruction = opts.instruction || "";
+      const bodyChunks = opts.bodyChunks || [];
+      const footerHtml = opts.footerHtml || "";
+      const afterMount = opts.afterMount;
+
+      const screen = document.getElementById("game-screen");
+      const chunks = bodyChunks.map(String).filter((c) => c.trim() !== "");
+      const titleHtml = title ? `<h2>${escapeHtml(title)}</h2>` : "";
+      const instHtml = instruction ? `<p class="minigame-instruction">${instruction}</p>` : "";
+
+      const singleHtml = `
+      <div class="minigame-wrap ${wrapClass}">
+        ${titleHtml}
+        ${instHtml}
+        <div class="minigame-body-grow">${chunks.join("")}</div>
+        ${footerHtml}
+      </div>`;
+
+      if (!isMobileGameViewport() || chunks.length <= 1) {
+        screen.innerHTML = singleHtml;
+        if (afterMount) afterMount(screen);
+        return;
+      }
+
+      const pagesHtml = chunks
+        .map(
+          (html, i) =>
+            `<div class="minigame-page" data-page="${i}"${i === 0 ? "" : " hidden"}>${html}</div>`
+        )
+        .join("");
+
+      screen.innerHTML = `
+      <div class="minigame-wrap minigame-wrap--tabbed ${wrapClass}">
+        ${titleHtml}
+        ${instHtml}
+        <div class="minigame-tab-panels">${pagesHtml}</div>
+        <div class="minigame-pager-controls">
+          <button type="button" class="btn-ghost minigame-page-prev" aria-label="Précédent" disabled>‹</button>
+          <span class="minigame-page-indicator"></span>
+          <button type="button" class="btn-ghost minigame-page-next" aria-label="Suivant">›</button>
+        </div>
+        <div class="minigame-footer-slot" hidden>${footerHtml}</div>
+      </div>`;
+
+      const prev = screen.querySelector(".minigame-page-prev");
+      const next = screen.querySelector(".minigame-page-next");
+      const ind = screen.querySelector(".minigame-page-indicator");
+      const footerSlot = screen.querySelector(".minigame-footer-slot");
+      const instEl = screen.querySelector(".minigame-instruction");
+      let pageIdx = 0;
+
+      function syncUi() {
+        screen.querySelectorAll(".minigame-page").forEach((el, i) => {
+          if (i === pageIdx) el.removeAttribute("hidden");
+          else el.setAttribute("hidden", "");
+        });
+        prev.disabled = pageIdx <= 0;
+        const last = pageIdx >= chunks.length - 1;
+        next.hidden = last;
+        if (ind) ind.textContent = `${pageIdx + 1} / ${chunks.length}`;
+        if (footerSlot) footerSlot.hidden = !last;
+        if (instEl) instEl.style.display = pageIdx === 0 ? "" : "none";
+      }
+
+      prev.addEventListener("click", () => {
+        if (pageIdx > 0) {
+          pageIdx--;
+          syncUi();
+        }
+      });
+      next.addEventListener("click", () => {
+        if (pageIdx < chunks.length - 1) {
+          pageIdx++;
+          syncUi();
+        }
+      });
+      syncUi();
+      if (afterMount) afterMount(screen);
+    }
+
     /**
      * Résout les chemins assets/... par rapport au dossier du fichier HTML (pas la racine du site).
      * Indispensable si l’URL est du type http://localhost:8000/odyssee_philosophique/odyssee_philosophique.html
@@ -1629,7 +1923,8 @@
     const BACKGROUNDS = {
       athens_agora: "linear-gradient(160deg, #3d2c1a 0%, #8b5a2b 25%, #c9783c 45%, #2a2450 85%, #0e1028 100%)",
       academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)",
-      plato_academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)"
+      plato_academy: "linear-gradient(165deg, #1a3028 0%, #4a7c59 35%, #d4a574 55%, #3d2b5c 100%)",
+      tribunal_athenien: "linear-gradient(165deg, #2a2450 0%, #4a3a6a 40%, #1a1530 100%)"
     };
 
     /**
@@ -1697,10 +1992,8 @@
           philosopher: "socrate",
           background: "athens_agora",
           dialogues: [
-            { speaker: "socrate", text: "Excellent début ! Maintenant, écoute-moi bien..." },
-            { speaker: "socrate", text: "Ces hommes que tu vois, ces <strong>sophistes</strong>, vendent leur art de parler contre de l'argent. Ils enseignent à transformer le discours faible en discours fort, le faux en vrai <em>en apparence</em>." },
-            { speaker: "socrate", text: "Moi, je ne demande rien en échange. Je ne prétends rien enseigner. <strong>Je questionne.</strong> Car la vraie philosophie commence par reconnaître qu'on ne sait pas." },
-            { speaker: "socrate", text: "Voici ma méthode : je vais te proposer une petite épreuve. Des affirmations vont apparaître. À toi de les classer : <em>opinion</em>, <em>véridique</em>, <em>sophisme</em>… et aussi le <em>paralogisme</em>, que je t'explique juste avant de commencer." }
+            { speaker: "socrate", text: "Écoute ces déclarations que j'entends chaque jour sur l'agora. Certaines sont de simples <strong>opinions</strong>, d'autres des énoncés <strong>véridiques</strong> (bien fondés par la raison), d'autres encore des <strong>sophismes</strong> — des raisonnements trompeurs." },
+            { speaker: "socrate", text: "Apprends d'abord à les distinguer. C'est le premier pas vers la philosophie." }
           ],
           action: "continue",
           nextScene: "socrate_paralogisme_intro"
@@ -1787,52 +2080,395 @@
             { speaker: "socrate", text: "Mais je ne suis qu'un vieux bonhomme qui pose des questions. Pour comprendre vraiment ce qu'est la vérité, tu dois rencontrer mon meilleur élève..." }
           ],
           action: "continue",
-          nextScene: "protagoras_intro",
+          nextScene: "sophistes_intro",
           unlocksNotions: ["verite", "langage", "raison"]
         },
         {
-          id: "protagoras_intro",
+          id: "sophistes_intro",
           type: "dialogue",
           philosopher: "socrate",
           background: "athens_agora",
           dialogues: [
-            {
-              speaker: "socrate",
-              text: "Bien ! Tu commences à distinguer opinion et véridique. Mais il y a un sophiste encore plus redoutable que les autres..."
-            },
-            {
-              speaker: "socrate",
-              text: "Son nom est <strong>Protagoras</strong>. Il affirme que <em>\"l'homme est la mesure de toute chose\"</em>. Autrement dit : ce qui est vrai pour toi l'est vraiment pour toi, ce qui est vrai pour moi l'est vraiment pour moi."
-            },
-            {
-              speaker: "socrate",
-              text: "Cela semble séduisant, n'est-ce pas ? Chacun sa vérité, aucune querelle possible ! Mais réfléchis bien..."
-            },
-            {
-              speaker: "socrate",
-              text: "Si Protagoras a raison, alors <strong>toutes les opinions se valent</strong>. L'opinion du sage et celle de l'ignorant auraient la même valeur. Est-ce vraiment acceptable ?"
-            }
+            { speaker: "narration", text: "Un homme élégamment vêtu s'approche. C'est Protagoras, le sophiste le plus célèbre d'Athènes. Une foule de jeunes aristocrates le suit." },
+            { speaker: "socrate", text: "Tiens, voilà Protagoras. Tu vas voir comment ces hommes vendent leur prétendu savoir..." },
+            { speaker: "protagoras", text: "Salut à toi, Socrate ! Et à toi, jeune inconnu. Sache que je peux t'enseigner l'<strong>art de persuader</strong> n'importe qui de n'importe quoi. Pour seulement quelques drachmes." },
+            { speaker: "socrate", text: "Persuader de <em>n'importe quoi</em>, dis-tu ? Même du faux ? Voilà qui est inquiétant..." },
+            { speaker: "protagoras", text: "Le faux, le vrai... ces mots n'ont pas de sens absolu, Socrate. <em>« L'homme est la mesure de toute chose. »</em> Ce qui est vrai pour toi l'est pour toi, ce qui est vrai pour moi l'est pour moi." }
+          ],
+          action: "continue",
+          nextScene: "protagoras_debat"
+        },
+        {
+          id: "protagoras_debat",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Intéressant. Mais réfléchis, Protagoras : si chacun a SA vérité, alors toutes les opinions se valent. L'opinion du sage et celle de l'ignorant auraient la même valeur ?" },
+            { speaker: "protagoras", text: "Précisément ! Personne ne détient la vérité absolue." },
+            { speaker: "socrate", text: "Mais alors, pourquoi discuterions-nous ? Pourquoi chercher à convaincre ? Si tu as raison, ta propre affirmation que « l'homme est la mesure de toute chose » n'est qu'une opinion parmi d'autres. Pourquoi devrais-je l'accepter ?" },
+            { speaker: "protagoras", text: "Tu joues sur les mots, Socrate..." },
+            { speaker: "socrate", text: "Non, je révèle la <strong>contradiction</strong> de ton relativisme. Tu prétends qu'il n'y a pas de vérité, mais tu veux que je croie que CELA est vrai. C'est incohérent." }
           ],
           choices: [
-            {
-              text: "\"Non, certaines opinions sont mieux fondées que d'autres.\"",
-              feedback: "Exactement ! Mais alors Protagoras a tort : il existe bien une différence entre vérité et opinion. C'est ce que nous cherchons.",
-              skillGain: { clarte: 15, examen: 10 },
-              nextScene: "doxa_intro"
-            },
-            {
-              text: "\"Oui, chacun a droit à son opinion.\"",
-              feedback: "Attention ! Si TOUTES les opinions se valent, pourquoi discuterions-nous ? Pourquoi chercher la vérité ? Le relativisme de Protagoras détruit la possibilité même de la philosophie.",
-              skillGain: { examen: 8 },
-              nextScene: "doxa_intro"
-            },
-            {
-              text: "\"Je ne sais pas, c'est compliqué...\"",
-              feedback: "Bien vu ! C'est effectivement compliqué. Le relativisme semble tolérant, mais il rend impossible toute recherche de vérité. Creusons cette question.",
-              skillGain: { examen: 12 },
-              nextScene: "doxa_intro"
-            }
+            { text: "« Socrate a raison. Si tout se vaut, rien ne vaut. »", feedback: "Exactement ! Le relativisme absolu se détruit lui-même. Il existe bien une différence entre opinion et vérité.", skillGain: { examen: 15, clarte: 10 }, nextScene: "gorgias_intro" },
+            { text: "« Protagoras a raison. Chacun sa vérité. »", feedback: "Attention ! Si c'était vrai, pourquoi Protagoras essaie-t-il de te convaincre ? Le relativisme se contredit.", skillGain: { examen: 5 }, nextScene: "gorgias_intro" },
+            { text: "« C'est compliqué... je ne sais pas. »", feedback: "Bien ! Reconnaître qu'on ne sait pas, c'est déjà philosopher. Mais creusons : si TOUT est relatif, cette affirmation elle-même l'est aussi.", skillGain: { examen: 10 }, nextScene: "gorgias_intro" }
           ]
+        },
+        {
+          id: "gorgias_intro",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "narration", text: "Un autre sophiste s'avance. C'est Gorgias, maître de rhétorique, connu pour sa capacité à plaider le pour et le contre avec une égale force." },
+            { speaker: "gorgias", text: "Socrate, tu parles de vérité comme si elle existait ! Mais moi je dis : <em>rien n'existe</em>. Et même si quelque chose existait, nous ne pourrions pas le connaître. Et même si nous le connaissions, nous ne pourrions pas le communiquer !" },
+            { speaker: "socrate", text: "Voilà un beau paradoxe. Mais si rien n'existe, pourquoi es-tu là à parler ? Si rien ne peut être communiqué, pourquoi essaies-tu de me convaincre ?" },
+            { speaker: "gorgias", text: "Peu importe ! Ce qui compte, c'est l'<strong>effet</strong> du discours, pas sa vérité. Un bon orateur peut défendre n'importe quelle cause." },
+            { speaker: "socrate", text: "Voilà le danger ! Ces hommes enseignent l'art de <strong>persuader</strong> sans se soucier du vrai. Ils confondent le <strong>langage</strong> comme outil de vérité et le langage comme instrument de pouvoir." }
+          ],
+          action: "continue",
+          nextScene: "sophistes_vente"
+        },
+        {
+          id: "sophistes_vente",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "gorgias", text: "Jeune homme, pour dix drachmes, je t'apprends à persuader l'Assemblée de voter n'importe quelle loi. Pour vingt, je t'apprends à gagner tous tes procès. Pour cinquante, je fais de toi un maître de la parole !" },
+            { speaker: "socrate", text: "Tu vois ? Ils <em>vendent</em> leur savoir. Mais peut-on vraiment vendre la sagesse comme on vend du poisson ? Et que valent leurs promesses ?" },
+            { speaker: "socrate", text: "Ils promettent de t'enseigner la <strong>vertu politique</strong> — l'excellence dans les affaires de la cité. Mais comment peuvent-ils l'enseigner s'ils ne savent même pas ce qu'elle est ?" },
+            { speaker: "socrate", text: "Voilà la différence entre <strong>sophistique</strong> et <strong>philosophie</strong>. Le sophiste prétend tout savoir. Le philosophe reconnaît qu'il ne sait rien, et c'est pourquoi il cherche." }
+          ],
+          action: "continue",
+          nextScene: "minigame_reperer_sophismes"
+        },
+        {
+          id: "minigame_reperer_sophismes",
+          type: "minigame",
+          gameType: "sophisme_detection",
+          title: "🎭 Repérer les sophismes",
+          instruction: "Gorgias prononce plusieurs arguments. Pour chacun, choisis le type de sophisme.",
+          items: [
+            { id: 1, argument: "Tout le monde à Athènes pense que la démocratie est le meilleur régime. Donc c'est vrai.", sophismeType: "appel_foule", nom: "Appel à la foule", explication: "Ce n'est pas parce que beaucoup de gens croient quelque chose que c'est vrai. La vérité ne se décide pas au vote." },
+            { id: 2, argument: "Périclès dit que cette guerre est juste. Périclès est un grand homme. Donc cette guerre est juste.", sophismeType: "appel_autorite", nom: "Appel à l'autorité", explication: "Même un grand homme peut se tromper. L'autorité d'une personne ne garantit pas la vérité de ses affirmations." },
+            { id: 3, argument: "Si on autorise les esclaves à parler à l'Assemblée, bientôt ils voudront voter, puis gouverner, et Athènes sera détruite !", sophismeType: "pente_glissante", nom: "Pente glissante", explication: "On exagère les conséquences en enchaînant des suppositions sans prouver qu'elles sont nécessaires." },
+            { id: 4, argument: "Tu ne peux pas critiquer ma théorie sur la justice si toi-même tu n'es pas parfaitement juste.", sophismeType: "ad_hominem", nom: "Attaque personnelle (ad hominem)", explication: "On attaque la personne au lieu de réfuter l'argument." },
+            { id: 5, argument: "Soit tu es avec nous, soit tu es contre nous. Il n'y a pas de position intermédiaire.", sophismeType: "faux_dilemme", nom: "Faux dilemme", explication: "On réduit artificiellement les options à deux choix alors qu'il peut en exister d'autres." }
+          ],
+          categories: [
+            { id: "appel_foule", label: "Appel à la foule" },
+            { id: "appel_autorite", label: "Appel à l'autorité" },
+            { id: "pente_glissante", label: "Pente glissante" },
+            { id: "ad_hominem", label: "Attaque personnelle" },
+            { id: "faux_dilemme", label: "Faux dilemme" }
+          ],
+          successThreshold: 0.6,
+          skillGain: { examen: 20, clarte: 15 },
+          nextScene: "transition_phase3"
+        },
+        {
+          id: "transition_phase3",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Maintenant que tu as vu comment les sophistes manipulent le langage, observons la différence entre <strong>persuader</strong> et <strong>convaincre</strong>." },
+            { speaker: "socrate", text: "<em>Persuader</em>, c'est obtenir l'adhésion par l'émotion, la séduction, l'autorité. <em>Convaincre</em>, c'est obtenir l'adhésion par la raison, la démonstration, la vérité." },
+            { speaker: "narration", text: "Un citoyen accourt, essoufflé." },
+            { speaker: "citoyen", text: "Un procès va avoir lieu ! Un homme accusé de vol. Gorgias défend l'accusé, un autre orateur l'accuse. Venez voir !" },
+            { speaker: "socrate", text: "Parfait. Allons au tribunal. Tu vas voir les deux méthodes en action." }
+          ],
+          action: "continue",
+          nextScene: "proces_intro"
+        },
+        {
+          id: "proces_intro",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "tribunal_athenien",
+          dialogues: [
+            { speaker: "narration", text: "Le tribunal d'Athènes. Des centaines de citoyens-jurés sont assis en demi-cercle. L'accusé se tient debout, enchaîné." },
+            { speaker: "accusateur", text: "Citoyens d'Athènes ! Cet homme a volé ! Des témoins l'ont vu près de la maison cambriolée. Il est pauvre et a besoin d'argent. <em>Qui d'autre que lui ?</em>" },
+            { speaker: "accusateur", text: "Si nous ne le punissons pas, <strong>d'autres voleront</strong> ! Athènes sombrera dans le chaos ! Votez coupable, pour la sécurité de tous !" },
+            { speaker: "socrate", text: "Vois-tu ? Il fait appel à la <strong>peur</strong> et à l'<strong>indignation</strong>. Mais a-t-il <em>prouvé</em> que l'homme est coupable ?" }
+          ],
+          action: "continue",
+          nextScene: "proces_defense"
+        },
+        {
+          id: "proces_defense",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "tribunal_athenien",
+          dialogues: [
+            { speaker: "gorgias", text: "Nobles jurés ! Regardez cet homme. Un père de famille. Un travailleur honnête. <em>Cet homme a des enfants !</em> Allez-vous les condamner à la misère ?" },
+            { speaker: "gorgias", text: "Les témoins ? Ils l'ont vu <em>près</em> de la maison. Est-ce une preuve ? Moi aussi je suis passé près de cette maison. Suis-je voleur ?" },
+            { speaker: "gorgias", text: "Et puis, cet homme est <strong>pauvre</strong>. Si la société le pousse au désespoir, qui est le vrai coupable ? Votez non-coupable, citoyens au grand cœur !" },
+            { speaker: "socrate", text: "Gorgias joue sur la <strong>pitié</strong> et retourne l'accusation contre la société. Mais a-t-il répondu à la question : l'homme a-t-il volé ou non ?" }
+          ],
+          action: "continue",
+          nextScene: "proces_analyse"
+        },
+        {
+          id: "proces_analyse",
+          type: "minigame",
+          gameType: "analyse_persuasion",
+          title: "⚖️ Persuasion vs conviction",
+          instruction: "Coche les techniques réellement présentes dans chaque discours. Aucun des deux n'a vraiment <em>prouvé</em> son point.",
+          discours: [
+            {
+              orateur: "Accusateur",
+              techniques: [
+                { id: "peur", label: "Appel à la peur", present: true },
+                { id: "temoins_faibles", label: "Témoignages faibles", present: true },
+                { id: "generalisation", label: "Généralisation hâtive", present: true },
+                { id: "raison", label: "Argumentation rationnelle", present: false }
+              ]
+            },
+            {
+              orateur: "Gorgias (défenseur)",
+              techniques: [
+                { id: "pitie", label: "Appel à la pitié", present: true },
+                { id: "retournement", label: "Retournement rhétorique", present: true },
+                { id: "question_rhetori", label: "Questions rhétoriques", present: true },
+                { id: "preuves", label: "Preuves concrètes", present: false }
+              ]
+            }
+          ],
+          conclusion: { speaker: "socrate", text: "Tu vois ? Aucun des deux n'a <strong>prouvé</strong> quoi que ce soit. L'un joue sur la peur, l'autre sur la pitié. Tous deux <em>persuadent</em> sans <em>convaincre</em>. Ils cherchent à <strong>séduire</strong> les jurés, pas à établir la vérité." },
+          skillGain: { examen: 20, clarte: 15 },
+          nextScene: "socrate_conviction"
+        },
+        {
+          id: "socrate_conviction",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "tribunal_athenien",
+          dialogues: [
+            { speaker: "socrate", text: "Pour <strong>convaincre</strong> vraiment, il faudrait : 1) Des preuves matérielles. 2) Des témoignages fiables et vérifiés. 3) Un raisonnement logique sans failles." },
+            { speaker: "socrate", text: "Mais persuader est plus <em>facile</em> que convaincre. Émouvoir est plus rapide que démontrer. Voilà pourquoi les sophistes réussissent." },
+            { speaker: "socrate", text: "La philosophie, elle, exige l'effort de la <strong>raison</strong>. Elle refuse les raccourcis émotionnels. Elle cherche la <strong>vérité</strong>, même si elle déplaît." },
+            { speaker: "socrate", text: "Voilà la première grande distinction : <em>persuader</em> (émouvoir, séduire) ≠ <em>convaincre</em> (prouver, démontrer)." }
+          ],
+          action: "continue",
+          nextScene: "transition_logos",
+          unlocksNotions: ["persuasion_conviction"]
+        },
+        {
+          id: "transition_logos",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Sortons du tribunal. Parlons maintenant de ce que les Grecs appellent le <strong>logos</strong>." },
+            { speaker: "socrate", text: "Le <em>logos</em>, c'est la <strong>raison</strong>, le <strong>discours rationnel</strong>, la <strong>logique</strong>. C'est ce qui nous permet de distinguer le vrai du faux, le cohérent de l'incohérent." },
+            { speaker: "socrate", text: "Avant le logos, il y avait le <em>mythos</em> — le récit, le mythe, transmis par tradition. Les poètes comme Homère racontaient des mythes pour expliquer le monde." },
+            { speaker: "socrate", text: "Mais le <strong>logos</strong> ne se contente pas de raconter. Il <em>démontre</em>. Il ne demande pas de croire sans examen : il demande de <em>comprendre</em>." }
+          ],
+          action: "continue",
+          nextScene: "logos_exemple"
+        },
+        {
+          id: "logos_exemple",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Exemple : pourquoi le soleil se lève-t-il chaque matin ?" },
+            { speaker: "socrate", text: "<strong>Mythos :</strong> « Hélios, le dieu du soleil, traverse le ciel sur son char de feu. » C'est un beau récit, mais il n'explique pas vraiment le phénomène." },
+            { speaker: "socrate", text: "<strong>Logos :</strong> « Le soleil semble se lever parce que la Terre tourne. » C'est une explication <em>rationnelle</em>, vérifiable, débatable proprement." },
+            { speaker: "socrate", text: "Le logos exige des <strong>raisons</strong>, de la <strong>cohérence</strong>. C'est la naissance de la philosophie et de la science." }
+          ],
+          action: "continue",
+          nextScene: "minigame_reconstruction"
+        },
+        {
+          id: "minigame_reconstruction",
+          type: "minigame",
+          gameType: "reconstruction_raisonnement",
+          title: "🔗 Reconstruire un raisonnement",
+          instruction: "Remets ces phrases dans le bon ordre (syllogisme).",
+          feedback_succes: "Parfait ! Si les prémisses sont vraies et la forme valide, la conclusion suit. Voilà le pouvoir du logos.",
+          feedback_echec: "Pas tout à fait. Ordre : prémisse générale → prémisse particulière → conclusion.",
+          skillGain: { clarte: 20, justification: 15 },
+          raisonnement: {
+            etapes: [
+              { id: 1, texte: "Tous les hommes sont mortels.", ordre: 1 },
+              { id: 2, texte: "Socrate est un homme.", ordre: 2 },
+              { id: 3, texte: "Donc Socrate est mortel.", ordre: 3 }
+            ]
+          },
+          nextScene: "minigame_reparer_argument"
+        },
+        {
+          id: "minigame_reparer_argument",
+          type: "minigame",
+          gameType: "reparer_argument",
+          title: "🔧 Réparer un argument invalide",
+          instruction: "Pour chaque raisonnement invalide, choisis la correction qui restaure un syllogisme valide.",
+          skillGain: { clarte: 25, examen: 20 },
+          arguments: [
+            { id: 1, invalide: "Tous les chats sont mortels. Socrate est mortel. Donc Socrate est un chat.", bonne_reponse: 1, explication: "On confondait propriété partagée et appartenance à une catégorie. « Tous les hommes sont mortels. Socrate est un homme. Donc Socrate est mortel. » est valide.", correction_options: ["Tous les chats sont mortels. Socrate est un chat. Donc Socrate est mortel.", "Tous les hommes sont mortels. Socrate est un homme. Donc Socrate est mortel.", "Certains mortels sont des chats. Socrate est mortel. Donc Socrate pourrait être un chat."] },
+            { id: 2, invalide: "S'il pleut, les rues sont mouillées. Les rues sont mouillées. Donc il pleut.", bonne_reponse: 2, explication: "Affirmer le conséquent est invalide. « S'il pleut alors mouillé ; les rues sont sèches ; donc il ne pleut pas » (modus tollens) est valide.", correction_options: ["S'il pleut, les rues sont mouillées. Il pleut. Donc les rues sont mouillées.", "S'il pleut, les rues sont mouillées. Les rues sont sèches. Donc il ne pleut pas.", "Les deux formulations valides ci-dessus peuvent illustrer une bonne forme."] }
+          ],
+          nextScene: "logos_conclusion"
+        },
+        {
+          id: "logos_conclusion",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Tu comprends mieux le <strong>logos</strong> : raison qui distingue le cohérent de l'incohérent." },
+            { speaker: "socrate", text: "Le logos est l'outil de la philosophie. Sans lui, récit mythique ou rhétorique seductrice prendrait toute la place." },
+            { speaker: "socrate", text: "Mais le logos seul ne suffit pas : un raisonnement peut être <em>valide</em> avec des prémisses fausses. Il faut aussi chercher la <strong>vérité</strong>." }
+          ],
+          action: "continue",
+          nextScene: "transition_verite",
+          unlocksNotions: ["raison_logos"]
+        },
+        {
+          id: "transition_verite",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Nous avons parlé de persuasion, de conviction, de logos. Mais qu'est-ce que la <strong>vérité</strong> elle-même ?" },
+            { speaker: "socrate", text: "Qu'est-ce qui fait qu'une affirmation est <em>vraie</em> ? Comment sais-tu que quelque chose est vrai ?" }
+          ],
+          choices: [
+            { text: "« C'est vrai si tout le monde le croit. »", correct: true, feedback: "À retravailler : la majorité a souvent tort (ex. Terre « plate »). Mais ce n'est pas grave — affinons les critères au fil de l'enquête.", skillGain: { examen: 5 }, nextScene: "criteres_verite" },
+            { text: "« C'est vrai si ça correspond à la réalité. »", correct: true, feedback: "Bien ! C'est une idée de <strong>correspondance</strong> avec le réel.", skillGain: { clarte: 15, examen: 10 }, nextScene: "criteres_verite" },
+            { text: "« C'est vrai si c'est cohérent et logique. »", correct: true, feedback: "La <strong>cohérence</strong> compte — mais on peut être cohérent dans l'erreur : il faut aussi le lien au réel.", skillGain: { clarte: 10, examen: 8 }, nextScene: "criteres_verite" },
+            { text: "« Je ne sais pas vraiment. »", correct: true, feedback: "Excellente humilité — la question de la vérité est parmi les plus ardues.", skillGain: { examen: 12 }, nextScene: "criteres_verite" }
+          ]
+        },
+        {
+          id: "criteres_verite",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "On parle souvent de <strong>correspondance</strong> au réel, de <strong>cohérence</strong> interne, parfois d'<strong>évidence</strong>. Mais comment être <em>certain</em> que nos sens ou notre raison ne nous trompent pas ?" },
+            { speaker: "socrate", text: "Exemple : une rumeur court dans Athènes. Comment distinguer le vrai témoignage du faux ?" }
+          ],
+          action: "continue",
+          nextScene: "minigame_enquete_verite"
+        },
+        {
+          id: "minigame_enquete_verite",
+          type: "minigame",
+          gameType: "enquete_temoignages",
+          title: "🔍 Enquête : démêler le vrai du faux",
+          instruction: "Lis les témoignages, analyse-les, puis choisis la conclusion la plus raisonnable.",
+          question: "D'après ces témoignages, quelle est la conclusion la plus probable ?",
+          temoignages: [
+            { id: 1, temoin: "Marchand", recit: "J'ai vu un homme courir près de la maison juste avant l'incendie. Il avait une torche !", fiabilite: "faible", probleme: "Nuit : vision incertaine ; beaucoup portent des torches." },
+            { id: 2, temoin: "Voisine", recit: "J'ai entendu des cris, vu la fumée. Je n'ai pas vu qui allume.", fiabilite: "moyenne", probleme: "Honnête mais incomplet sur la cause." },
+            { id: 3, temoin: "Esclave", recit: "Le propriétaire voulait l'assurance et détestait cette maison.", fiabilite: "intéressant", probleme: "Mobile plausible, pas une preuve directe." },
+            { id: 4, temoin: "Pompiste", recit: "Restes d'huile inflammable à l'intérieur ; le feu part de l'intérieur.", fiabilite: "forte", probleme: "Indice matériel : accès intérieur + acte volontaire plausible." }
+          ],
+          options: [
+            { texte: "L'homme à la torche est coupable.", correct: false, explication: "Témoignage trop fragile." },
+            { texte: "Le propriétaire a probablement incendié sa propre maison.", correct: true, explication: "Mobile + accès + preuve matérielle = hypothèse la plus cohérente." },
+            { texte: "C'est un accident.", correct: false, explication: "L'huile suggère plutôt un acte délibéré." },
+            { texte: "Impossible de savoir.", correct: false, explication: "Jamais de certitude absolue, mais on peut comparer la force des indices." }
+          ],
+          conclusion: { speaker: "socrate", text: "On évalue les sources, on croise les preuves, on cherche la meilleure ébauche de vérité — sans confondre avec la certitude absolue." },
+          skillGain: { examen: 25, clarte: 20 },
+          nextScene: "verite_conclusion"
+        },
+        {
+          id: "verite_conclusion",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "La <strong>vérité</strong> n'est pas toujours aisée ; elle n'est pas « à chacun la sienne » comme le clamait Protagoras." },
+            { speaker: "socrate", text: "Pour la chercher : examiner les preuves, tester la cohérence, questionner nos préjugés, accepter de nous tromper." },
+            { speaker: "socrate", text: "Ne pas confondre <em>croire</em> et <em>savoir</em>. Croire sans examen, c'est souvent de la <strong>doxa</strong>." }
+          ],
+          action: "continue",
+          nextScene: "transition_langage",
+          unlocksNotions: ["verite"]
+        },
+        {
+          id: "transition_langage",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Parlons du <strong>langage</strong> : informer, persuader/séduire, ou démontrer — trois usages possibles." },
+            { speaker: "socrate", text: "Selon qu'on l'emploie avec rigueur ou pour manipuler, il devient outil de vérité ou arme." }
+          ],
+          action: "continue",
+          nextScene: "minigame_classer_discours"
+        },
+        {
+          id: "minigame_classer_discours",
+          type: "minigame",
+          gameType: "classification_discours",
+          title: "💬 Classer les usages du langage",
+          instruction: "Pour chaque phrase, choisis la fonction principale.",
+          skillGain: { clarte: 20, examen: 15 },
+          discours: [
+            { id: 1, texte: "L'Assemblée vote demain sur la guerre contre Sparte.", fonction: "informer", explication: "Factualité annoncée." },
+            { id: 2, texte: "Citoyens ! Nos ancêtres ont versé leur sang ! Ne les trahissons pas ! Votons la guerre !", fonction: "persuader", explication: "Émotion et devoir pour influencer." },
+            { id: 3, texte: "Si nous attaquons, Sparte ripostera ; si elle riposte, nous perdrons des hommes ; donc attaquer maintenant coûtera des vies.", fonction: "demontrer", explication: "Raisonnement pour conclure." },
+            { id: 4, texte: "Ô Athènes, perle des cités, dont les murs brillent comme l'or du matin...", fonction: "seduire", explication: "Beauté verbale, émotion esthétique." },
+            { id: 5, texte: "Tous les hommes sont mortels. Périclès est un homme. Donc Périclès est mortel.", fonction: "demontrer", explication: "Structure démonstrative." },
+            { id: 6, texte: "Si tu ne votes pas avec nous, tu es un traître !", fonction: "persuader", explication: "Pression affective / faux dilemme." }
+          ],
+          categories: [
+            { id: "informer", label: "Informer" },
+            { id: "persuader", label: "Persuader" },
+            { id: "demontrer", label: "Démontrer" },
+            { id: "seduire", label: "Séduire (poétique)" }
+          ],
+          nextScene: "langage_socrate_sophiste"
+        },
+        {
+          id: "langage_socrate_sophiste",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "gorgias", text: "Socrate, le langage sert le <strong>pouvoir</strong>, pas la vérité. Qui maîtrise les mots maîtrise les hommes." },
+            { speaker: "socrate", text: "Tu réduis le langage à la domination. Il peut aussi servir la <strong>vérité</strong>, avec définitions et démonstrations." },
+            { speaker: "gorgias", text: "Les mots n'atteignent pas la réalité !" },
+            { speaker: "socrate", text: "Alors pourquoi cherches-tu à me <em>convaincre</em> de cette thèse ? Tu t'exposes au même paradoxe qu'avant." },
+            { speaker: "socrate", text: "En <strong>définissant</strong> et en distinguant, on réduit les malentendus — premier pas vers le logos partagé." }
+          ],
+          action: "continue",
+          nextScene: "langage_definition"
+        },
+        {
+          id: "langage_definition",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "D'où ma question : <em>« Qu'est-ce que... ? »</em> Justice, courage, vérité — sans définition claire, on dispute dans le brouillard." },
+            { speaker: "socrate", text: "Beaucoup de débats sont des malentendus sur les mots." }
+          ],
+          action: "continue",
+          nextScene: "langage_conclusion",
+          unlocksNotions: ["langage", "sophisme"]
+        },
+        {
+          id: "langage_conclusion",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Le langage informe, persuade ou démontre. À nous de viser la clarté plutôt que la séduction trompeuse." },
+            { speaker: "socrate", text: "Le philosophe <strong>définit</strong>, <strong>distingue</strong>, <strong>démontre</strong>." }
+          ],
+          action: "continue",
+          nextScene: "doxa_intro"
         },
         {
           id: "doxa_intro",
@@ -1998,40 +2634,179 @@
             revelation: "Nous sommes dans l'impasse. Nous pensions savoir ce qu'est la justice, mais en réalité, nous ne le savons pas. Et c'est là que commence vraiment la philosophie."
           },
           skillGain: { examen: 25, clarte: 20, justification: 15 },
-          nextScene: "aporie_conclusion"
+          nextScene: "aporie_utilite"
         },
         {
-          id: "aporie_conclusion",
+          id: "aporie_utilite",
           type: "dialogue",
           philosopher: "socrate",
           background: "athens_agora",
           dialogues: [
-            {
-              speaker: "socrate",
-              text: "Cette expérience peut sembler décourageante. Tu pensais peut-être savoir ce qu'est la justice, et voilà que tu ne le sais plus."
-            },
-            {
-              speaker: "socrate",
-              text: "Mais c'est précisément le but ! <strong>\"Je sais que je ne sais rien\"</strong> - c'est ma seule certitude. Et c'est déjà beaucoup !"
-            },
-            {
-              speaker: "socrate",
-              text: "Car celui qui croit savoir n'apprendra jamais rien. Mais celui qui reconnaît son ignorance, celui-là peut commencer à chercher la vérité."
-            },
-            {
-              speaker: "socrate",
-              text: "L'aporie n'est pas un échec. C'est le <em>départ</em> de la réflexion philosophique. Tu es maintenant prêt à rencontrer celui qui ira plus loin que moi..."
-            }
+            { speaker: "socrate", text: "Tu te souviens de notre aporie sur la justice ? Tu as peut-être pensé que c'était un échec." },
+            { speaker: "socrate", text: "Mais l'<strong>aporie</strong> n'est pas un échec. C'est une <strong>révélation</strong> : nous ne savions pas ce que nous pensions savoir." },
+            { speaker: "socrate", text: "Celui qui croit savoir n'apprendra jamais rien. Celui qui reconnaît son ignorance peut chercher." },
+            { speaker: "socrate", text: "<strong>« Je sais que je ne sais rien. »</strong> Voilà une forme de sagesse — car je peux enfin chercher vraiment." },
+            { speaker: "socrate", text: "L'aporie est le <em>point de départ</em> : elle nous libère de la doxa non examinée." }
           ],
           action: "continue",
-          nextScene: "transition_platon",
-          unlocksNotions: ["justice", "doxa", "aporie"]
+          nextScene: "aporie_progression",
+          unlocksNotions: ["justice", "doxa"]
         },
         {
-          id: "transition_platon",
-          type: "transition",
-          title: "Un nouvel enseignement",
-          content: "Socrate vous guide à travers les ruelles d'Athènes jusqu'à un jardin paisible. Là, sous les oliviers, un homme d'une quarantaine d'années médite, entouré de jeunes disciples. Son regard intense semble percer les apparences...",
+          id: "aporie_progression",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Après l'aporie, que faire ? D'autres définitions, des exemples, comparer, lire les sages..." },
+            { speaker: "socrate", text: "Mon élève Platon ira plus loin : là où je m'arrête à l'impasse, il parlera d'un monde des <strong>Idées</strong>." },
+            { speaker: "socrate", text: "Moi, je questionne ; lui théorisera. L'examen critique et la construction — ensemble, c'est la philosophie." }
+          ],
+          action: "continue",
+          nextScene: "minigame_proces_opinion"
+        },
+        {
+          id: "minigame_proces_opinion",
+          type: "minigame",
+          gameType: "proces_opinion",
+          title: "⚖️ Le procès d'une opinion",
+          instruction: "Une opinion est « jugée » : lis les arguments, puis choisis le verdict le plus raisonnable.",
+          opinion_accusee: "« Les riches méritent leur richesse car ils ont travaillé dur. »",
+          skillGain: { examen: 25, justification: 20, clarte: 15 },
+          verdict_options: [
+            { texte: "Opinion validée : le mérite suffit à tout expliquer.", correct: false, feedback: "Trop simple : héritage, chance et inégalités de départ comptent aussi." },
+            { texte: "Opinion rejetée : la richesse n'a rien à voir avec le mérite.", correct: false, feedback: "Trop radical : le travail peut jouer, mais ce n'est pas le seul facteur." },
+            { texte: "Verdict nuancé : le mérite joue, mais n'est pas le seul facteur.", correct: true, feedback: "Travail, héritage, chance, structure sociale — une analyse plus fidèle." }
+          ],
+          conclusion: { speaker: "socrate", text: "On examine sans dogme : contre-exemples et nuances, c'est philosopher." },
+          nextScene: "minigame_chaine_causale"
+        },
+        {
+          id: "minigame_chaine_causale",
+          type: "minigame",
+          gameType: "chaine_causale",
+          title: "🔗 Chaîne causale",
+          instruction: "Remets les événements dans l'ordre causal (du plus ancien au conflit final).",
+          feedback_succes: "Parfait ! Comprendre les causes aide à agir avec lucidité.",
+          feedback_echec: "Réessaie : chaque étape doit préparer logiquement la suivante.",
+          skillGain: { clarte: 20, justification: 15 },
+          evenements: [
+            { id: 1, texte: "Athènes devient une puissance maritime.", ordre: 1 },
+            { id: 2, texte: "Les cités s'inquiètent de la puissance athénienne.", ordre: 2 },
+            { id: 3, texte: "Sparte forme une alliance contre Athènes.", ordre: 3 },
+            { id: 4, texte: "Un incident frontalier dégénère.", ordre: 4 },
+            { id: 5, texte: "Athènes et Sparte se déclarent la guerre.", ordre: 5 }
+          ],
+          nextScene: "minigame_refutation"
+        },
+        {
+          id: "minigame_refutation",
+          type: "minigame",
+          gameType: "refutation_guidee",
+          title: "❌ Réfuter avec méthode",
+          instruction: "Pour chaque thèse trop absolue, choisis la meilleure objection.",
+          skillGain: { examen: 25, justification: 20 },
+          arguments: [
+            {
+              affirmation: "Il faut toujours dire la vérité, en toutes circonstances.",
+              objections: [
+                { texte: "Et si un assassin demande où se cache sa victime ?", qualite: "excellente" },
+                { texte: "Non, c'est faux !", qualite: "mauvaise" },
+                { texte: "Parfois on peut mentir pour protéger.", qualite: "moyenne" }
+              ]
+            },
+            {
+              affirmation: "La démocratie est toujours le meilleur régime.",
+              objections: [
+                { texte: "Et si la majorité vote l'injustice envers une minorité ?", qualite: "excellente" },
+                { texte: "La monarchie est meilleure.", qualite: "mauvaise" },
+                { texte: "Chaque régime a des avantages.", qualite: "faible" }
+              ]
+            }
+          ],
+          conclusion: { speaker: "socrate", text: "Réfuter, c'est montrer une faille : contre-exemple, contradiction — voilà la dialectique." },
+          nextScene: "aporie_conclusion_finale"
+        },
+        {
+          id: "aporie_conclusion_finale",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "socrate", text: "Tu manies des outils : opinions, sophismes, logos, langage, enquête." },
+            { speaker: "socrate", text: "L'aporie n'est pas la fin : c'est le seuil de la vraie recherche." },
+            { speaker: "socrate", text: "Mais mon histoire tourne mal : Athènes n'aime pas qu'on perce ses certitudes." }
+          ],
+          action: "continue",
+          nextScene: "transition_mort",
+          unlocksNotions: ["aporie", "dialectique"]
+        },
+        {
+          id: "transition_mort",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            { speaker: "narration", text: "399 av. J.-C. Socrate, vers 70 ans : accusé de corrompre la jeunesse et de méconnaître les dieux de la cité." },
+            { speaker: "socrate", text: "On me reproche surtout de <strong>questionner</strong> — et de montrer que beaucoup qui « savent » ne savent pas." },
+            { speaker: "socrate", text: "Ils préfèrent me faire taire plutôt que d'admettre leur ignorance." }
+          ],
+          action: "continue",
+          nextScene: "proces_socrate"
+        },
+        {
+          id: "proces_socrate",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "tribunal_athenien",
+          dialogues: [
+            { speaker: "narration", text: "501 jurés. Socrate se défend lui-même." },
+            { speaker: "accusateur", text: "Il corrompt la jeunesse ! Il méprise nos lois ! Il invente de nouveaux dieux !" },
+            { speaker: "socrate", text: "Je n'enseigne rien : je <strong>questionne</strong>. Est-ce un crime de demander des raisons ?" },
+            { speaker: "narration", text: "Vote : 280 contre 221. Condamné à mort." }
+          ],
+          action: "continue",
+          nextScene: "pourquoi_tue"
+        },
+        {
+          id: "pourquoi_tue",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "tribunal_athenien",
+          dialogues: [
+            { speaker: "socrate", text: "Je suis peut-être votre <strong>meilleur ami</strong> : comme un taon qui réveille le cheval endormi." },
+            { speaker: "socrate", text: "En me tuant, vous confirmez que celui qui cherche la vérité dérange ceux qui préfèrent l'illusion." },
+            { speaker: "socrate", text: "Souviens-toi de la caverne : celui qui redescend pour libérer les autres risque d'être tué." }
+          ],
+          action: "continue",
+          nextScene: "mort_socrate_scene"
+        },
+        {
+          id: "mort_socrate_scene",
+          type: "narrative_sequence",
+          title: "La mort de Socrate",
+          subtitle: "399 av. J.-C. — prison d'Athènes",
+          images: [
+            {
+              path: "assets/scenes/socrate/mort_socrate.jpg",
+              title: "La ciguë",
+              text: "Socrate boit la ciguë, entouré de disciples. Il reste lucide.<br><br>« <strong>Ne pleurez pas</strong> » : soit l'âme survit, soit il n'y a plus de souffrance.<br><br>Il meurt en philosophe : <strong>sans haine, fidèle à la raison</strong>.<br><br>Dernier mot rapporté : <em>« Criton, nous devons un coq à Asclépios… »</em>"
+            }
+          ],
+          nextScene: "platon_herite"
+        },
+        {
+          id: "platon_herite",
+          type: "dialogue",
+          philosopher: "platon",
+          background: "plato_academy",
+          dialogues: [
+            { speaker: "narration", text: "Des années plus tard : l'Académie. Platon médite." },
+            { speaker: "platon", text: "Mon maître est mort ; son exigence vit en moi. Lui a questionné ; moi je t'inviterai à <strong>contempler</strong>." },
+            { speaker: "platon", text: "Là où il montrait l'aporie, je parlerai d'un monde des <strong>Idées</strong>, au-delà du sensible." },
+            { speaker: "platon", text: "Je raconterai son histoire pour qu'on n'oublie pas celui qui est mort pour la lucidité." }
+          ],
+          action: "continue",
           nextScene: "platon_1"
         },
         {
@@ -2277,7 +3052,35 @@
           relatedPhilosophers: ["platon"],
           examples: ["Συναγωγή du Bien au Livre VI de la République", "Analogon du soleil dans l'allégorie de la caverne (République VII)"]
         },
-        temps: { name: "Temps", description: "À documenter.", relatedPhilosophers: ["platon", "augustin"], examples: ["Le Timée"] }
+        temps: { name: "Temps", description: "À documenter.", relatedPhilosophers: ["platon", "augustin"], examples: ["Le Timée"] },
+        persuasion_conviction: {
+          name: "Persuasion vs conviction",
+          description: "Persuader : obtenir l'adhésion par l'émotion et la séduction. Convaincre : obtenir l'adhésion par la raison et la démonstration.",
+          category: "Langage",
+          relatedPhilosophers: ["socrate"],
+          examples: ["Rhétorique des sophistes vs examen socratique"]
+        },
+        sophisme: {
+          name: "Sophisme",
+          description: "Raisonnement volontairement trompeur ou manipulation logique pour faire accepter une conclusion.",
+          category: "Raison",
+          relatedPhilosophers: ["socrate"],
+          examples: ["Appel à l'autorité", "Faux dilemme", "Pente glissante"]
+        },
+        dialectique: {
+          name: "Dialectique",
+          description: "Art du dialogue rigoureux : questionner, réfuter, avancer par objections et contre-exemples (méthode socratique).",
+          category: "Raison",
+          relatedPhilosophers: ["socrate", "platon"],
+          examples: ["Entretiens socratiques", "Contradictions révélatrices"]
+        },
+        raison_logos: {
+          name: "Logos (raison)",
+          description: "Le discours rationnel qui distingue le vrai du faux par la logique et la cohérence — par opposition au mythe révélé.",
+          category: "Raison",
+          relatedPhilosophers: ["socrate"],
+          examples: ["Mythos vs logos", "Syllogisme"]
+        }
       }
     };
 
@@ -2304,42 +3107,45 @@
           const items = [...scene.items].sort(() => Math.random() - 0.5);
           const cats = scene.categories;
           this.state = { scene, placements: {} };
-          const gameScreen = document.getElementById("game-screen");
-          gameScreen.innerHTML = `
-            <div class="minigame-wrap">
-              <h2>${scene.title}</h2>
-              <p class="minigame-instruction">${scene.instruction}</p>
-              <div class="card-bank" id="sort-bank" aria-label="Affirmations à classer"></div>
+          const prepHtml = `<p class="mg-hint" style="text-align:center;margin:0.25rem 0 0">Passe à l’écran suivant pour voir les colonnes et les cartes à glisser.</p>`;
+          const playStub = `<div class="card-bank" id="sort-bank" aria-label="Affirmations à classer"></div>
               <div class="sorting-grid" id="sort-zones"></div>
               <div class="minigame-actions">
                 <button type="button" class="btn-continue" id="btn-validate-sort">Valider</button>
-              </div>
-            </div>`;
-          const bank = document.getElementById("sort-bank");
-          const zonesEl = document.getElementById("sort-zones");
-          cats.forEach((c) => {
-            zonesEl.innerHTML += `
+              </div>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: [prepHtml, playStub],
+            afterMount(root) {
+              const bank = root.querySelector("#sort-bank");
+              const zonesEl = root.querySelector("#sort-zones");
+              cats.forEach((c) => {
+                zonesEl.innerHTML += `
               <div class="drop-zone" data-category="${c.id}" aria-dropeffect="move">
                 <h3>${c.label}</h3>
                 <p class="hint">${c.description}</p>
                 <div class="zone-cards" data-zone="${c.id}"></div>
               </div>`;
+              });
+              items.forEach((it) => {
+                const el = document.createElement("div");
+                el.className = "sort-card";
+                el.draggable = true;
+                el.dataset.itemId = String(it.id);
+                el.textContent = it.text;
+                el.addEventListener("dragstart", onSortDragStart);
+                bank.appendChild(el);
+              });
+              zonesEl.querySelectorAll(".drop-zone").forEach((z) => {
+                z.addEventListener("dragover", onSortDragOver);
+                z.addEventListener("dragleave", onSortDragLeave);
+                z.addEventListener("drop", onSortDrop);
+              });
+              const vbtn = root.querySelector("#btn-validate-sort");
+              if (vbtn) vbtn.addEventListener("click", () => this.validate());
+            }
           });
-          items.forEach((it) => {
-            const el = document.createElement("div");
-            el.className = "sort-card";
-            el.draggable = true;
-            el.dataset.itemId = String(it.id);
-            el.textContent = it.text;
-            el.addEventListener("dragstart", onSortDragStart);
-            bank.appendChild(el);
-          });
-          zonesEl.querySelectorAll(".drop-zone").forEach((z) => {
-            z.addEventListener("dragover", onSortDragOver);
-            z.addEventListener("dragleave", onSortDragLeave);
-            z.addEventListener("drop", onSortDrop);
-          });
-          document.getElementById("btn-validate-sort").addEventListener("click", () => this.validate());
         },
         validate() {
           const { scene, placements } = this.state;
@@ -2387,37 +3193,33 @@
         window.doxaAnswers = {};
         this.state = { scene };
 
-        const gameScreen = document.getElementById("game-screen");
-        gameScreen.innerHTML = `
-          <div class="minigame-wrap">
-            <h2>${scene.title}</h2>
-            <p class="minigame-instruction">${scene.instruction}</p>
-            <div class="doxa-exercise">
-              ${scene.items
-                .map(
-                  (item) => `
-                <div class="doxa-item" data-item-id="${item.id}">
-                  <div class="doxa-statement">${item.statement}</div>
-                  <div class="doxa-categories">
-                    ${scene.categories
-                      .map(
-                        (cat) => `
-                      <button type="button" class="doxa-category-btn" data-item-id="${item.id}"
-                        onclick="selectDoxaCategory(${item.id}, '${cat.id}', this)">${cat.label}</button>
-                    `
-                      )
-                      .join("")}
-                  </div>
-                  <div class="doxa-feedback" id="feedback-${item.id}"></div>
+        const chunks = (scene.items || []).map(
+          (item) => `
+            <div class="doxa-exercise doxa-exercise--one">
+              <div class="doxa-item" data-item-id="${item.id}">
+                <div class="doxa-statement">${item.statement}</div>
+                <div class="doxa-categories">
+                  ${scene.categories
+                    .map(
+                      (cat) => `
+                    <button type="button" class="doxa-category-btn" data-item-id="${item.id}"
+                      onclick="selectDoxaCategory(${item.id}, '${cat.id}', this)">${cat.label}</button>
+                  `
+                    )
+                    .join("")}
                 </div>
-              `
-                )
-                .join("")}
-            </div>
-            <div class="minigame-actions">
+                <div class="doxa-feedback" id="feedback-${item.id}"></div>
+              </div>
+            </div>`
+        );
+        mountMinigameTabbedPages({
+          title: scene.title,
+          instruction: scene.instruction,
+          bodyChunks: chunks,
+          footerHtml: `<div class="minigame-actions">
               <button type="button" class="btn-continue" onclick="validateDoxaExercise()">Valider</button>
-            </div>
-          </div>`;
+            </div>`
+        });
       }
       },
 
@@ -2429,8 +3231,542 @@
         this.state = { scene };
         showAporieStep(0);
       }
+      },
+
+      sophisme_detection: {
+        render(scene) {
+          window.sophismeScene = scene;
+          window.sophismeAnswers = {};
+          const opts = (scene.categories || [])
+            .map((c) => `<option value="${escapeAttrSingle(c.id)}">${escapeHtml(c.label)}</option>`)
+            .join("");
+          const chunks = (scene.items || []).map(
+              (it) => `
+            <div class="mg-panel" data-sid="${it.id}">
+              <p class="mg-arg">${escapeHtml(it.argument)}</p>
+              <select class="mg-select" data-sid="${it.id}" aria-label="Type de sophisme">
+                <option value="">— Choisir —</option>${opts}
+              </select>
+              <div class="mg-feedback" id="soph-fb-${it.id}"></div>
+            </div>`
+          );
+          mountMinigameTabbedPages({
+            wrapClass: "mg-sophisme",
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: chunks,
+            footerHtml: `<div class="minigame-actions">
+                <button type="button" class="btn-continue" id="btn-soph-val">Valider</button>
+              </div>`,
+            afterMount(root) {
+              root.querySelectorAll(".mg-select").forEach((sel) => {
+                sel.addEventListener("change", () => {
+                  window.sophismeAnswers[sel.dataset.sid] = sel.value;
+                });
+              });
+              const b = root.querySelector("#btn-soph-val");
+              if (b) b.addEventListener("click", () => validateSophismeScene());
+            }
+          });
+        }
+      },
+
+      analyse_persuasion: {
+        render(scene) {
+          window.persuasionScene = scene;
+          const blocks = (scene.discours || []).map((disc, idx) => {
+              const checks = (disc.techniques || [])
+                .map(
+                  (t) => `
+                <label class="mg-check">
+                  <input type="checkbox" data-di="${idx}" data-tid="${escapeAttrSingle(t.id)}" />
+                  ${escapeHtml(t.label)}
+                </label>`
+                )
+                .join("");
+              return `<div class="mg-panel"><h3 class="mg-h3">${escapeHtml(disc.orateur)}</h3>${checks}</div>`;
+            });
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: blocks,
+            footerHtml: `<div class="minigame-actions">
+                <button type="button" class="btn-continue" id="btn-pers-val">Analyser</button>
+              </div><div id="persuasion-after"></div>`,
+            afterMount(root) {
+              const b = root.querySelector("#btn-pers-val");
+              if (b) b.addEventListener("click", () => validatePersuasionScene());
+            }
+          });
+        }
+      },
+
+      reconstruction_raisonnement: {
+        render(scene) {
+          const etapes = [...(scene.raisonnement?.etapes || [])].sort(() => Math.random() - 0.5);
+          window.reconScene = scene;
+          const lis = etapes
+            .map(
+              (e) =>
+                `<li class="mg-recon-li" draggable="true" data-ordre="${e.ordre}">${escapeHtml(e.texte)}</li>`
+            )
+            .join("");
+          const playChunk = `
+              <ol id="recon-list" class="mg-recon-list">${lis}</ol>
+              <p class="mg-hint">Astuce : glisse les lignes pour les réordonner (ou long press mobile).</p>
+              <div class="minigame-actions">
+                <button type="button" class="btn-continue" id="btn-recon-val">Vérifier l'ordre</button>
+              </div>
+              <div id="recon-result"></div>`;
+          const introChunk = `<p class="mg-hint" style="text-align:center;margin:0.2rem 0 0">À l’écran suivant, réordonne les étapes du raisonnement.</p>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: isMobileGameViewport() ? [introChunk, playChunk] : [playChunk],
+            afterMount(root) {
+              const list = root.querySelector("#recon-list");
+              if (!list) return;
+              let dragEl = null;
+              list.querySelectorAll("li").forEach((li) => {
+                li.addEventListener("dragstart", () => { dragEl = li; li.classList.add("dragging"); });
+                li.addEventListener("dragend", () => li.classList.remove("dragging"));
+                li.addEventListener("dragover", (ev) => { ev.preventDefault(); });
+                li.addEventListener("drop", (ev) => {
+                  ev.preventDefault();
+                  if (!dragEl || dragEl === li) return;
+                  const rect = li.getBoundingClientRect();
+                  const before = ev.clientY < rect.top + rect.height / 2;
+                  if (before) list.insertBefore(dragEl, li);
+                  else list.insertBefore(dragEl, li.nextSibling);
+                });
+              });
+              const btn = root.querySelector("#btn-recon-val");
+              if (btn) btn.addEventListener("click", () => validateReconScene());
+            }
+          });
+        }
+      },
+
+      reparer_argument: {
+        render(scene) {
+          window.reparerScene = scene;
+          window.reparerIdx = 0;
+          renderReparerStep();
+        }
+      },
+
+      enquete_temoignages: {
+        render(scene) {
+          window.enqueteScene = scene;
+          const temChunks = (scene.temoignages || []).map(
+              (t, i) => `
+            <div class="mg-panel">
+              <h3 class="mg-h3">${escapeHtml(t.temoin)}</h3>
+              <p><em>« ${escapeHtml(t.recit)} »</em></p>
+              <button type="button" class="btn-gold mg-analyze" data-i="${i}">Analyser</button>
+              <div class="mg-analyse" id="enq-a-${i}" hidden>
+                <strong>Fiabilité :</strong> ${escapeHtml(t.fiabilite)} — ${escapeHtml(t.probleme)}
+              </div>
+            </div>`
+          );
+          const opts = (scene.options || [])
+            .map((o, i) => `<button type="button" class="choice-btn mg-enq-opt" data-oi="${i}">${escapeHtml(o.texte)}</button>`)
+            .join("");
+          const finale = `
+              <p class="mg-q"><strong>${escapeHtml(scene.question)}</strong></p>
+              <div class="choices">${opts}</div>
+              <div id="enquete-result"></div>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: [...temChunks, finale],
+            afterMount(root) {
+              root.querySelectorAll(".mg-analyze").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                  const el = root.querySelector("#enq-a-" + btn.dataset.i);
+                  if (el) el.hidden = !el.hidden;
+                });
+              });
+              root.querySelectorAll(".mg-enq-opt").forEach((btn) => {
+                btn.addEventListener("click", () => validateEnquete(parseInt(btn.dataset.oi, 10)));
+              });
+            }
+          });
+        }
+      },
+
+      classification_discours: {
+        render(scene) {
+          window.classifScene = scene;
+          window.classifAnswers = {};
+          const cats = (scene.categories || [])
+            .map((c) => `<option value="${escapeAttrSingle(c.id)}">${escapeHtml(c.label)}</option>`)
+            .join("");
+          const chunks = (scene.discours || []).map(
+              (d) => `
+            <div class="mg-panel">
+              <p class="mg-arg">${escapeHtml(d.texte)}</p>
+              <select class="mg-select" data-did="${d.id}">
+                <option value="">— Choisir —</option>${cats}
+              </select>
+              <div id="class-fb-${d.id}"></div>
+            </div>`
+          );
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: chunks,
+            footerHtml: `<div class="minigame-actions">
+                <button type="button" class="btn-continue" id="btn-class-val">Valider</button>
+              </div>`,
+            afterMount(root) {
+              root.querySelectorAll(".mg-select").forEach((sel) => {
+                sel.addEventListener("change", () => { window.classifAnswers[sel.dataset.did] = sel.value; });
+              });
+              const b = root.querySelector("#btn-class-val");
+              if (b) b.addEventListener("click", () => validateClassifScene());
+            }
+          });
+        }
+      },
+
+      proces_opinion: {
+        render(scene) {
+          window.procOpScene = scene;
+          const vos = (scene.verdict_options || [])
+            .map(
+              (v, i) => `<button type="button" class="choice-btn" data-vi="${i}">${escapeHtml(v.texte)}</button>`
+            )
+            .join("");
+          const play = `
+              <p class="mg-opinion-acc"><em>${escapeHtml(scene.opinion_accusee || "")}</em></p>
+              <div class="choices">${vos}</div>
+              <div id="proc-op-result"></div>`;
+          const intro = `<p class="mg-hint" style="text-align:center;margin:0.2rem 0 0">Passe à la suite pour lire l’avis attesté et choisir un verdict.</p>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: isMobileGameViewport() ? [intro, play] : [play],
+            afterMount(root) {
+              root.querySelectorAll("[data-vi]").forEach((btn) => {
+                btn.addEventListener("click", () => validateProcOp(parseInt(btn.dataset.vi, 10)));
+              });
+            }
+          });
+        }
+      },
+
+      chaine_causale: {
+        render(scene) {
+          const evs = [...(scene.evenements || [])].sort(() => Math.random() - 0.5);
+          window.chaineScene = scene;
+          const lis = evs.map((e) => `<li class="mg-recon-li" draggable="true" data-ordre="${e.ordre}">${escapeHtml(e.texte)}</li>`).join("");
+          const playChunk = `
+              <ol id="chaine-list" class="mg-recon-list">${lis}</ol>
+              <div class="minigame-actions">
+                <button type="button" class="btn-continue" id="btn-chaine-val">Vérifier</button>
+              </div>
+              <div id="chaine-result"></div>`;
+          const introChunk = `<p class="mg-hint" style="text-align:center;margin:0.2rem 0 0">À l’écran suivant, remets les événements dans l’ordre causal.</p>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: isMobileGameViewport() ? [introChunk, playChunk] : [playChunk],
+            afterMount(root) {
+              const list = root.querySelector("#chaine-list");
+              if (!list) return;
+              let dragEl = null;
+              list.querySelectorAll("li").forEach((li) => {
+                li.addEventListener("dragstart", () => { dragEl = li; li.classList.add("dragging"); });
+                li.addEventListener("dragend", () => li.classList.remove("dragging"));
+                li.addEventListener("dragover", (ev) => { ev.preventDefault(); });
+                li.addEventListener("drop", (ev) => {
+                  ev.preventDefault();
+                  if (!dragEl || dragEl === li) return;
+                  const rect = li.getBoundingClientRect();
+                  const before = ev.clientY < rect.top + rect.height / 2;
+                  if (before) list.insertBefore(dragEl, li);
+                  else list.insertBefore(dragEl, li.nextSibling);
+                });
+              });
+              const btn = root.querySelector("#btn-chaine-val");
+              if (btn) btn.addEventListener("click", () => validateChaineScene());
+            }
+          });
+        }
+      },
+
+      refutation_guidee: {
+        render(scene) {
+          window.refutScene = scene;
+          window.refutStep = 0;
+          renderRefutStep();
+        }
       }
     };
+
+    function validateSophismeScene() {
+      const scene = window.sophismeScene;
+      if (!scene || !scene.items) return;
+      const answers = window.sophismeAnswers || {};
+      let ok = 0;
+      scene.items.forEach((it) => {
+        const sel = answers[String(it.id)] || document.querySelector(`select[data-sid=\"${it.id}\"]`)?.value || "";
+        const good = sel === it.sophismeType;
+        if (good) ok++;
+        const fb = document.getElementById("soph-fb-" + it.id);
+        if (fb) {
+          fb.innerHTML = good
+            ? `<div class="feedback-correct">✓ ${escapeHtml(it.nom)} — ${escapeHtml(it.explication)}</div>`
+            : `<div class="feedback-wrong">✗ Attendu : <strong>${escapeHtml(it.nom)}</strong>. ${escapeHtml(it.explication)}</div>`;
+        }
+      });
+      const ratio = ok / scene.items.length;
+      const th = scene.successThreshold ?? 0.6;
+      if (ratio < th) {
+        const wrap = document.querySelector(".mg-sophisme");
+        if (wrap) {
+          showWrongAttemptPanel(wrap, {
+            title: "Score insuffisant",
+            bodyHtml: `<p>Tu as <strong>${ok} / ${scene.items.length}</strong> réponses justes. Il faut au moins <strong>${Math.round(th * 100)}%</strong>.</p>`
+          });
+        }
+        return;
+      }
+      const g = scene.skillGain || { examen: 15, clarte: 10 };
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      showToast("Sophismes repérés !");
+      setTimeout(() => goToScene(scene.nextScene), 900);
+    }
+
+    function validatePersuasionScene() {
+      const scene = window.persuasionScene;
+      if (!scene) return;
+      let allOk = true;
+      (scene.discours || []).forEach((disc, idx) => {
+        (disc.techniques || []).forEach((t) => {
+        const inp = document.querySelector(`input[data-di=\"${idx}\"][data-tid=\"${t.id}\"]`);
+        const checked = inp && inp.checked;
+        const expect = !!t.present;
+          if (checked !== expect) allOk = false;
+        });
+      });
+      if (!allOk) {
+        const wrap = document.querySelector(".minigame-wrap");
+        if (wrap) {
+          showWrongAttemptPanel(wrap, {
+            title: "Cases à revoir",
+            bodyHtml: "<p>Coche <strong>uniquement</strong> les techniques réellement présentes dans chaque discours (selon le récit), puis réessaie.</p>"
+          });
+        }
+        return;
+      }
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      const c = scene.conclusion || {};
+      document.getElementById("persuasion-after").innerHTML = `
+        <div class="mg-panel">
+          <p><strong>${escapeHtml((c.speaker || "socrate").toUpperCase())}</strong></p>
+          <p>${c.text || ""}</p>
+          <button type="button" class="btn-continue" id="btn-pers-next">Continuer →</button>
+        </div>`;
+      document.getElementById("btn-pers-next").addEventListener("click", () => goToScene(scene.nextScene));
+    }
+
+    function validateReconScene() {
+      const scene = window.reconScene;
+      const list = document.getElementById("recon-list");
+      const res = document.getElementById("recon-result");
+      if (!scene || !list || !res) return;
+      const nodes = [...list.querySelectorAll("li")];
+      let ok = true;
+      nodes.forEach((li, i) => {
+        if (parseInt(li.dataset.ordre, 10) !== i + 1) ok = false;
+      });
+      if (!ok) {
+        res.innerHTML = `<div class="feedback-wrong">${scene.feedback_echec || "Ordre incorrect."}</div>`;
+        return;
+      }
+      res.innerHTML = `<div class="feedback-correct">${scene.feedback_succes || "Bravo !"}</div>`;
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      setTimeout(() => goToScene(scene.nextScene), 1100);
+    }
+
+    function renderReparerStep() {
+      const scene = window.reparerScene;
+      const args = scene.arguments || [];
+      const idx = window.reparerIdx || 0;
+      const screen = document.getElementById("game-screen");
+      if (idx >= args.length) {
+        const g = scene.skillGain || {};
+        Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+        goToScene(scene.nextScene);
+        return;
+      }
+      const arg = args[idx];
+      const btns = (arg.correction_options || [])
+        .map(
+          (opt, i) =>
+            `<button type="button" class="choice-btn" data-ci="${i}">${escapeHtml(opt)}</button>`
+        )
+        .join("");
+      const thesis = `<div class="mg-panel"><strong>Raisonnement à corriger :</strong><p>${escapeHtml(arg.invalide)}</p></div>`;
+      const play = `<div class="choices">${btns}</div><div id="reparer-fb"></div>`;
+      mountMinigameTabbedPages({
+        title: scene.title,
+        instruction: scene.instruction,
+        bodyChunks: isMobileGameViewport() ? [thesis, play] : [`${thesis}${play}`],
+        afterMount(root) {
+          root.querySelectorAll("[data-ci]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const choice = parseInt(btn.dataset.ci, 10);
+              const fb = root.querySelector("#reparer-fb");
+              if (choice === arg.bonne_reponse) {
+                fb.innerHTML = `<div class="feedback-correct">${escapeHtml(arg.explication)}</div>`;
+                window.reparerIdx = idx + 1;
+                setTimeout(() => renderReparerStep(), 1200);
+              } else {
+                fb.innerHTML = `<div class="feedback-wrong">Pas tout à fait. ${escapeHtml(arg.explication)}</div>`;
+              }
+            });
+          });
+        }
+      });
+    }
+
+    function validateEnquete(optIndex) {
+      const scene = window.enqueteScene;
+      const opt = scene.options[optIndex];
+      const res = document.getElementById("enquete-result");
+      if (!opt.correct) {
+        res.innerHTML = `<div class="feedback-wrong">${opt.explication}</div>`;
+        return;
+      }
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      const c = scene.conclusion || {};
+      res.innerHTML = `
+        <div class="feedback-correct">
+          <p>${escapeHtml(opt.explication)}</p>
+          <p><strong>${escapeHtml(c.speaker || "socrate")}</strong> — ${c.text || ""}</p>
+          <button type="button" class="btn-continue" id="btn-enq-next">Continuer →</button>
+        </div>`;
+      document.getElementById("btn-enq-next").addEventListener("click", () => goToScene(scene.nextScene));
+    }
+
+    function validateClassifScene() {
+      const scene = window.classifScene;
+      const ans = window.classifAnswers || {};
+      let ok = 0;
+      let n = 0;
+      (scene.discours || []).forEach((d) => {
+        n++;
+        const v = ans[String(d.id)] || document.querySelector(`select[data-did=\"${d.id}\"]`)?.value;
+        const good = v === d.fonction;
+        if (good) ok++;
+        const fb = document.getElementById("class-fb-" + d.id);
+        if (fb) {
+          fb.innerHTML = good
+            ? `<div class="feedback-correct">✓ ${escapeHtml(d.explication)}</div>`
+            : `<div class="feedback-wrong">✗ ${escapeHtml(d.explication)}</div>`;
+        }
+      });
+      if (ok < n) {
+        const wrap = document.querySelector(".minigame-wrap");
+        if (wrap) {
+          showWrongAttemptPanel(wrap, {
+            title: "Classifications à revoir",
+            bodyHtml: "<p>Toutes les phrases doivent être bien classées pour continuer.</p>"
+          });
+        }
+        return;
+      }
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      showToast("Langage bien classé !");
+      setTimeout(() => goToScene(scene.nextScene), 800);
+    }
+
+    function validateProcOp(i) {
+      const scene = window.procOpScene;
+      const v = scene.verdict_options[i];
+      const res = document.getElementById("proc-op-result");
+      if (!v.correct) {
+        res.innerHTML = `<div class="feedback-wrong">${escapeHtml(v.feedback)}</div>`;
+        return;
+      }
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      const c = scene.conclusion || {};
+      res.innerHTML = `
+        <div class="feedback-correct">
+          <p>${escapeHtml(v.feedback)}</p>
+          <p><strong>${escapeHtml(c.speaker || "socrate")}</strong> — ${c.text || ""}</p>
+          <button type="button" class="btn-continue" id="btn-proc-next">Continuer →</button>
+        </div>`;
+      document.getElementById("btn-proc-next").addEventListener("click", () => goToScene(scene.nextScene));
+    }
+
+    function validateChaineScene() {
+      const scene = window.chaineScene;
+      const list = document.getElementById("chaine-list");
+      const res = document.getElementById("chaine-result");
+      const nodes = [...list.querySelectorAll("li")];
+      let ok = true;
+      nodes.forEach((li, i) => {
+        if (parseInt(li.dataset.ordre, 10) !== i + 1) ok = false;
+      });
+      if (!ok) {
+        res.innerHTML = `<div class="feedback-wrong">${scene.feedback_echec || "Ordre incorrect."}</div>`;
+        return;
+      }
+      res.innerHTML = `<div class="feedback-correct">${scene.feedback_succes || "Bravo !"}</div>`;
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      setTimeout(() => goToScene(scene.nextScene), 1000);
+    }
+
+    function renderRefutStep() {
+      const scene = window.refutScene;
+      const step = scene.arguments[window.refutStep || 0];
+      const screen = document.getElementById("game-screen");
+      if (!step) {
+        const c = scene.conclusion || {};
+        const g = scene.skillGain || {};
+        Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+        screen.innerHTML = `
+          <div class="minigame-wrap">
+            <p class="mg-panel"><strong>${escapeHtml(c.speaker || "socrate")}</strong><br>${c.text || ""}</p>
+            <button type="button" class="btn-continue" id="btn-refut-end">Continuer →</button>
+          </div>`;
+        document.getElementById("btn-refut-end").addEventListener("click", () => goToScene(scene.nextScene));
+        return;
+      }
+      const btns = step.objections.map((o, i) => `<button type="button" class="choice-btn" data-oi="${i}">${escapeHtml(o.texte)}</button>`).join("");
+      const thesis = `<p class="mg-panel"><strong>Thèse :</strong> ${escapeHtml(step.affirmation)}</p>`;
+      const play = `<div class="choices">${btns}</div><div id="refut-fb"></div>`;
+      mountMinigameTabbedPages({
+        title: scene.title,
+        instruction: scene.instruction,
+        bodyChunks: isMobileGameViewport() ? [thesis, play] : [`${thesis}${play}`],
+        afterMount(root) {
+          root.querySelectorAll("[data-oi]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const o = step.objections[parseInt(btn.dataset.oi, 10)];
+              const fb = root.querySelector("#refut-fb");
+              if (o.qualite === "excellente") {
+                fb.innerHTML = `<div class="feedback-correct">Bien vu.</div>`;
+                window.refutStep = (window.refutStep || 0) + 1;
+                setTimeout(() => renderRefutStep(), 700);
+              } else {
+                fb.innerHTML = `<div class="feedback-wrong">Ce n'est pas l'objection la plus solide. Essaie un contre-exemple qui met la thèse en difficulté.</div>`;
+              }
+            });
+          });
+        }
+      });
+    }
 
     function selectDoxaCategory(itemId, categoryId, btnEl) {
       window.doxaAnswers = window.doxaAnswers || {};
@@ -2672,7 +4008,7 @@
     }
 
     function applySaveData(data) {
-      gameState.currentScene = data.currentScene || "intro_1";
+      gameState.currentScene = resolveSceneId(data.currentScene) || "intro_1";
       gameState.skills = { ...defaultState().skills, ...data.skills };
       gameState.notebookNotionKeys = data.notebookNotionKeys || [];
       gameState.unlockedPhilosophers = data.unlockedPhilosophers || defaultState().unlockedPhilosophers;
@@ -2692,10 +4028,12 @@
       }
       try {
         const data = JSON.parse(entry.raw);
-        if (!data.currentScene || !getSceneById(data.currentScene)) {
+        const sid = resolveSceneId(data.currentScene);
+        if (!sid || !getSceneById(sid)) {
           showToast("Sauvegarde incomplète ou scène inconnue.");
           return false;
         }
+        data.currentScene = sid;
         migrateSaveToPrimaryIfNeeded(entry.key, entry.raw);
         applySaveData(data);
         renderScene(gameState.currentScene);
@@ -2742,8 +4080,20 @@
       panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
+    const LEGACY_SCENE_IDS = {
+      aporie_conclusion: "aporie_conclusion_finale",
+      transition_platon: "platon_herite",
+      protagoras_intro: "sophistes_intro"
+    };
+
+    function resolveSceneId(id) {
+      if (!id || typeof id !== "string") return id;
+      return LEGACY_SCENE_IDS[id] || id;
+    }
+
     function getSceneById(id) {
-      return gameData.scenes.find((s) => s.id === id);
+      const resolved = resolveSceneId(id);
+      return gameData.scenes.find((s) => s.id === resolved);
     }
 
     function getBackgroundStyle(key) {
@@ -2888,12 +4238,13 @@
      */
     function renderScene(sceneId) {
       clearNarrativeSequenceTimer();
-      const scene = getSceneById(sceneId);
+      const resolved = resolveSceneId(sceneId);
+      const scene = getSceneById(resolved);
       if (!scene) {
         document.getElementById("game-screen").innerHTML = "<p style='padding:2rem'>Scène introuvable.</p>";
         return;
       }
-      gameState.currentScene = sceneId;
+      gameState.currentScene = resolved;
       if (scene.type !== "narrative_sequence" && gameState.resume && gameState.resume.narrative) {
         gameState.resume = null;
       }
@@ -2912,9 +4263,21 @@
       saveGame();
     }
 
+    const DIALOGUE_SPEAKER_LABELS = {
+      protagoras: "Protagoras",
+      gorgias: "Gorgias",
+      citoyen: "Citoyen",
+      accusateur: "Accusateur"
+    };
+
     function renderDialogueLineHtml(line, scene, ph) {
       const isNarration = line.speaker === "narration";
-      const speakerLabel = isNarration ? "Narration" : (ph && line.speaker === scene.philosopher ? ph.name : line.speaker);
+      let speakerLabel = "Narration";
+      if (!isNarration) {
+        if (DIALOGUE_SPEAKER_LABELS[line.speaker]) speakerLabel = DIALOGUE_SPEAKER_LABELS[line.speaker];
+        else if (ph && line.speaker === scene.philosopher) speakerLabel = ph.name;
+        else speakerLabel = line.speaker.charAt(0).toUpperCase() + line.speaker.slice(1);
+      }
       const cls = isNarration ? "dialogue-line speaker-narration" : "dialogue-line";
       const tag = isNarration ? "" : `<div class="speaker-tag">${speakerLabel}</div>`;
       return `<div class="${cls}" style="animation-delay:0.08s">${tag}<div>${line.text}</div></div>`;
@@ -3105,39 +4468,149 @@
     }
 
     function goToScene(nextId) {
-      const next = getSceneById(nextId);
+      const resolved = resolveSceneId(nextId);
+      const next = getSceneById(resolved);
       if (next && next.unlocksNotions) addNotionsToNotebook(next.unlocksNotions);
-      gameState.currentScene = nextId;
+      gameState.currentScene = resolved;
       saveGame();
-      renderScene(nextId);
+      renderScene(resolved);
     }
 
     function renderTransition(scene) {
       const bgHtml = buildSceneBackgroundHtml("athens_agora");
-      document.getElementById("game-screen").innerHTML = `
+      const screen = document.getElementById("game-screen");
+      const titleEsc = escapeHtml(scene.title);
+      const chunks = splitTransitionContentToPages(scene.content);
+      const nextRaw = scene.nextScene ? String(scene.nextScene) : "";
+
+      function bindContinue(root) {
+        const b = root.querySelector(".btn-continue[data-next]");
+        if (b) b.addEventListener("click", (e) => goToScene(e.target.dataset.next));
+      }
+
+      if (!isMobileGameViewport() || chunks.length <= 1) {
+        screen.innerHTML = `
         <div class="scene-background" style="position:absolute;inset:0">${bgHtml}</div>
-        <div class="panel-center glass-panel" style="position:relative;margin-top:10vh">
-          <h2>${scene.title}</h2>
+        <div class="panel-center glass-panel transition-screen transition-screen--wide" style="position:relative;margin-top:10vh">
+          <h2>${titleEsc}</h2>
           <p style="text-align:left;font-size:1.05rem;line-height:1.65">${scene.content}</p>
-          <button type="button" class="btn-continue" style="margin-top:1.5rem" data-next="${scene.nextScene}">Continuer</button>
+          <button type="button" class="btn-continue" style="margin-top:1.5rem" data-next="${escapeHtml(nextRaw)}">Continuer</button>
         </div>`;
-      document.querySelector(".btn-continue[data-next]").addEventListener("click", (e) => goToScene(e.target.dataset.next));
+        bindContinue(screen);
+        return;
+      }
+
+      let pageIdx = 0;
+      function paintTransition() {
+        const last = pageIdx >= chunks.length - 1;
+        screen.innerHTML = `
+        <div class="scene-background" style="position:absolute;inset:0">${bgHtml}</div>
+        <div class="transition-screen glass-panel">
+          <h2>${titleEsc}</h2>
+          <div class="minigame-tab-panels">
+            ${chunks
+              .map(
+                (html, i) =>
+                  `<div class="minigame-page transition-page"${i === pageIdx ? "" : " hidden"}>${html}</div>`
+              )
+              .join("")}
+          </div>
+          <div class="minigame-pager-controls">
+            <button type="button" class="btn-ghost tr-pager-prev" aria-label="Précédent"${pageIdx <= 0 ? " disabled" : ""}>‹</button>
+            <span class="minigame-page-indicator tr-pager-ind">${pageIdx + 1} / ${chunks.length}</span>
+            <button type="button" class="btn-ghost tr-pager-next" aria-label="Suivant"${last ? " hidden" : ""}>›</button>
+          </div>
+          <button type="button" class="btn-continue tr-pager-done" data-next="${escapeHtml(nextRaw)}"${last ? "" : " hidden"}>Continuer</button>
+        </div>`;
+        const prev = screen.querySelector(".tr-pager-prev");
+        const next = screen.querySelector(".tr-pager-next");
+        const done = screen.querySelector(".tr-pager-done");
+        if (prev) {
+          prev.addEventListener("click", () => {
+            if (pageIdx > 0) {
+              pageIdx--;
+              paintTransition();
+            }
+          });
+        }
+        if (next) {
+          next.addEventListener("click", () => {
+            if (pageIdx < chunks.length - 1) {
+              pageIdx++;
+              paintTransition();
+            }
+          });
+        }
+        bindContinue(screen);
+      }
+      paintTransition();
     }
 
     function renderEnding(scene) {
-      document.getElementById("game-screen").innerHTML = `
-        <div class="panel-center glass-panel" style="margin-top:2rem">
-          <h2>${scene.title}</h2>
+      const screen = document.getElementById("game-screen");
+      const titleEsc = escapeHtml(scene.title);
+      const chunks = splitTransitionContentToPages(scene.content);
+
+      function bindRestart(root) {
+        const b = root.querySelector("#btn-restart-demo");
+        if (b) {
+          b.addEventListener("click", () => {
+            gameState = defaultState();
+            clearAllSaveSlots();
+            renderNotebook();
+            refreshSkillBars();
+            renderScene("intro_1");
+          });
+        }
+      }
+
+      if (!isMobileGameViewport() || chunks.length <= 1) {
+        screen.innerHTML = `
+        <div class="panel-center glass-panel ending-screen" style="margin-top:2rem">
+          <h2>${titleEsc}</h2>
           <div style="margin-top:1rem">${scene.content}</div>
           <button type="button" class="btn-continue" style="margin-top:1.75rem" id="btn-restart-demo">Rejouer la démo</button>
         </div>`;
-      document.getElementById("btn-restart-demo").addEventListener("click", () => {
-        gameState = defaultState();
-        clearAllSaveSlots();
-        renderNotebook();
-        refreshSkillBars();
-        renderScene("intro_1");
-      });
+        bindRestart(screen);
+        return;
+      }
+
+      let pageIdx = 0;
+      function paintEnding() {
+        const last = pageIdx >= chunks.length - 1;
+        screen.innerHTML = `
+        <div class="ending-screen-wrap glass-panel">
+          <h2>${titleEsc}</h2>
+          <div class="minigame-tab-panels">
+            ${chunks
+              .map(
+                (html, i) =>
+                  `<div class="minigame-page ending-page"${i === pageIdx ? "" : " hidden"}>${html}</div>`
+              )
+              .join("")}
+          </div>
+          <div class="minigame-pager-controls">
+            <button type="button" class="btn-ghost end-pager-prev"${pageIdx <= 0 ? " disabled" : ""}>‹</button>
+            <span class="minigame-page-indicator">${pageIdx + 1} / ${chunks.length}</span>
+            <button type="button" class="btn-ghost end-pager-next"${last ? " hidden" : ""}>›</button>
+          </div>
+          <button type="button" class="btn-continue" style="margin-top:0.65rem" id="btn-restart-demo"${last ? "" : " hidden"}>Rejouer la démo</button>
+        </div>`;
+        screen.querySelector(".end-pager-prev")?.addEventListener("click", () => {
+          if (pageIdx > 0) {
+            pageIdx--;
+            paintEnding();
+          }
+        });
+        screen.querySelector(".end-pager-next")?.addEventListener("click", () => {
+          if (pageIdx < chunks.length - 1) {
+            pageIdx++;
+            paintEnding();
+          }
+        });
+        bindRestart(screen);
+      }
+      paintEnding();
     }
 
     function bootstrapGame() {
@@ -3150,10 +4623,12 @@
       }
       try {
         const data = JSON.parse(entry.raw);
-        if (!data.currentScene || !getSceneById(data.currentScene)) {
+        const sid = resolveSceneId(data.currentScene);
+        if (!sid || !getSceneById(sid)) {
           renderScene(gameState.currentScene);
           return;
         }
+        data.currentScene = sid;
         migrateSaveToPrimaryIfNeeded(entry.key, entry.raw);
         applySaveData(data);
         renderScene(gameState.currentScene);
