@@ -158,47 +158,6 @@ async function getFiche(ficheKey) {
   }
   return _cache[ck] || null;
 }
-function _b64ToBytes(b64) {
-  var bin = atob(b64);
-  var bytes = new Uint8Array(bin.length);
-  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return bytes;
-}
-function _inflateRawB64ToString(b64) {
-  // Requires pako (loaded from CDN near the top of the document).
-  return pako.inflateRaw(_b64ToBytes(b64), { to: 'string' });
-}
-
-// Embedded HTML bundle (deflate-raw + base64) to avoid any local file fetches in production.
-// This is a JSON map { relativePath -> htmlText } compressed and inlined here so `index.html` is self-contained.
-const __EMBEDDED_HTML_BUNDLE_DEFLATE_RAW_B64 =
-  '7L1ZjxxHlib6V1ysq46IW56RseYmUVXJXLrYQy0lkurbEAmVZ4RFpFMe7iFfUkxxctCYhx70PFZdYF76oVG4QInVwO2XAgaDuk9K9B+pX3LPZot7uGdEkpKg' +
-  '6c7uEjMifDGzY8fOZsfO9+ped/s0nJyHKn130PvVkw8fwZ9gudz+KMnDJM62j+CfSajiifoiV1mu0i8ylX0xSeI4CLMsgN+z7nm+iO4d3Hv/neOPj5783Scn' +
-  'Hv7wwbP4ffzrRUE8v//s3ix9do9+U8EU/y5UHniT8yDNVA6Xnz453drjO+hKHCwU/HwRqq+XSZo/u+dBm7mK8d6vw2l+fn+qLsKJ2qIvvhfGYR4G0VY2CSJ1' +
-  'v9/t8bvyMI/UB78uwm+8Le9R4NnhvL/N1+CmbJKGy9ybpEmWJWk4D2MvSyfQ0HmeL7OD7e3JNO6+yKYqCi/Sbqzy7Xi52E5VMMl/2d/bLhZT/tJdpsm0mCDh' +
-  'uosQH4FOvL/Nr3/LhramyaLUGP6waYMbNPLLs+BMRdtZHsTTIEpitU0/NLw2vyTKnSXTS+/Vs9jzFkEKoznweu/htxlM1dYsWITR5YG3BewUqa3sErhn4XsP' +
-  'ojD+8sNg8pi+n8Kdvvfs3mM1T5T39OGze74HXJVtZSoNZ/Sys2Dy5TxNinh64MGzKki35mkwhUnM2/3heKrmvvez4fHocHfg9d6Fz4OT4eH4yBvTl/7pYG+0' +
-  '6/V7vXc79DoY0Na5Cufn+QH+enFOvy6D6TSM5wcesM+kreKLdhbM1FYApN4KY2DRrTxZ+t5Ob/my4/3c66dq0aF/vQH8A6+4ArJsa7q8v625HCmEf6fhhRdO' +
-  'YRLSJMmJmvALXLBzlF8ukeFz9TJn0hMDA9NnuffKKzL1OA9y5eOnk9lMTXLvyrvvfYqs8B6+h+88+vjRx58+hguf46heLQKYlNbPDnf3HpwetvyIht362dHo' +
-  'wfj0uOWfzQ9a6fwsaPd3dv3+cN8fjHt+r9sfd+Bakk5VWnsdL2M/4U0n+8fj09PWle82t9M7HLvN7Q+Pys3t7/j9nXFja6XLTmPHD04OT08qjQ1Hx8P9fdvY' +
-  'zsnJ7oNdp7HxwB/0+35/PKxtrHTZbax/engyrjR2+uDB6WBkGzs9Oob2ncYGY3jVft8f7tQ2VrrsNHZ6cjo82q02trfb3+27jR2OD8duY6M9v98f0n+1rZWu' +
-  'l5o7GZwMqs2NdgcPdpzm9g/3jkel5kbwKvhvb9DQnHvdbe7oZPd0WGluMDgenpw487Z7sne67zQ3HNHEDIZ7ta2VLjuNHZ2erjLJj7wABsfHowentrnxyclhiZQj4O7+gFihrrXSZXdsR6cPTvsrPLk/GB4583b84HB3VOXJ0Y6/02vmSX3ZnbXTk+Pj6gLY6+8dne7Zxg7HD0anRy4hB/vwtp6PvFdLyNJ1l5A9YJIqIQ+HJzvDsW3uwcnpYGdUmrchsEDPb1jcpctuY0enR0cPWiC0n5Pw3N72Hhx+9OunJ97xiTfoefDp8ZOHH3/02Gsvrv+4UF4ehFGkvK8K5UUq84IiT+FPzEZSx/vL3//f3vT69YysEPjFxztUkcIHUNFn0fXrRZCH8HSmBbVtQctq/McDJXHQ91EXHDy799VkAfqQf8dn8dXw868LhX2B717Uun6dXy6SKJmH8MtLUAbKmxbeIsm97/4FTSaxdrzv/uz9wrwsWVIvDz5/du+oWHh0D1hPXju4UBPQvxdJmHbw7ntgL3nZMkzDvMjkctRS2RJ+kBvweXw6Vfpx+uY8PgmXYaIfDryoWITX36YK7ngu' +
-  // (bundle continues)
-  '';
-
-let __EMBEDDED_HTML_MAP = null;
-function _getEmbeddedHtmlMap() {
-  if (__EMBEDDED_HTML_MAP) return __EMBEDDED_HTML_MAP;
-  try {
-    var jsonText = _inflateRawB64ToString(__EMBEDDED_HTML_BUNDLE_DEFLATE_RAW_B64);
-    __EMBEDDED_HTML_MAP = JSON.parse(jsonText);
-    return __EMBEDDED_HTML_MAP;
-  } catch (e) {
-    console.warn('embedded-html-bundle:', e);
-    __EMBEDDED_HTML_MAP = null;
-    return null;
-  }
-}
 
 // ===== Self-contained embedded assets (generated) =====
 function _sc64ToBytes(b64) {
@@ -419,6 +378,9 @@ if (typeof EXPLANATIONS_DATA !== 'undefined' && typeof pako !== 'undefined') {
 
 function DecompressIframe({ dataOrPromise, title, style, cacheKey, getData }) {
   const containerRef = React.useRef(null);
+  // Toujours appeler la dernière fonction getData sans remonter l'effet quand le parent repasse une inline lambda.
+  const getDataRef = React.useRef(getData);
+  getDataRef.current = getData;
   const containerStyle = React.useMemo(() => ({
     position: "relative",
     width: "100%",
@@ -440,9 +402,10 @@ function DecompressIframe({ dataOrPromise, title, style, cacheKey, getData }) {
     (async () => {
       try {
         let html;
-        if (getData) {
+        const gd = getDataRef.current;
+        if (gd) {
           if (isQuiz) console.time('quiz-getData');
-          html = await getData();
+          html = await gd();
           if (isQuiz) console.timeEnd('quiz-getData');
         } else if (typeof dataOrPromise === 'string' && dataOrPromise.length > 0) {
           html = await getHtml(cacheKey || title, dataOrPromise);
@@ -495,8 +458,10 @@ function DecompressIframe({ dataOrPromise, title, style, cacheKey, getData }) {
         try { console.timeEnd('quiz-load'); } catch (err) {}
       }
     };
-  }, [dataOrPromise, cacheKey, getData, title]);
-  return React.createElement("div", { ref: containerRef, style: containerStyle, dangerouslySetInnerHTML: { __html: '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:DM Sans,sans-serif;font-size:13px;color:#6b7280">Chargement\u2026</div>' } });
+  }, [dataOrPromise, cacheKey, title]);
+  // Ne pas utiliser dangerouslySetInnerHTML sur ce nœud : à chaque re-render React réinjecterait
+  // le HTML de chargement et détruirait l'iframe créée dans useEffect (simulation Bac, quiz, etc.).
+  return React.createElement("div", { ref: containerRef, style: containerStyle });
 }
 
 const APP_NAME = "PhiloPrep";
@@ -2476,11 +2441,24 @@ function AuteursModal({ open, onClose, onDialogue }) {
       for (const auteur of toFetch) {
         try {
           const title = WIKI_TITLES[auteur.id] || auteur.nom;
-          const api = "https://fr.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(title);
-          const res = await fetch(api);
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          const json = await res.json();
-          const src = json && json.thumbnail && json.thumbnail.source ? json.thumbnail.source : null;
+          const bases = [
+            "https://fr.wikipedia.org/api/rest_v1/page/summary/",
+            "https://en.wikipedia.org/api/rest_v1/page/summary/",
+          ];
+          let src = null;
+          for (const base of bases) {
+            try {
+              const res = await fetch(base + encodeURIComponent(title), {
+                headers: { Accept: "application/json" },
+              });
+              if (!res.ok) continue;
+              const json = await res.json();
+              src = json && json.thumbnail && json.thumbnail.source ? json.thumbnail.source : null;
+              if (src) break;
+            } catch (e) {
+              /* try next wiki */
+            }
+          }
           portraitCacheRef.current[auteur.id] = src || null;
           if (!cancelled && src) setPortraitUrls(prev => ({ ...prev, [auteur.id]: src }));
         } catch (e) {
