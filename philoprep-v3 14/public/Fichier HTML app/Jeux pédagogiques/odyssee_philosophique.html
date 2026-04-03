@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>L'Odyssée philosophique — Démo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -85,7 +85,7 @@
       z-index: 1;
       max-width: 1280px;
       margin: 0 auto;
-      padding: 0;
+      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
       height: 100%;
       max-height: 100dvh;
       box-sizing: border-box;
@@ -104,8 +104,8 @@
 
     .btn-game-menu {
       position: absolute;
-      top: max(0.4rem, env(safe-area-inset-top, 0px));
-      right: max(0.45rem, env(safe-area-inset-right, 0px));
+      top: 0.35rem;
+      right: 0.45rem;
       z-index: 40;
       font-family: var(--font-title);
       font-size: 0.72rem;
@@ -602,41 +602,66 @@
       .dialogue-scene.dialogue-scene--paged {
         flex-direction: column;
         align-items: stretch;
-        justify-content: flex-start;
-        padding: 10px 0 12px;
-        gap: 8px;
+        justify-content: flex-end;
+        padding: 0;
+        padding-bottom: max(3.35rem, calc(env(safe-area-inset-bottom, 0px) + 2.85rem));
+        gap: 0;
         height: 100%;
         max-height: 100%;
       }
+      .dialogue-scene.dialogue-scene--paged .nav-arrow {
+        top: auto;
+        bottom: max(0.3rem, env(safe-area-inset-bottom, 0px));
+        transform: none;
+      }
       .dialogue-scene.dialogue-scene--paged .character-portrait:not(.is-hidden) {
+        order: 1;
+        flex: 1 1 auto;
+        min-height: 0;
         width: 100%;
-        flex-shrink: 0;
+        max-height: min(44vh, 48dvh);
         position: relative;
         top: auto;
-        padding: 0 56px;
-        justify-content: flex-start;
+        padding: 0.15rem 48px 0.35rem;
+        justify-content: center;
+        align-items: center;
+      }
+      .dialogue-scene.dialogue-scene--paged.narration-page .character-portrait {
+        display: none;
+      }
+      .dialogue-scene.dialogue-scene--paged.narration-page .dialogue-main {
+        order: 1;
+        flex: 1 1 auto;
+        max-height: none;
+        justify-content: flex-end;
       }
       .dialogue-scene.dialogue-scene--paged .portrait-frame {
-        width: min(78vw, 260px);
-        max-height: min(30vh, 320px);
+        width: min(68vw, 228px);
+        max-height: min(36vh, 280px);
         margin: 0 auto;
       }
       .dialogue-scene.dialogue-scene--paged .dialogue-main {
+        order: 2;
         grid-column: unset;
         grid-row: unset;
         width: 100%;
-        flex: 1 1 auto;
+        flex: 0 1 auto;
         min-height: 0;
+        max-height: min(40vh, 44dvh);
         padding-left: 0;
         padding-right: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
       }
       .dialogue-scene.dialogue-scene--paged .dialogue-box {
         width: 100%;
-        flex: 1 1 auto;
+        flex: 0 1 auto;
         min-height: 0;
         max-height: 100%;
         display: flex;
         flex-direction: column;
+        justify-content: flex-end;
         overflow: hidden;
       }
       .dialogue-scene.dialogue-scene--paged .dialogue-text {
@@ -945,6 +970,9 @@
     .minigame-wrap--tabbed .minigame-page {
       max-height: 100%;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
     .minigame-page[hidden] {
       display: none !important;
@@ -1061,7 +1089,18 @@
       margin-bottom: 1rem;
     }
     @media (max-width: 720px) {
-      .sorting-grid { grid-template-columns: 1fr; }
+      .sorting-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .mg-sort-play-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 0 0.15rem 0.35rem 0;
+    }
+    .minigame-wrap--tabbed .mg-sort-play-scroll {
+      max-height: 100%;
     }
     .drop-zone {
       min-height: 140px;
@@ -1107,6 +1146,29 @@
     }
     .sort-card:active { cursor: grabbing; }
     .sort-card.placed { opacity: 0.95; }
+
+    @media (max-width: 768px) {
+      .drop-zone {
+        min-height: 100px;
+        padding: 0.4rem;
+      }
+      .drop-zone h3 {
+        font-size: 0.62rem;
+      }
+      .drop-zone .hint {
+        font-size: 0.68rem;
+        line-height: 1.25;
+      }
+      .sort-card {
+        font-size: 0.76rem;
+        padding: 0.45rem 0.5rem;
+      }
+      .card-bank {
+        padding: 0.5rem;
+        gap: 0.35rem;
+        margin-bottom: 0.65rem;
+      }
+    }
 
     .minigame-actions {
       display: flex;
@@ -1239,10 +1301,16 @@
       padding: 0.4rem 0.65rem !important;
     }
     @media (max-width: 768px) {
+      .narrative-sequence .nav-arrow {
+        top: auto;
+        bottom: max(0.3rem, env(safe-area-inset-bottom, 0px));
+        transform: none;
+      }
       .narrative-sequence {
         position: relative;
         padding-left: 0;
         padding-right: 0;
+        padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
       }
       .narrative-title {
         font-size: clamp(1.05rem, 5.2vw, 1.4rem);
@@ -3108,11 +3176,13 @@
           const cats = scene.categories;
           this.state = { scene, placements: {} };
           const prepHtml = `<p class="mg-hint" style="text-align:center;margin:0.25rem 0 0">Passe à l’écran suivant pour voir les colonnes et les cartes à glisser.</p>`;
-          const playStub = `<div class="card-bank" id="sort-bank" aria-label="Affirmations à classer"></div>
+          const playStub = `<div class="mg-sort-play-scroll">
+              <div class="card-bank" id="sort-bank" aria-label="Affirmations à classer"></div>
               <div class="sorting-grid" id="sort-zones"></div>
               <div class="minigame-actions">
                 <button type="button" class="btn-continue" id="btn-validate-sort">Valider</button>
-              </div>`;
+              </div>
+            </div>`;
           mountMinigameTabbedPages({
             title: scene.title,
             instruction: scene.instruction,
