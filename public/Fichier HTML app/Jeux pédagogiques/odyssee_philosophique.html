@@ -825,6 +825,39 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* Barre « Quitter » quand le jeu est intégré en iframe (ex. PhiloPrep) */
+    .odyssee-embed-quit-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 400;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px 12px;
+      padding-top: max(10px, env(safe-area-inset-top, 0px));
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(10, 14, 39, 0.65) 0%, transparent 100%);
+    }
+    .odyssee-embed-quit-btn {
+      pointer-events: auto;
+      font-family: var(--font-title);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.55rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      cursor: pointer;
+      background: rgba(26, 31, 58, 0.92);
+      color: var(--gold-light);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    .odyssee-embed-quit-btn:hover {
+      background: rgba(40, 46, 88, 0.95);
+    }
   </style>
 </head>
 <body>
@@ -1767,6 +1800,30 @@
       }
     }
 
+    function installOdysseeEmbedQuit() {
+      try {
+        if (window.self === window.top) return;
+      } catch (e) {
+        return;
+      }
+      if (document.getElementById("odyssee-embed-quit-bar")) return;
+      const bar = document.createElement("div");
+      bar.id = "odyssee-embed-quit-bar";
+      bar.className = "odyssee-embed-quit-bar";
+      bar.innerHTML =
+        "<button type=\"button\" class=\"odyssee-embed-quit-btn\" id=\"odyssee-embed-quit-btn\">Quitter le mode aventure</button>";
+      document.body.insertBefore(bar, document.body.firstChild);
+      document.getElementById("odyssee-embed-quit-btn").addEventListener("click", () => {
+        try {
+          window.parent.postMessage({ type: "odyssee-quit" }, window.location.origin);
+        } catch (err) {
+          try {
+            window.parent.postMessage({ type: "odyssee-quit" }, "*");
+          } catch (e2) { /* ignore */ }
+        }
+      });
+    }
+
     function wireHeader() {
       document.getElementById("btn-save").addEventListener("click", saveGame);
       document.getElementById("btn-load").addEventListener("click", () => loadGame());
@@ -1783,6 +1840,7 @@
 
     /** Point d'entrée : particules, en-tête, puis sauvegarde ou scène par défaut. */
     function init() {
+      installOdysseeEmbedQuit();
       initParticles();
       wireHeader();
       bootstrapGame();

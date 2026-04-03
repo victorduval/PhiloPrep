@@ -3685,6 +3685,17 @@ function ReviserTabbedScreen({ onBack, onSelectNotion, onAuteurs, onCitations, o
 
 function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, onDissertationsCorrigees, onPhilosophia, onPhiloquest, onPhilomind, onPhilorush, onPhilodoxa, onPhilologique, onPlanProbl, initialTab, onTabChange }) {
   const [tab, setTab] = useState(initialTab || "jeux");
+  const odysseeSrc = React.useMemo(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return new URL(
+        "Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html",
+        window.location.origin + "/"
+      ).href;
+    } catch (e) {
+      return "/Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html";
+    }
+  }, []);
   const changeTab = (id) => {
     setTab(id);
     if (onTabChange) onTabChange(id);
@@ -4056,20 +4067,28 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
           </div>
         )}
         {tab === "mode-aventure" && (
-          <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", background: "#0a0e27" }}>
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              position: "relative",
+              overflow: "hidden",
+              background: "#0a0e27",
+            }}
+          >
             {/*
-              Odyssée / Mode aventure — iframe avec src (pas srcdoc) pour que assets/portraits, assets/backgrounds, etc.
-              restent résolus par rapport à odyssee_philosophique.html.
-              Chemin relatif depuis index.html (servi à la racine du site) :
-              ./Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html
+              Iframe avec URL absolue depuis l’origine du site pour éviter de charger index.html par erreur.
+              Les chemins assets/ du jeu restent relatifs à odyssee_philosophique.html (voir assetUrl dans le jeu).
             */}
             <iframe
               title="L'Odyssée philosophique"
-              src="./Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html"
+              src={odysseeSrc}
               style={{
-                flex: 1,
+                position: "absolute",
+                left: 0,
+                top: 0,
                 width: "100%",
-                minHeight: 0,
+                height: "100%",
                 border: "none",
                 display: "block",
               }}
@@ -5462,6 +5481,17 @@ function App() {
   const [sentrainerSurfaceTab, setSentrainerSurfaceTab] = React.useState("jeux");
   const onSentrainerTabChange = React.useCallback((tabId) => {
     setSentrainerSurfaceTab(tabId);
+  }, []);
+  React.useEffect(() => {
+    function onOdysseeMessage(e) {
+      if (!e || !e.data) return;
+      if (e.origin !== window.location.origin) return;
+      if (e.data.type !== "odyssee-quit") return;
+      setSentrainerSurfaceTab("jeux");
+      setSentrainerInitialTab("jeux");
+    }
+    window.addEventListener("message", onOdysseeMessage);
+    return () => window.removeEventListener("message", onOdysseeMessage);
   }, []);
   const [reviserEntryTab, setReviserEntryTab] = React.useState("notions");
   const [reviserSurfaceTab, setReviserSurfaceTab] = React.useState("notions");
