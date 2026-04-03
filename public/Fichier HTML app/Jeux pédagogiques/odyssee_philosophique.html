@@ -957,6 +957,141 @@
     .odyssee-embed-quit-btn:hover {
       background: rgba(40, 46, 88, 0.95);
     }
+
+    /* ============================================================
+       Mini-jeux : Doxa & Aporie (extension Socrate → avant Platon)
+       ============================================================ */
+    .doxa-exercise {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .doxa-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 12px;
+      border-left: 4px solid var(--gold-light);
+    }
+    .doxa-statement {
+      font-size: 1.05em;
+      margin-bottom: 0.75rem;
+      color: var(--marble);
+      line-height: 1.6;
+    }
+    .doxa-categories {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .doxa-category-btn {
+      background: rgba(107, 70, 193, 0.25);
+      border: 2px solid rgba(159, 122, 234, 0.75);
+      color: var(--marble);
+      padding: 0.55rem 0.85rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.92rem;
+    }
+    .doxa-category-btn:hover {
+      background: rgba(107, 70, 193, 0.38);
+      border-color: rgba(212, 175, 55, 0.8);
+      filter: brightness(1.05);
+    }
+    .doxa-category-btn.selected {
+      background: rgba(159, 122, 234, 0.65);
+      border-color: rgba(212, 175, 55, 0.95);
+    }
+    .doxa-feedback {
+      margin-top: 0.65rem;
+      font-size: 0.92em;
+      line-height: 1.45;
+    }
+    .feedback-correct {
+      color: #27ae60;
+      padding: 0.5rem 0.6rem;
+      background: rgba(39, 174, 96, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(39, 174, 96, 0.2);
+    }
+    .feedback-wrong {
+      color: #e74c3c;
+      padding: 0.5rem 0.6rem;
+      background: rgba(231, 76, 60, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(231, 76, 60, 0.2);
+    }
+
+    .aporie-step, .aporie-conclusion {
+      padding: 1rem 0.75rem 1.25rem;
+    }
+    .aporie-progress {
+      text-align: center;
+      color: var(--gold-light);
+      margin-bottom: 0.9rem;
+      font-family: var(--font-title);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+    .socrate-question {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--gold);
+    }
+    .aporie-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .aporie-option-btn {
+      background: linear-gradient(135deg, rgba(107, 70, 193, 0.22), rgba(159, 122, 234, 0.12));
+      border: 2px solid rgba(159, 122, 234, 0.65);
+      color: var(--marble);
+      padding: 0.85rem 0.95rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      font-size: 1.0rem;
+    }
+    .aporie-option-btn:hover {
+      border-color: rgba(212, 175, 55, 0.8);
+      filter: brightness(1.05);
+      transform: translateX(4px);
+    }
+    .aporie-objection {
+      margin-top: 1rem;
+      padding: 0.9rem;
+      border-radius: 12px;
+      background: rgba(230, 126, 34, 0.08);
+      border-left: 4px solid rgba(230, 126, 34, 0.35);
+    }
+    .socrate-objection {
+      font-size: 1.02rem;
+      margin-bottom: 0.6rem;
+    }
+    .aporie-insight {
+      background: rgba(218, 165, 32, 0.08);
+      padding: 0.6rem 0.7rem;
+      border-radius: 10px;
+      font-style: italic;
+      color: var(--gold-light);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      margin-bottom: 0.25rem;
+    }
+    .aporie-revelation {
+      margin-top: 1rem;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.14), rgba(159, 122, 234, 0.12));
+      padding: 1rem 0.9rem;
+      border-radius: 14px;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: var(--marble);
+    }
   </style>
 </head>
 <body>
@@ -1240,8 +1375,245 @@
             { speaker: "socrate", text: "Mais je ne suis qu'un vieux bonhomme qui pose des questions. Pour comprendre vraiment ce qu'est la vérité, tu dois rencontrer mon meilleur élève..." }
           ],
           action: "continue",
-          nextScene: "transition_platon",
+          nextScene: "protagoras_intro",
           unlocksNotions: ["verite", "langage", "raison"]
+        },
+        {
+          id: "protagoras_intro",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            {
+              speaker: "socrate",
+              text: "Bien ! Tu commences à distinguer opinion et argument. Mais il y a un sophiste encore plus redoutable que les autres..."
+            },
+            {
+              speaker: "socrate",
+              text: "Son nom est <strong>Protagoras</strong>. Il affirme que <em>\"l'homme est la mesure de toute chose\"</em>. Autrement dit : ce qui est vrai pour toi l'est vraiment pour toi, ce qui est vrai pour moi l'est vraiment pour moi."
+            },
+            {
+              speaker: "socrate",
+              text: "Cela semble séduisant, n'est-ce pas ? Chacun sa vérité, aucune querelle possible ! Mais réfléchis bien..."
+            },
+            {
+              speaker: "socrate",
+              text: "Si Protagoras a raison, alors <strong>toutes les opinions se valent</strong>. L'opinion du sage et celle de l'ignorant auraient la même valeur. Est-ce vraiment acceptable ?"
+            }
+          ],
+          choices: [
+            {
+              text: "\"Non, certaines opinions sont mieux fondées que d'autres.\"",
+              feedback: "Exactement ! Mais alors Protagoras a tort : il existe bien une différence entre vérité et opinion. C'est ce que nous cherchons.",
+              skillGain: { clarte: 15, examen: 10 },
+              nextScene: "doxa_intro"
+            },
+            {
+              text: "\"Oui, chacun a droit à son opinion.\"",
+              feedback: "Attention ! Si TOUTES les opinions se valent, pourquoi discuterions-nous ? Pourquoi chercher la vérité ? Le relativisme de Protagoras détruit la possibilité même de la philosophie.",
+              skillGain: { examen: 8 },
+              nextScene: "doxa_intro"
+            },
+            {
+              text: "\"Je ne sais pas, c'est compliqué...\"",
+              feedback: "Bien vu ! C'est effectivement compliqué. Le relativisme semble tolérant, mais il rend impossible toute recherche de vérité. Creusons cette question.",
+              skillGain: { examen: 12 },
+              nextScene: "doxa_intro"
+            }
+          ]
+        },
+        {
+          id: "doxa_intro",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            {
+              speaker: "socrate",
+              text: "Le problème de Protagoras révèle quelque chose de crucial : nous vivons entourés d'<strong>opinions</strong> - ce que nous appelons la <em>doxa</em>."
+            },
+            {
+              speaker: "socrate",
+              text: "La doxa, ce sont toutes ces choses que nous croyons sans jamais les avoir examinées. <em>\"Tout le monde dit que...\"</em>, <em>\"C'est évident que...\"</em>, <em>\"On a toujours fait comme ça...\"</em>"
+            },
+            {
+              speaker: "socrate",
+              text: "Ces opinions nous semblent naturelles, comme l'air que nous respirons. Mais sont-elles vraies ? Le premier geste philosophique, c'est de <strong>mettre en cause nos préjugés</strong>."
+            },
+            {
+              speaker: "socrate",
+              text: "Voyons si tu peux détecter la doxa cachée dans ces affirmations..."
+            }
+          ],
+          action: "continue",
+          nextScene: "minigame_doxa"
+        },
+        {
+          id: "minigame_doxa",
+          type: "minigame",
+          gameType: "doxa_detection",
+          title: "🎭 Détecter la doxa",
+          instruction: "Identifie le préjugé caché dans chaque affirmation. Attention : c'est plus subtil que tu ne crois !",
+          items: [
+            {
+              id: 1,
+              statement: "Les femmes sont naturellement plus douces que les hommes.",
+              doxaType: "naturalisation",
+              explanation: "On attribue à la 'nature' ce qui relève en réalité de l'éducation et de la culture. C'est un préjugé sexiste déguisé en évidence naturelle."
+            },
+            {
+              id: 2,
+              statement: "Les riches ont réussi grâce à leur mérite.",
+              doxaType: "merite",
+              explanation: "On ignore les inégalités de départ (héritage, éducation, opportunités). Ce préjugé justifie l'ordre social existant."
+            },
+            {
+              id: 3,
+              statement: "Il faut obéir aux lois car elles sont justes.",
+              doxaType: "autorite",
+              explanation: "On confond légalité et justice. Une loi peut être légale sans être juste (exemple : lois esclavagistes)."
+            },
+            {
+              id: 4,
+              statement: "Les jeunes d'aujourd'hui sont moins respectueux qu'avant.",
+              doxaType: "nostalgie",
+              explanation: "Préjugé générationnel récurrent depuis l'Antiquité. Chaque époque idéalise le passé et critique la jeunesse."
+            },
+            {
+              id: 5,
+              statement: "Il est normal de privilégier sa famille avant les autres.",
+              doxaType: "tribalisme",
+              explanation: "On naturalise le favoritisme familial sans questionner si c'est moralement justifiable. Pourquoi ma famille vaudrait-elle plus qu'une autre ?"
+            }
+          ],
+          categories: [
+            { id: "naturalisation", label: "Naturalisation", description: "Présenter comme naturel ce qui est culturel" },
+            { id: "merite", label: "Illusion méritocratique", description: "Ignorer les inégalités de départ" },
+            { id: "autorite", label: "Confusion autorité/vérité", description: "Confondre ce qui est et ce qui devrait être" },
+            { id: "nostalgie", label: "Nostalgie du passé", description: "Idéaliser le passé, critiquer le présent" },
+            { id: "tribalisme", label: "Favoritisme tribal", description: "Privilégier son groupe sans justification" }
+          ],
+          successThreshold: 0.6,
+          nextScene: "aporie_intro"
+        },
+        {
+          id: "aporie_intro",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            {
+              speaker: "socrate",
+              text: "Excellent ! Tu vois maintenant comment nos préjugés se cachent derrière des évidences apparentes."
+            },
+            {
+              speaker: "socrate",
+              text: "Mais allons plus loin. Quand nous examinons vraiment nos croyances, nous découvrons souvent quelque chose de troublant..."
+            },
+            {
+              speaker: "socrate",
+              text: "Nous aboutissons à une <strong>aporie</strong> - une impasse intellectuelle. Nous découvrons que nous ne savons pas ce que nous pensions savoir."
+            },
+            {
+              speaker: "socrate",
+              text: "Prenons un exemple : qu'est-ce que la <strong>justice</strong> ? Tu utilises ce mot tous les jours. Mais sais-tu vraiment ce qu'il signifie ?"
+            }
+          ],
+          action: "continue",
+          nextScene: "minigame_aporie_justice"
+        },
+        {
+          id: "minigame_aporie_justice",
+          type: "minigame",
+          gameType: "aporie_dialectique",
+          title: "⚖️ L'aporie de la justice",
+          instruction: "Socrate va te demander de définir la justice. À chaque définition, il trouvera un contre-exemple. Prépare-toi à l'impasse...",
+          dialectic_steps: [
+            {
+              question: "Alors, qu'est-ce que la justice ?",
+              options: [
+                {
+                  answer: "La justice, c'est rendre à chacun ce qui lui est dû.",
+                  objection: "Intéressant ! Mais si je dois de l'argent à un ami qui est devenu fou, est-il juste de lui rendre un couteau ? Pourtant, c'est 'ce qui lui est dû'...",
+                  insight: "Ta définition semblait bonne, mais elle mène à des situations absurdes."
+                },
+                {
+                  answer: "La justice, c'est obéir aux lois de la cité.",
+                  objection: "Vraiment ? Mais si une loi ordonne de tuer des innocents, est-il juste d'obéir ? Les lois peuvent-elles être injustes ?",
+                  insight: "Tu confonds justice et légalité. Ce n'est pas la même chose."
+                },
+                {
+                  answer: "La justice, c'est l'égalité entre tous.",
+                  objection: "L'égalité absolue ? Faut-il traiter également un enfant et un adulte ? Un malade et un bien-portant ? N'y a-t-il pas des différences légitimes ?",
+                  insight: "L'égalité ne peut pas être absolue. Mais alors, quelle égalité ?"
+                }
+              ]
+            },
+            {
+              question: "Essayons autrement. La justice concerne-t-elle les actes ou les intentions ?",
+              options: [
+                {
+                  answer: "Les actes. Ce qui compte, c'est le résultat.",
+                  objection: "Donc si je veux tuer quelqu'un mais que j'échoue par accident, je ne suis pas injuste ? Et si je veux aider mais cause un tort par erreur, je suis injuste ?",
+                  insight: "Juger uniquement sur les actes semble insuffisant."
+                },
+                {
+                  answer: "Les intentions. Ce qui compte, c'est la volonté.",
+                  objection: "Mais les bonnes intentions suffisent-elles ? Si je veux aider mais cause un désastre, n'ai-je aucune responsabilité ? L'enfer n'est-il pas pavé de bonnes intentions ?",
+                  insight: "Les intentions seules ne suffisent pas non plus."
+                }
+              ]
+            },
+            {
+              question: "Dernière tentative : la justice est-elle la même pour tous ou relative à chaque situation ?",
+              options: [
+                {
+                  answer: "La même pour tous. La justice est universelle.",
+                  objection: "Universelle ? Mais voler pour nourrir ses enfants affamés, est-ce aussi injuste que voler par cupidité ? Toutes les situations sont-elles vraiment identiques ?",
+                  insight: "L'universalité absolue semble rigide et aveugle aux circonstances."
+                },
+                {
+                  answer: "Relative à chaque situation. Il faut s'adapter.",
+                  objection: "Mais alors, nous retombons sur Protagoras ! Si la justice change selon les cas, comment distinguer le juste de l'injuste ? N'est-ce pas du relativisme ?",
+                  insight: "La relativité totale détruit la notion même de justice."
+                }
+              ]
+            }
+          ],
+          conclusion: {
+            speaker: "socrate",
+            text: "Tu vois maintenant ? À chaque définition, nous trouvons une objection. À chaque tentative, une contradiction. C'est cela, l'<strong>aporie</strong>.",
+            revelation: "Nous sommes dans l'impasse. Nous pensions savoir ce qu'est la justice, mais en réalité, nous ne le savons pas. Et c'est là que commence vraiment la philosophie."
+          },
+          skillGain: { examen: 25, clarte: 20, justification: 15 },
+          nextScene: "aporie_conclusion"
+        },
+        {
+          id: "aporie_conclusion",
+          type: "dialogue",
+          philosopher: "socrate",
+          background: "athens_agora",
+          dialogues: [
+            {
+              speaker: "socrate",
+              text: "Cette expérience peut sembler décourageante. Tu pensais peut-être savoir ce qu'est la justice, et voilà que tu ne le sais plus."
+            },
+            {
+              speaker: "socrate",
+              text: "Mais c'est précisément le but ! <strong>\"Je sais que je ne sais rien\"</strong> - c'est ma seule certitude. Et c'est déjà beaucoup !"
+            },
+            {
+              speaker: "socrate",
+              text: "Car celui qui croit savoir n'apprendra jamais rien. Mais celui qui reconnaît son ignorance, celui-là peut commencer à chercher la vérité."
+            },
+            {
+              speaker: "socrate",
+              text: "L'aporie n'est pas un échec. C'est le <em>départ</em> de la réflexion philosophique. Tu es maintenant prêt à rencontrer celui qui ira plus loin que moi..."
+            }
+          ],
+          action: "continue",
+          nextScene: "transition_platon",
+          unlocksNotions: ["justice", "doxa", "aporie"]
         },
         {
           id: "transition_platon",
@@ -1355,7 +1727,19 @@
           relatedPhilosophers: ["socrate", "platon", "descartes", "kant"],
           examples: ["La maïeutique socratique", "Le Cogito (Descartes)", "Les impératifs catégoriques (Kant)"]
         },
-        justice: { name: "Justice", description: "À documenter dans une extension du jeu.", relatedPhilosophers: ["socrate", "platon"], examples: ["Le Gorgias", "La République"] },
+        justice: { name: "Justice", description: "Questionner ce que signifie « rendre à chacun » et découvrir les difficultés à définir le juste.", relatedPhilosophers: ["socrate", "platon"], examples: ["Le Gorgias", "La République"] },
+        doxa: {
+          name: "Doxa",
+          description: "Opinions reçues et croyances tenues pour évidentes sans examen critique.",
+          relatedPhilosophers: ["socrate"],
+          examples: ["« Tout le monde sait que… »", "« C'est évident… »", "Préjugés naturalisés"]
+        },
+        aporie: {
+          name: "Aporie",
+          description: "Impasse intellectuelle : quand l'examen détruit les réponses trop faciles, et rend possible la recherche.",
+          relatedPhilosophers: ["socrate"],
+          examples: ["« Je ne sais pas… »", "Contradictions après chaque tentative de définition"]
+        },
         temps: { name: "Temps", description: "À documenter.", relatedPhilosophers: ["platon", "augustin"], examples: ["Le Timée"] }
       }
     };
@@ -1456,7 +1840,205 @@
           setTimeout(() => renderScene(gameState.currentScene), 1600);
         }
       }
+    },
+
+    doxa_detection: {
+      state: null,
+      render(scene) {
+        // Stocke dans window pour que les handlers inline puissent lire les données.
+        window.doxaGameData = scene;
+        window.doxaAnswers = {};
+        this.state = { scene };
+
+        const gameScreen = document.getElementById("game-screen");
+        gameScreen.innerHTML = `
+          <div class="minigame-wrap">
+            <h2>${scene.title}</h2>
+            <p class="minigame-instruction">${scene.instruction}</p>
+            <div class="doxa-exercise">
+              ${scene.items
+                .map(
+                  (item) => `
+                <div class="doxa-item" data-item-id="${item.id}">
+                  <div class="doxa-statement">${item.statement}</div>
+                  <div class="doxa-categories">
+                    ${scene.categories
+                      .map(
+                        (cat) => `
+                      <button type="button" class="doxa-category-btn" data-item-id="${item.id}"
+                        onclick="selectDoxaCategory(${item.id}, '${cat.id}', this)">${cat.label}</button>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                  <div class="doxa-feedback" id="feedback-${item.id}"></div>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+            <div class="minigame-actions">
+              <button type="button" class="btn-continue" onclick="validateDoxaExercise()">Valider</button>
+            </div>
+          </div>`;
+      }
+    },
+
+    aporie_dialectique: {
+      state: null,
+      render(scene) {
+        window.aporieData = scene;
+        window.aporieStep = 0;
+        this.state = { scene };
+        showAporieStep(0);
+      }
+    }
     };
+
+    function selectDoxaCategory(itemId, categoryId, btnEl) {
+      window.doxaAnswers = window.doxaAnswers || {};
+      window.doxaAnswers[itemId] = categoryId;
+      document
+        .querySelectorAll(\`[data-item-id="${itemId}"] .doxa-category-btn\`)
+        .forEach((b) => b.classList.remove("selected"));
+      if (btnEl) btnEl.classList.add("selected");
+    }
+
+    function validateDoxaExercise() {
+      const gameData = window.doxaGameData;
+      const answers = window.doxaAnswers || {};
+      if (!gameData || !gameData.items) return;
+
+      const items = gameData.items;
+      const n = items.length;
+      let correct = 0;
+
+      items.forEach((item) => {
+        const userAnswer = answers[item.id];
+        const isCorrect = userAnswer === item.doxaType;
+        if (isCorrect) correct++;
+        const feedbackDiv = document.getElementById("feedback-" + item.id);
+        if (feedbackDiv) {
+          feedbackDiv.innerHTML = `
+            <div class="${isCorrect ? "feedback-correct" : "feedback-wrong"}">
+              ${isCorrect ? "✓ " : "✗ "}${item.explanation}
+            </div>
+          `;
+        }
+      });
+
+      const score = correct / n;
+      const th = gameData.successThreshold ?? 0.6;
+
+      if (score < th) {
+        const wrap = document.querySelector(".minigame-wrap");
+        if (wrap) {
+          showWrongAttemptPanel(wrap, {
+            title: "Doxa à corriger",
+            bodyHtml: `
+              <p>Tu as <strong>${correct} sur ${n}</strong> bonnes classifications.</p>
+              <p>Il faut au moins <strong>${Math.round(th * 100)}%</strong> de réussite pour poursuivre.</p>
+              <p>Relis chaque affirmation et cherche ce que le texte présente comme « naturel », évident ou indiscutable.</p>
+            `
+          });
+        }
+        return;
+      }
+
+      let skillGain = {};
+      if (score >= 0.8) skillGain = { examen: 20, clarte: 15 };
+      else if (score >= th) skillGain = { examen: 12, clarte: 8 };
+      else skillGain = { examen: 5 };
+
+      Object.keys(skillGain).forEach((k) => updateSkill(k, skillGain[k]));
+      showToast(`Bravo ! Tu as détecté la doxa (${Math.round(score * 100)}%).`);
+
+      setTimeout(() => goToScene(gameData.nextScene), 1200);
+    }
+
+    function showAporieStep(stepIndex) {
+      const gameData = window.aporieData;
+      const step = gameData?.dialectic_steps?.[stepIndex];
+      const screen = document.getElementById("game-screen");
+      if (!screen) return;
+
+      window.aporieStep = stepIndex;
+
+      if (!step) {
+        const c = gameData.conclusion || {};
+        screen.innerHTML = `
+          <div class="aporie-conclusion">
+            <div class="aporie-progress">L'impasse révélatrice</div>
+            <div class="socrate-question">
+              <strong>SOCRATE</strong><br>
+              ${c.text || ""}
+            </div>
+            <div class="aporie-revelation">
+              <em>${c.revelation || ""}</em>
+            </div>
+            <div style="margin-top: 1.25rem; text-align: center;">
+              <button type="button" class="btn-continue" onclick="completeAporie()">Comprendre l'aporie →</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      screen.innerHTML = `
+        <div class="aporie-step">
+          <div class="aporie-progress">Étape ${stepIndex + 1} / ${gameData.dialectic_steps.length}</div>
+          <div class="socrate-question">
+            <strong>SOCRATE</strong><br>
+            ${step.question}
+          </div>
+          <div class="aporie-options">
+            ${step.options
+              .map(
+                (opt, idx) => `
+              <button type="button" class="aporie-option-btn" onclick="selectAporieAnswer(${idx})">
+                ${opt.answer}
+              </button>
+            `
+              )
+              .join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectAporieAnswer(optionIndex) {
+      const gameData = window.aporieData;
+      const step = gameData.dialectic_steps[window.aporieStep];
+      const option = step.options[optionIndex];
+      const screen = document.getElementById("game-screen");
+      if (!screen || !option) return;
+
+      screen.innerHTML += `
+        <div class="aporie-objection">
+          <div class="socrate-objection">
+            <strong>SOCRATE</strong><br>
+            ${option.objection}
+          </div>
+          <div class="aporie-insight">💡 <em>${option.insight}</em></div>
+          <div style="margin-top: 1.15rem;">
+            <button type="button" class="btn-continue" onclick="nextAporieStep()">Continuer →</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function nextAporieStep() {
+      showAporieStep((window.aporieStep || 0) + 1);
+    }
+
+    function completeAporie() {
+      const gameData = window.aporieData;
+      const gains = gameData.skillGain || {};
+      Object.keys(gains).forEach((k) => updateSkill(k, gains[k]));
+      showToast("Aporie comprise !");
+
+      setTimeout(() => goToScene(gameData.nextScene), 700);
+    }
 
     let draggedCard = null;
 
@@ -1802,7 +2384,9 @@
     function selectChoice(sceneId, choiceIndex) {
       const scene = getSceneById(sceneId);
       const ch = scene.choices[choiceIndex];
-      if (ch.correct !== true) {
+      // Si `correct` est explicitement false, on considère que c'est une mauvaise réponse.
+      // Sinon (y compris si `correct` est omis), on laisse la scène avancer.
+      if (ch.correct === false) {
         const box = document.querySelector(".dialogue-box");
         const body =
           ch.wrongExplanation ||
