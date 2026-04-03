@@ -358,19 +358,19 @@ async function getLexiqueFile() {
 async function getPhiloDoxaFile() {
   var ck = 'philo_doxa_file';
   if (_cache[ck]) return _cache[ck];
-  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/PhiloDoxa.html');
+  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/PhiloDoxa.html');
   return _cache[ck];
 }
 async function getPhiloLogiqueFile() {
   var ck = 'philo_logique_file';
   if (_cache[ck]) return _cache[ck];
-  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/PhiloLogique%20(3).html');
+  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/PhiloLogique%20(3).html');
   return _cache[ck];
 }
 async function getParcoursGuideFile() {
   var ck = 'parcours_guide_file';
   if (_cache[ck]) return _cache[ck];
-  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/ParcourGuide%20(6).html');
+  _cache[ck] = fetchAppStaticHtml('./Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/ParcourGuide%20(6).html');
   return _cache[ck];
 }
 
@@ -379,7 +379,7 @@ async function getCitationsExpliqueesHubFile() {
   if (_cache[ck]) return _cache[ck];
   _cache[ck] = (async function () {
     var paths = [
-      './Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/Citations_expliquees_hub.html',
+      './Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/Citations_expliquees_hub.html',
       './Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/Citations_expliquees_hub.html',
       './Fichier HTML app/Jeux pédagogiques/Citations_expliquees_hub.html',
       './Fichier HTML app/Jeux pédagogiques/Citations_expliquees_hub.html',
@@ -3688,12 +3688,12 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
   const odysseeSrc = React.useMemo(() => {
     if (typeof window === "undefined") return "";
     try {
-      return new URL(
-        "Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html",
-        window.location.origin + "/"
-      ).href;
+      /* Même orthographe que dans Git (é NFC) : évite 404 Linux/Netlify si l’URL utilisait NFD (%CC%81). */
+      const segments = ["Fichier HTML app", "Jeux pédagogiques", "odyssee_philosophique.html"];
+      const path = segments.map(encodeURIComponent).join("/");
+      return new URL(path, window.location.origin + "/").href;
     } catch (e) {
-      return "/Fichier%20HTML%20app/Jeux%20pe%CC%81dagogiques/odyssee_philosophique.html";
+      return "/Fichier%20HTML%20app/Jeux%20p%C3%A9dagogiques/odyssee_philosophique.html";
     }
   }, []);
   const changeTab = (id) => {
