@@ -1839,10 +1839,8 @@
           saveGame();
           setTimeout(() => renderScene(gameState.currentScene), 1600);
         }
-      }
-    },
-
-    doxa_detection: {
+      },
+      doxa_detection: {
       state: null,
       render(scene) {
         // Stocke dans window pour que les handlers inline puissent lire les données.
@@ -1882,9 +1880,9 @@
             </div>
           </div>`;
       }
-    },
+      },
 
-    aporie_dialectique: {
+      aporie_dialectique: {
       state: null,
       render(scene) {
         window.aporieData = scene;
@@ -1892,14 +1890,14 @@
         this.state = { scene };
         showAporieStep(0);
       }
-    }
+      }
     };
 
     function selectDoxaCategory(itemId, categoryId, btnEl) {
       window.doxaAnswers = window.doxaAnswers || {};
       window.doxaAnswers[itemId] = categoryId;
       document
-        .querySelectorAll(\`[data-item-id="${itemId}"] .doxa-category-btn\`)
+        .querySelectorAll("[data-item-id=\"" + itemId + "\"] .doxa-category-btn")
         .forEach((b) => b.classList.remove("selected"));
       if (btnEl) btnEl.classList.add("selected");
     }
