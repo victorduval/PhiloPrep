@@ -979,6 +979,7 @@
         <button type="button" class="btn-menu-item" id="btn-load" title="Charger">Charger</button>
         <button type="button" class="btn-menu-item" id="btn-new" title="Nouvelle partie">Nouvelle partie</button>
         <button type="button" class="btn-menu-item btn-menu-secondary" id="btn-open-notebook">Carnet</button>
+        <button type="button" class="btn-menu-item btn-menu-secondary" id="btn-quit-to-jeux">Quitter</button>
       </div>
       <button type="button" class="btn-menu-close" id="btn-menu-dismiss">Fermer</button>
     </div>
@@ -1951,6 +1952,18 @@
         btnNb.addEventListener("click", () => {
           closeGameMenu();
           openNotebookModal();
+        });
+      }
+
+      const btnQuit = document.getElementById("btn-quit-to-jeux");
+      if (btnQuit) {
+        btnQuit.addEventListener("click", () => {
+          closeGameMenu();
+          try {
+            window.parent.postMessage({ type: "odyssee-quit" }, window.location.origin);
+          } catch (err) {
+            try { window.parent.postMessage({ type: "odyssee-quit" }, "*"); } catch (e2) { /* ignore */ }
+          }
         });
       }
 

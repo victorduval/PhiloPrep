@@ -4079,37 +4079,6 @@ function SentrainerTabbedScreen({ onBack, onMethodeDissert, onMethodePasAPas, on
           overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            flexShrink: 0,
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            padding: "max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px))",
-            background: "linear-gradient(180deg, rgba(10,14,39,0.98) 0%, rgba(10,14,39,0.92) 100%)",
-            borderBottom: "1px solid rgba(212, 175, 55, 0.35)",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-          }}
-        >
-          <button
-            type="button"
-            onClick={quitOdysseeToJeux}
-            style={{
-              padding: "10px 18px",
-              borderRadius: "12px",
-              border: "1px solid rgba(212, 175, 55, 0.45)",
-              background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(139,92,46,0.18) 100%)",
-              color: "#f5e6c8",
-              fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
-            }}
-          >
-            ← Quitter · Jeux pédagogiques
-          </button>
-        </div>
         <iframe
           title="L'Odyssée philosophique"
           src={odysseeSrc}
