@@ -1731,7 +1731,19 @@
      * Incrémenter quand le graphe de scènes change de façon incompatible (ex. ancienne fin « démo » juste après la caverne).
      * Les sauvegardes sans ce champ ou avec une valeur inférieure sont migrées (voir applySaveData).
      */
-    const ODYSSEE_STORY_VERSION = 2;
+    const ODYSSEE_STORY_VERSION = 3;
+
+    /** Sauvegardes v2 : scènes renommées ou remplacées au chapitre 1 Platon (v3). */
+    const STORY_V3_SCENE_REMAP = {
+      minigame_proces_gyges: "minigame_arbre_gyges",
+      minigame_organiser_cite: "minigame_simulation_cite",
+      philosophe_roi_intro: "transition_cite_juste",
+      ame_cite_parallele: "transition_cite_juste",
+      pourquoi_philosophe: "minigame_simulation_cite",
+      thetete_definition_1: "thetete_intro",
+      thetete_definition_2: "minigame_refuter_opinion_vraie",
+      thetete_definition_3: "thetete_logos_circulaire"
+    };
 
     /** Clé primaire par chemin (évite les collisions si plusieurs copies du jeu sur le même domaine) ; ancienne clé lue pour compatibilité. */
     const LEGACY_SAVE_KEY = "odyssee_save";
@@ -1902,6 +1914,15 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+    }
+
+    function shuffleCopy(arr) {
+      const a = (arr || []).slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
     }
 
     function isMobileGameViewport() {
@@ -3129,6 +3150,50 @@
             { speaker: "platon", text: "Mais qu'est-ce exactement que ce monde intelligible ? Qu'est-ce qu'une <strong>Idée</strong> ? C'est ce que je vais t'expliquer maintenant." }
           ],
           action: "continue",
+          nextScene: "minigame_quiz_reperes"
+        },
+        {
+          id: "minigame_quiz_reperes",
+          type: "minigame",
+          gameType: "quiz_reperes_rapide",
+          title: "⚡ Quiz rapide : as-tu compris ?",
+          instruction: "Trois questions sur les repères de la caverne.",
+          questions: [
+            {
+              id: 1,
+              question: "Un prisonnier dans la caverne qui voit les ombres, il est dans :",
+              options: [
+                { id: "opinion", text: "L'opinion (doxa)", correct: true },
+                { id: "savoir", text: "Le savoir (épistémè)", correct: false },
+                { id: "ignorance", text: "L'ignorance totale", correct: false }
+              ],
+              feedback_correct: "Exact ! Il a une opinion : il croit savoir, mais il se trompe sur la réalité.",
+              feedback_incorrect: "Non. Il a une opinion : les ombres ne sont pas la réalité."
+            },
+            {
+              id: 2,
+              question: "Quand le libéré voit le feu puis le soleil, il passe :",
+              options: [
+                { id: "apparence_realite", text: "De l'apparence à la réalité", correct: true },
+                { id: "realite_apparence", text: "De la réalité à l'apparence", correct: false },
+                { id: "opinion_opinion", text: "D'une opinion à une autre opinion", correct: false }
+              ],
+              feedback_correct: "Parfait ! Les ombres sont des apparences ; le monde extérieur est la réalité.",
+              feedback_incorrect: "Réfléchis : les ombres sont-elles la réalité ou une apparence trompeuse ?"
+            },
+            {
+              id: 3,
+              question: "Le prisonnier croit que les ombres sont réelles ; dehors il sait que c'étaient des illusions. Quel repère ?",
+              options: [
+                { id: "croire_savoir", text: "Croire / Savoir", correct: true },
+                { id: "legal_legitime", text: "Légal / Légitime", correct: false },
+                { id: "obligation_contrainte", text: "Obligation / Contrainte", correct: false }
+              ],
+              feedback_correct: "Oui ! Croire ≠ savoir : adhérer sans comprendre vs contempler la vérité.",
+              feedback_incorrect: "Ici le repère clé est croire (dans la caverne) vs savoir (hors caverne)."
+            }
+          ],
+          skillGain: { clarte: 15, examen: 10 },
           nextScene: "platon_idees_intro",
           unlocksReperes: ["croire_savoir", "opinion_verite", "apparence_realite"]
         },
@@ -3158,6 +3223,47 @@
             { speaker: "platon", text: "Les choses belles <em>participent</em> au Beau, elles en sont des <strong>copies imparfaites</strong>. Mais le Beau en soi est parfait, éternel, immuable." }
           ],
           action: "continue",
+          nextScene: "minigame_fleur_fane"
+        },
+        {
+          id: "minigame_fleur_fane",
+          type: "minigame",
+          gameType: "fleur_fane_sequence",
+          title: "🌸 Le sensible change, l'Idée reste",
+          instruction: "Observe l'enchaînement (images à enrichir plus tard) et conclus.",
+          animation: {
+            etapes: [
+              { image: "assets/scenes/caverne/07_sun_contemplation.jpg", texte: "Jour 1 : la fleur est magnifique.", dureeMs: 3200 },
+              { image: "assets/scenes/caverne/04_outside_world.jpg", texte: "Jour 2 : elle commence à faner.", dureeMs: 3200 },
+              { image: "assets/scenes/caverne/08_hostile_return.jpg", texte: "Jour 3 : les pétales tombent.", dureeMs: 3200 },
+              { image: "assets/scenes/caverne/01_prisoners_chained.jpg", texte: "Jour 4 : flétrie ; jour 5 : morte — le sensible passe.", dureeMs: 3800 }
+            ],
+            idee_fixe: {
+              texte: "Le Beau en soi : éternel, parfait, immuable (monde intelligible)."
+            }
+          },
+          question_finale: "Qu'est-ce qui a vraiment changé ?",
+          options_finale: [
+            {
+              id: "fleur",
+              texte: "La fleur (sensible) a changé ; le Beau en soi (Idée) reste éternel.",
+              correct: true,
+              feedback: "Parfait ! Les choses sensibles changent ; les Idées sont éternelles."
+            },
+            {
+              id: "beau",
+              texte: "Le Beau lui-même a changé.",
+              correct: false,
+              feedback: "Non : le Beau en soi ne change pas. C'est la copie sensible qui fane."
+            },
+            {
+              id: "rien",
+              texte: "Rien n'a vraiment changé.",
+              correct: false,
+              feedback: "Si : la fleur a fané. Mais l'Idée du Beau, elle, est immuable."
+            }
+          ],
+          skillGain: { clarte: 20, examen: 15 },
           nextScene: "platon_exemple_cercle"
         },
         {
@@ -3173,6 +3279,19 @@
             { speaker: "platon", text: "Voilà la grande vérité : <strong>les choses sensibles sont des copies imparfaites des Idées</strong>." }
           ],
           action: "continue",
+          nextScene: "minigame_dessiner_cercle"
+        },
+        {
+          id: "minigame_dessiner_cercle",
+          type: "minigame",
+          gameType: "dessiner_cercle_imparfait",
+          title: "✏️ Dessine un « cercle » à main levée",
+          instruction: "Essaie le meilleur cercle possible : tu verras pourquoi le dessin sensible ne peut égaler l'Idée.",
+          conclusion: {
+            speaker: "platon",
+            texte: "Tu vois ? Ton tracé est <em>approximatif</em>. Même avec effort, tu n'affiches pas le Cercle parfait — mais ton esprit <strong>conçoit</strong> le cercle parfait. C'est la preuve que l'<strong>Idée du Cercle</strong> est dans le monde intelligible, au-delà du dessin."
+          },
+          skillGain: { clarte: 25, examen: 20 },
           nextScene: "minigame_relier_idees"
         },
         {
@@ -3195,8 +3314,30 @@
           ],
           successThreshold: 0.75,
           skillGain: { clarte: 20, justification: 15 },
-          nextScene: "platon_conclusion_idees",
+          nextScene: "minigame_echelle_platon",
           unlocksNotions: ["idee_platonicienne"]
+        },
+        {
+          id: "minigame_echelle_platon",
+          type: "minigame",
+          gameType: "sorting",
+          title: "🪜 L'échelle de la connaissance",
+          instruction: "Glisse chaque affirmation au bon niveau (caverne → sensible → Idées → Bien). <!-- À GÉNÉRER : diagramme echelle_platon.svg -->",
+          successThreshold: 1,
+          nextScene: "platon_conclusion_idees",
+          rewards: { perfect: { clarte: 25, examen: 20 }, good: { clarte: 15, examen: 10 } },
+          categories: [
+            { id: "lv1", label: "1. Caverne (opinion / doxa)", description: "Ombres prises pour la réalité." },
+            { id: "lv2", label: "2. Monde sensible", description: "Perception des choses matérielles." },
+            { id: "lv3", label: "3. Intelligible (Idées)", description: "Vérités éternelles par la raison." },
+            { id: "lv4", label: "4. Sommet — le Bien", description: "Principe qui rend tout intelligible." }
+          ],
+          items: [
+            { id: 201, text: "« Cette ombre sur le mur est un cheval. »", correct: "lv1" },
+            { id: 202, text: "« Cette statue de marbre est belle. »", correct: "lv2" },
+            { id: 203, text: "« Le Beau en soi est éternel. »", correct: "lv3" },
+            { id: 204, text: "« Le Bien illumine toute vérité. »", correct: "lv4" }
+          ]
         },
         {
           id: "platon_conclusion_idees",
@@ -3220,9 +3361,9 @@
           philosopher: "platon",
           background: "plato_academy",
           dialogues: [
-            { speaker: "platon", text: "Dans un dialogue que j'ai écrit, Socrate interroge un jeune mathématicien nommé Théétète. La question est simple : <em>qu'est-ce que le savoir ?</em>" },
-            { speaker: "platon", text: "Théétète propose plusieurs définitions. Socrate les examine une par une. Et chacune échoue. Le dialogue se termine sur une <strong>aporie</strong> — une impasse." },
-            { speaker: "platon", text: "Mais cette aporie est instructive. Elle nous montre ce que le savoir <em>n'est pas</em>. Examinons ces définitions ensemble." }
+            { speaker: "platon", text: "Dans un dialogue que j'ai écrit, Socrate interroge Théétète : <em>qu'est-ce que le savoir ?</em>" },
+            { speaker: "platon", text: "Théétète propose trois définitions. Socrate les réfute. Cette fois, <strong>c'est toi qui joues Socrate</strong> : choisis les meilleures objections." },
+            { speaker: "platon", text: "D'abord un passage visuel — <!-- À GÉNÉRER : socrate_thetete_dialogue.jpg --> — puis tu t'exerces." }
           ],
           action: "continue",
           nextScene: "thetete_narrative"
@@ -3233,54 +3374,173 @@
           title: "Le Théétète",
           subtitle: "Qu'est-ce que le savoir ?",
           images: [
-            { path: "assets/scenes/caverne/09_three_worlds_diagram.jpg", title: "Socrate et Théétète", text: "La question du <strong>savoir</strong> : ni la sensation ni l'opinion ne suffisent. Il faudra chercher plus haut.", duration: 6000 },
-            { path: "assets/scenes/caverne/01_prisoners_chained.jpg", title: "Trois définitions examinées", text: "Sensation, opinion vraie, opinion vraie avec <em>logos</em> : Socrate réfute ou complique chaque piste.", duration: 6500 },
-            { path: "assets/scenes/caverne/07_sun_contemplation.jpg", title: "Vers les Idées", text: "L'aporie prépare une <strong>conversion de l'âme</strong> vers ce qui est stable et intelligible.", duration: 6500 }
+            { path: "assets/scenes/caverne/09_three_worlds_diagram.jpg", title: "Socrate et Théétète", text: "La question du <strong>savoir</strong> : ni la sensation ni l'opinion ne suffisent. <!-- À GÉNÉRER : image dédiée Théétète -->", duration: 6000 },
+            { path: "assets/scenes/caverne/01_prisoners_chained.jpg", title: "Trois définitions", text: "Sensation, opinion vraie, opinion vraie + <em>logos</em> : chaque piste est examinée.", duration: 6500 },
+            { path: "assets/scenes/caverne/07_sun_contemplation.jpg", title: "Conversion de l'âme", text: "L'aporie prépare une ascension vers l'intelligible. <!-- À GÉNÉRER : conversion_ame.jpg -->", duration: 6500 }
           ],
-          nextScene: "thetete_definition_1"
+          nextScene: "thetete_definition_1_intro"
         },
         {
-          id: "thetete_definition_1",
+          id: "thetete_definition_1_intro",
           type: "dialogue",
           philosopher: "platon",
           background: "plato_academy",
           dialogues: [
-            { speaker: "platon", text: "<strong>Première définition :</strong> « Le savoir, c'est la sensation. » Ce que je vois, touche, entends, voilà ce que je sais." },
-            { speaker: "platon", text: "Mais Socrate réfute cette définition. Pourquoi ? Parce que la sensation est <strong>instable</strong> et <strong>relative</strong> à chacun." },
-            { speaker: "platon", text: "L'eau te semble froide quand tu as chaud, chaude quand tu as froid. La sensation change selon l'état de celui qui perçoit. Elle ne peut donc pas donner une connaissance <em>universelle</em> et <em>stable</em>." },
-            { speaker: "platon", text: "De plus, la sensation n'explique pas l'<strong>erreur</strong> ni la <strong>réflexion</strong>. Elle ne peut pas expliquer comment nous pensons, raisonnons, nous trompons." },
-            { speaker: "platon", text: "Donc : le savoir n'est pas la sensation. Première définition réfutée." }
+            { speaker: "platon", text: "Théétète dit : « Le savoir, c'est la <strong>sensation</strong>. Ce que je vois et touche, voilà ce que je sais. »" },
+            { speaker: "platon", text: "À toi : quelle objection est la plus solide ?" }
           ],
           action: "continue",
-          nextScene: "thetete_definition_2"
+          nextScene: "minigame_refuter_sensation"
         },
         {
-          id: "thetete_definition_2",
+          id: "minigame_refuter_sensation",
+          type: "minigame",
+          gameType: "refutation_guidee",
+          title: "💬 Réfuter : savoir = sensation",
+          instruction: "Choisis la meilleure objection contre « Le savoir = la sensation ».",
+          skillGain: { examen: 25, justification: 20 },
+          arguments: [
+            {
+              affirmation: "Le savoir, c'est la sensation (aisthêsis).",
+              objections: [
+                {
+                  texte: "La sensation est relative : l'eau semble froide ou chaude selon mon état. Le savoir devrait être stable et universel.",
+                  qualite: "excellente",
+                  feedback: "Parfait ! La sensation dépend du sujet ; elle ne peut fonder une connaissance universelle."
+                },
+                {
+                  texte: "La sensation n'explique pas l'erreur ni la réflexion.",
+                  qualite: "bonne",
+                  feedback: "Bien vu — la perception ne suffit pas à rendre compte du raisonnement."
+                },
+                {
+                  texte: "Les gens sont en désaccord sur ce qu'ils perçoivent.",
+                  qualite: "faible",
+                  feedback: "Vrai mais vague : insiste sur la relativité systématique des données sensibles."
+                },
+                {
+                  texte: "Les sens peuvent tromper (illusions d'optique).",
+                  qualite: "moyenne",
+                  feedback: "Juste, mais l'objection la plus tranchante reste la relativité et le non-universel de la sensation."
+                }
+              ]
+            }
+          ],
+          conclusion: { speaker: "platon", text: "La sensation ne suffit pas. Première définition réfutée." },
+          nextScene: "thetete_definition_2_intro"
+        },
+        {
+          id: "thetete_definition_2_intro",
           type: "dialogue",
           philosopher: "platon",
           background: "plato_academy",
           dialogues: [
-            { speaker: "platon", text: "<strong>Deuxième définition :</strong> « Le savoir, c'est l'opinion vraie. » Si je crois quelque chose qui est vrai, alors je sais." },
-            { speaker: "platon", text: "Mais là encore, Socrate objecte. Pourquoi ? Parce qu'on peut avoir raison <strong>par hasard</strong> ou <strong>par persuasion</strong>, sans comprendre <em>pourquoi</em> c'est vrai." },
-            { speaker: "platon", text: "Exemple : un témoin au tribunal peut dire la vérité sans savoir qu'il dit vrai. Il a été persuadé par un bon orateur. Son opinion est vraie, mais ce n'est pas un savoir authentique." },
-            { speaker: "platon", text: "Autre exemple : tu devines la bonne réponse à une question de mathématiques par chance. Tu as raison, mais tu ne <em>sais</em> pas vraiment. Tu ne comprends pas le raisonnement." },
-            { speaker: "platon", text: "Avoir raison par chance ne constitue pas un savoir authentique. Deuxième définition réfutée." }
+            { speaker: "platon", text: "Deuxième essai de Théétète : « Le savoir, c'est l'<strong>opinion vraie</strong>. »" },
+            { speaker: "platon", text: "Si je crois quelque chose qui est vrai, est-ce déjà du savoir ? À toi de réfuter." }
           ],
           action: "continue",
-          nextScene: "thetete_definition_3"
+          nextScene: "minigame_refuter_opinion_vraie"
         },
         {
-          id: "thetete_definition_3",
+          id: "minigame_refuter_opinion_vraie",
+          type: "minigame",
+          gameType: "refutation_guidee",
+          title: "💬 Réfuter : savoir = opinion vraie",
+          instruction: "Pourquoi l'opinion vraie ne suffit-elle pas ?",
+          skillGain: { examen: 25, justification: 20 },
+          arguments: [
+            {
+              affirmation: "Le savoir, c'est l'opinion vraie (doxa alèthès).",
+              objections: [
+                {
+                  texte: "On peut avoir raison par hasard sans comprendre : deviner la bonne réponse n'est pas savoir.",
+                  qualite: "excellente",
+                  feedback: "Exact ! Il manque la compréhension : la vérité « par chance » n'est pas épistémè."
+                },
+                {
+                  texte: "Un témoin peut dire vrai sans savoir qu'il dit vrai s'il a été persuadé par un orateur.",
+                  qualite: "excellente",
+                  feedback: "Excellent exemple : opinion vraie sans justification interne."
+                },
+                {
+                  texte: "Certaines opinions sont fausses.",
+                  qualite: "mauvaise",
+                  feedback: "Ici Théétète parle d'opinions <em>vraies</em> : l'objection doit viser le cas « vrai mais pas savoir »."
+                },
+                {
+                  texte: "Les opinions changent avec le temps.",
+                  qualite: "faible",
+                  feedback: "Peu pertinent pour le cas d'une opinion vraie à un instant donné."
+                }
+              ]
+            }
+          ],
+          conclusion: { speaker: "platon", text: "Avoir raison sans comprendre ne suffit pas. Deuxième définition réfutée." },
+          nextScene: "thetete_definition_3_intro"
+        },
+        {
+          id: "thetete_definition_3_intro",
           type: "dialogue",
           philosopher: "platon",
           background: "plato_academy",
           dialogues: [
-            { speaker: "platon", text: "<strong>Troisième définition :</strong> « Le savoir, c'est l'opinion vraie accompagnée de raison (logos). » C'est-à-dire : avoir raison ET savoir pourquoi." },
-            { speaker: "platon", text: "Cette définition semble meilleure. Elle évite le hasard et la persuasion. Mais Socrate montre qu'elle aussi échoue." },
-            { speaker: "platon", text: "Pourquoi ? Parce que le mot <strong>logos</strong> est ambigu. Que signifie « accompagner l'opinion vraie de raison » ?" },
-            { speaker: "platon", text: "Si le <em>logos</em> est une simple <strong>description</strong> — « Je peux décrire ce que je crois » —, cela ne transforme pas l'opinion en savoir. Décrire n'est pas comprendre." },
-            { speaker: "platon", text: "Mais si le <em>logos</em> implique déjà une <strong>connaissance profonde</strong>, alors la définition devient <em>circulaire</em>." },
-            { speaker: "platon", text: "Écoute bien : si je dis « Le savoir, c'est l'opinion vraie accompagnée de savoir », je ne définis rien du tout ! J'utilise le mot « savoir » pour définir le savoir. C'est un cercle vicieux." }
+            { speaker: "platon", text: "Troisième tentative : « Le savoir, c'est l'opinion vraie accompagnée de <strong>logos</strong> (raison). »" },
+            { speaker: "platon", text: "Avant d'en voir la faille, <strong>construis toi-même</strong> une définition du savoir avec les briques suivantes." }
+          ],
+          action: "continue",
+          nextScene: "minigame_construire_definition"
+        },
+        {
+          id: "minigame_construire_definition",
+          type: "minigame",
+          gameType: "construire_definition_savoir",
+          title: "🔨 Construis ta définition du savoir",
+          instruction: "Sélectionne 2 ou 3 éléments (taper à nouveau pour désélectionner).",
+          tache: "Combine des briques pour dire ce qu'est le savoir pour toi.",
+          elements_disponibles: [
+            { id: "opinion_vraie", texte: "Opinion vraie" },
+            { id: "justification", texte: "Justification" },
+            { id: "demonstration", texte: "Démonstration" },
+            { id: "explication", texte: "Explication" },
+            { id: "raison", texte: "Raison (logos)" },
+            { id: "comprehension", texte: "Compréhension profonde" },
+            { id: "contemplation", texte: "Contemplation des Idées" }
+          ],
+          definitions_possibles: [
+            {
+              elements: ["opinion_vraie", "raison"],
+              evaluation: "Tentative de Théétète",
+              feedback: "C'est la troisième définition du dialogue — mais Socrate va montrer le piège du <em>logos</em> ambigu et la circularité possible."
+            },
+            {
+              elements: ["opinion_vraie", "demonstration"],
+              evaluation: "Proche de Théétète",
+              feedback: "La « démonstration » n'est-elle pas déjà une forme de savoir ? Attention à la circularité."
+            },
+            {
+              elements: ["contemplation"],
+              evaluation: "Piste platonicienne",
+              feedback: "Voilà la piste que je défends : le savoir comme contemplation des Idées par la raison — au-delà du Théétète."
+            },
+            {
+              elements: ["comprehension", "raison"],
+              evaluation: "Exigeant",
+              feedback: "Compréhension + logos : tu te rapproches d'une épistémè exigeante, même si le dialogue s'arrête sur l'aporie."
+            }
+          ],
+          feedback_inconnu: "Essaie une autre combinaison (par ex. opinion vraie + raison, ou seulement contemplation).",
+          skillGain: { clarte: 20, examen: 20 },
+          nextScene: "thetete_logos_circulaire"
+        },
+        {
+          id: "thetete_logos_circulaire",
+          type: "dialogue",
+          philosopher: "platon",
+          background: "plato_academy",
+          dialogues: [
+            { speaker: "platon", text: "Socrate montre que le mot <strong>logos</strong> est ambigu." },
+            { speaker: "platon", text: "Si le logos est une simple <em>description</em> de ce que je crois, cela ne transforme pas l'opinion en savoir." },
+            { speaker: "platon", text: "Mais si le logos implique déjà une <strong>connaissance profonde</strong>, la définition devient <strong>circulaire</strong> : « Le savoir, c'est l'opinion vraie accompagnée de… savoir. » <!-- À GÉNÉRER : diagramme circularité.svg -->" }
           ],
           action: "continue",
           nextScene: "minigame_circularite"
@@ -3290,17 +3550,18 @@
           type: "minigame",
           gameType: "detecter_circularite",
           title: "🔄 Détecter les définitions circulaires",
-          instruction: "Une définition circulaire utilise le terme à définir dans la définition elle-même. Identifie les définitions circulaires.",
+          instruction: "Une définition circulaire réutilise le terme à définir (ou un synonyme). L'ordre des phrases est mélangé à l'affichage.",
           definitions: [
-            { id: 1, texte: "Le savoir, c'est l'opinion vraie accompagnée de connaissance.", circulaire: true, explication: "Circulaire ! On définit le « savoir » en utilisant « connaissance », qui est un synonyme. On tourne en rond." },
-            { id: 2, texte: "La justice, c'est donner à chacun ce qui lui est dû.", circulaire: false, explication: "Non circulaire. On définit la justice sans utiliser le mot « juste » ou « justice »." },
-            { id: 3, texte: "Le courage, c'est la vertu courageuse.", circulaire: true, explication: "Circulaire ! On définit « courage » en utilisant « courageux ». Aucune information nouvelle." },
-            { id: 4, texte: "Un cercle, c'est l'ensemble des points situés à égale distance d'un point central.", circulaire: false, explication: "Non circulaire. On définit le cercle en termes géométriques clairs, sans utiliser le mot « cercle »." },
-            { id: 5, texte: "La vérité, c'est ce qui est vrai.", circulaire: true, explication: "Circulaire ! On définit « vérité » avec « vrai ». On n'apprend rien." }
+            { id: 1, texte: "Le savoir, c'est l'opinion vraie accompagnée de connaissance.", circulaire: true, explication: "Circulaire ! « Savoir » et « connaissance » se renvoient." },
+            { id: 2, texte: "La justice, c'est donner à chacun ce qui lui est dû.", circulaire: false, explication: "Non circulaire : pas de cercle lexical évident." },
+            { id: 3, texte: "Le courage, c'est la vertu courageuse.", circulaire: true, explication: "Circulaire ! « Courage » / « courageux »." },
+            { id: 4, texte: "Un cercle, c'est l'ensemble des points à égale distance d'un centre.", circulaire: false, explication: "Définition géométrique sans « cercle » dans le définiens." },
+            { id: 5, texte: "La vérité, c'est ce qui est vrai.", circulaire: true, explication: "Circulaire ! Vérité / vrai." },
+            { id: 6, texte: "Le bonheur, c'est l'état de celui qui est heureux.", circulaire: true, explication: "Circulaire ! Synonymie vide." }
           ],
-          feedback_final: { speaker: "platon", text: "Excellent ! Tu vois maintenant pourquoi la troisième définition du Théétète échoue. Si le <em>logos</em> implique déjà le savoir, la définition est circulaire. Le dialogue se termine donc sur une aporie." },
-          successThreshold: 0.6,
-          skillGain: { clarte: 25, examen: 20 },
+          feedback_final: { speaker: "platon", text: "Tu vois le piège de la troisième définition : si le logos exige déjà le savoir, on tourne en rond. Aporie." },
+          successThreshold: 0.65,
+          skillGain: { clarte: 25, examen: 25 },
           nextScene: "thetete_conclusion"
         },
         {
@@ -3309,13 +3570,32 @@
           philosopher: "platon",
           background: "plato_academy",
           dialogues: [
-            { speaker: "platon", text: "Le Théétète se termine sur une <strong>aporie délibérée</strong>. Aucune des trois définitions n'est satisfaisante." },
-            { speaker: "platon", text: "Mais cette absence de réponse est intentionnelle. Elle suggère que le vrai savoir ne se trouve pas dans les opinions ni dans les perceptions sensibles." },
-            { speaker: "platon", text: "Le savoir exige une <strong>« conversion de l'âme »</strong> vers le monde des Idées éternelles et immuables. C'est ce que montre l'allégorie de la Caverne." },
-            { speaker: "platon", text: "Le savoir véritable n'est pas une simple « opinion vraie accompagnée de raison ». Il est d'une nature plus <em>exigeante</em> et plus <em>transcendante</em>." },
-            { speaker: "platon", text: "Il est <strong>contemplation</strong> des Idées par la raison pure. C'est une ascension difficile, douloureuse, mais libératrice." }
+            { speaker: "platon", text: "Le Théétète s'achève sur une <strong>aporie délibérée</strong>." },
+            { speaker: "platon", text: "Le vrai savoir n'est pas sensation, ni opinion vraie de hasard, ni définition circulaire du logos." },
+            { speaker: "platon", text: "Il appelle une <strong>conversion de l'âme</strong> vers les Idées — contemplation par la raison." }
           ],
           action: "continue",
+          nextScene: "minigame_timeline_thetete"
+        },
+        {
+          id: "minigame_timeline_thetete",
+          type: "minigame",
+          gameType: "chaine_causale",
+          title: "📅 Remets le Théétète en ordre",
+          instruction: "Ordre dialectique des étapes (de la première définition à l'issue).",
+          feedback_succes: "Parfait ! Proposer, réfuter, progresser : voilà la dialectique.",
+          feedback_echec: "Réessaie : chaque étape prépare la suivante.",
+          skillGain: { clarte: 20, examen: 20 },
+          evenements: [
+            { id: 1, texte: "Théétète : « Le savoir = sensation »", ordre: 1 },
+            { id: 2, texte: "Socrate réfute (relativité des sens)", ordre: 2 },
+            { id: 3, texte: "Théétète : « Le savoir = opinion vraie »", ordre: 3 },
+            { id: 4, texte: "Socrate réfute (hasard, persuasion)", ordre: 4 },
+            { id: 5, texte: "Théétète : « Opinion vraie + logos »", ordre: 5 },
+            { id: 6, texte: "Socrate : ambiguïté et circularité du logos", ordre: 6 },
+            { id: 7, texte: "Aporie : aucune définition ne tient", ordre: 7 },
+            { id: 8, texte: "Piste platonicienne : savoir = contemplation des Idées", ordre: 8 }
+          ],
           nextScene: "analogie_solaire_intro"
         },
         {
@@ -3404,33 +3684,138 @@
             { speaker: "platon", text: "La justice vaut-elle <em>pour elle-même</em>, ou seulement pour ses <em>conséquences</em> (réputation, récompense, absence de punition) ?" }
           ],
           action: "continue",
-          nextScene: "minigame_proces_gyges"
+          nextScene: "minigame_arbre_gyges"
         },
         {
-          id: "minigame_proces_gyges",
+          id: "minigame_arbre_gyges",
           type: "minigame",
-          gameType: "dilemme_moral_gyges",
-          title: "⚖️ Le dilemme de Gygès",
-          instruction: "Imagine que tu possèdes cet anneau d'invisibilité. Personne ne peut te voir quand tu es invisible. Tu peux voler, tromper, nuire sans jamais être puni. Que fais-tu ?",
-          scenario: "Tu possèdes l'anneau de Gygès. Personne ne peut te voir quand tu es invisible. Tu peux voler, tromper, nuire sans jamais être puni. Que fais-tu ?",
-          choix: [
-            { id: "peur", texte: "Je reste juste par peur de la punition divine ou du karma.", motivation: "Peur", feedback: { speaker: "platon", text: "Tu es <em>esclave de la peur</em>. Ta justice n'est qu'apparente. Tu obéis non pas à la raison, mais à la crainte. Si tu étais certain qu'aucun dieu ne te voit, que ferais-tu ?" }, skillGain: { examen: 10 } },
-            { id: "reputation", texte: "Je reste juste pour garder ma réputation et l'estime des autres.", motivation: "Réputation", feedback: { speaker: "platon", text: "Tu es <em>esclave de l'opinion</em>. Tu n'es pas juste en vérité, seulement en apparence. Tu cherches la gloire, pas le Bien. Ta vertu dépend du regard d'autrui." }, skillGain: { examen: 12 } },
-            { id: "utilitarisme", texte: "Je reste juste car à long terme, c'est plus avantageux pour moi.", motivation: "Calcul", feedback: { speaker: "platon", text: "Tu es <em>esclave de l'intérêt</em>. Tu calcules, tu pèses le pour et le contre. Mais si l'injustice devenait plus avantageuse, tu changerais. Ta justice est conditionnelle, pas absolue." }, skillGain: { examen: 15 } },
-            { id: "justice_soi", texte: "Je reste juste car la justice est un bien en soi, indépendamment des conséquences.", motivation: "Justice pour elle-même", feedback: { speaker: "platon", text: "Voilà ! Toi seul es <strong>vraiment libre</strong>. Tu obéis à la <em>raison</em>, pas à la peur, à l'opinion, ou à l'intérêt. Tu as compris que la justice est une <strong>Idée</strong>, un Bien en soi. Même invisible, tu restes juste car ton âme est ordonnée par la raison." }, skillGain: { examen: 30, clarte: 25, justification: 20 } },
-            { id: "injustice", texte: "Je deviens injuste. Avec l'invisibilité, je peux tout prendre sans conséquence.", motivation: "Injustice assumée", feedback: { speaker: "platon", text: "Tu es honnête dans ta réponse, mais tu révèles que tu es <em>esclave de tes désirs</em>. L'anneau ne t'a pas corrompu : il a simplement révélé ce que tu es vraiment. Ton âme est dominée par les appétits, pas par la raison. Tu es le contraire du philosophe." }, skillGain: { examen: 8 } }
-          ],
-          question_suivante: {
-            question: "Mais pourquoi la justice serait-elle un bien en soi ? Qu'est-ce qui la rend désirable indépendamment de ses conséquences ?",
-            options: [
-              { texte: "Parce que l'âme juste est harmonieuse, ordonnée par la raison.", correct: true, explication: "Exactement ! La justice n'est pas une contrainte extérieure. C'est l'<strong>harmonie de l'âme</strong>. Une âme juste, où la raison commande, est une âme heureuse, libre, en paix. L'injustice, au contraire, est le chaos intérieur : les désirs tyrannisent la raison." },
-              { texte: "Parce que Dieu ou les dieux nous récompenseront dans l'au-delà.", correct: false, explication: "Non ! Tu retombes dans la logique de la récompense. La justice ne vaut pas parce qu'elle sera récompensée. Elle vaut <em>pour elle-même</em>, comme harmonie de l'âme." },
-              { texte: "Parce que sinon la société s'effondrerait.", correct: false, explication: "Tu penses encore aux conséquences sociales. Mais la question de Gygès est personnelle : même si la société ne s'effondre pas (car tu es invisible), pourquoi serais-tu juste ?" }
-            ]
-          },
+          gameType: "arbre_decisions_gyges",
+          title: "🔮 Que ferais-tu avec l'anneau ?",
+          instruction: "Chaque choix ouvre une suite. Lis l'analyse platonicienne en fin de branche.",
+          skillGain: { examen: 22, justification: 18, clarte: 15 },
+          nextScene: "minigame_debat_gyges",
+          arbre: {
+            start: {
+              texte: "Tu possèdes l'anneau : invisible, jamais puni pour tes actes. Que fais-tu en premier ?",
+              choix: [
+                { texte: "Je détruis l'anneau : un tel pouvoir est trop dangereux.", prochaine_situation: "detruire_fin" },
+                { texte: "Je le garde mais je reste juste par principe.", prochaine_situation: "garde_ruelle" },
+                { texte: "Je l'utilise pour servir le bien commun (espionner les tyrans…).", prochaine_situation: "bien_ami" },
+                { texte: "Je m'en sers pour mon intérêt (richesses, pouvoir).", prochaine_situation: "interet_fin" }
+              ]
+            },
+            detruire_fin: {
+              fin: true,
+              texte: "Tu détruis l'anneau. Tu évites la tentation en supprimant le moyen.",
+              analyse_platon: "La vraie vertu résiste à la tentation sans détruire le choix : as-tu besoin de cette béquille pour rester juste ?",
+              motivation_revelee: "Peur de toi-même"
+            },
+            garde_ruelle: {
+              texte: "Un mois passe. Dans une ruelle, un voleur agresse une passante. Personne ne voit. Tu as l'anneau.",
+              choix: [
+                { texte: "J'interviens sans utiliser l'anneau.", prochaine_situation: "vertu_fin" },
+                { texte: "J'utilise l'anneau pour neutraliser le voleur.", prochaine_situation: "glissement_fin" },
+                { texte: "Ce n'est pas mon problème.", prochaine_situation: "indiff_fin" }
+              ]
+            },
+            vertu_fin: {
+              fin: true,
+              texte: "Tu agis visiblement, au prix du risque. Tu refuses l'outil de l'invisibilité même quand il serait utile.",
+              analyse_platon: "Justice pour elle-même : la raison commande ; tu n'es pas esclave de la peur ni du désir de pouvoir dissimulé.",
+              motivation_revelee: "Justice pour elle-même"
+            },
+            glissement_fin: {
+              fin: true,
+              texte: "Le « bon usage » de l'anneau t'habitue au secret et au contrôle sans visage.",
+              analyse_platon: "Le glissement : le pouvoir discret corrompt, même avec de bonnes intentions au départ.",
+              motivation_revelee: "Corruption progressive"
+            },
+            indiff_fin: {
+              fin: true,
+              texte: "Tu passes ton chemin alors que tu pouvais agir.",
+              analyse_platon: "Indifférence morale : parfois pire que l'injustice active quand on détient un pouvoir.",
+              motivation_revelee: "Indifférence morale"
+            },
+            bien_ami: {
+              texte: "Tu espionnes les injustices. Puis tu surprends ton meilleur ami en petit vol. Le dénonces-tu ?",
+              choix: [
+                { texte: "Oui, la règle est la même pour tous.", prochaine_situation: "justice_froide_fin" },
+                { texte: "Non, je ferme les yeux pour mon ami.", prochaine_situation: "double_std_fin" }
+              ]
+            },
+            justice_froide_fin: {
+              fin: true,
+              texte: "Tu es « juste » mais sans mesure : l'amitié se brise.",
+              analyse_platon: "Légalisme sans prudence : la justice vraie n'est pas mécanique.",
+              motivation_revelee: "Rigueur sans sagesse"
+            },
+            double_std_fin: {
+              fin: true,
+              texte: "Deux poids, deux mesures : les autres vols, si tu les dénonçais ?",
+              analyse_platon: "Partialité : tu n'es pas guidé par la raison universelle.",
+              motivation_revelee: "Partialité"
+            },
+            interet_fin: {
+              fin: true,
+              texte: "Tu t'enrichis et tu te couvres. Tu deviens le maître invisible des biens des autres.",
+              analyse_platon: "Tyrannie des désirs : comme Gygès, l'âme est dominée par l'épithumia.",
+              motivation_revelee: "Tyrannie des désirs"
+            }
+          }
+        },
+        {
+          id: "minigame_debat_gyges",
+          type: "minigame",
+          gameType: "debat_contradictoire",
+          title: "⚔️ Défends la justice volontaire",
+          instruction: "Réfute la thèse glauconienne : à chaque manche, choisis l'argument le plus solide.",
+          these_adverse: "« Personne n'est juste volontairement : on ne l'est que par contrainte. Si l'injustice profitait sans risque, tout le monde choisirait l'injustice. »",
+          excellentRequired: 2,
+          skillGain: { justification: 28, examen: 22 },
           nextScene: "gyges_conclusion",
           unlocksNotions: ["justice_platonicienne", "liberte_vraie"],
-          unlocksReperes: ["legal_legitime", "obligation_contrainte"]
+          unlocksReperes: ["legal_legitime", "obligation_contrainte"],
+          conclusion: {
+            texte: "Tu as montré que la thèse du tout-puissant intérêt peut être combattue par de bons arguments — la justice pour elle-même reste pensable."
+          },
+          rounds: [
+            {
+              question: "Premier contre-feu : que réponds-tu ?",
+              intro: "L'adversaire dit : « Tous mentent dès qu'ils peuvent. »",
+              options: [
+                {
+                  texte: "Contre-exemple : certains restent justes même quand ils pourraient tricher sans être vus — athées compris, donc ce n'est pas seulement la peur des dieux.",
+                  qualite: "excellente"
+                },
+                {
+                  texte: "La plupart des gens sont honnêtes.",
+                  qualite: "faible"
+                },
+                {
+                  texte: "La justice est dans la nature humaine sans preuve.",
+                  qualite: "moyenne"
+                }
+              ]
+            },
+            {
+              question: "Deuxième manche",
+              intro: "Il rétorque : « Tu n'es juste que pour ton confort intérieur — encore de l'intérêt ! »",
+              options: [
+                {
+                  texte: "L'harmonie de l'âme n'est pas un « profit » extérieur : ordonner sa vie selon la raison, c'est la justice elle-même, pas un moyen.",
+                  qualite: "excellente"
+                },
+                {
+                  texte: "Tout le monde cherche le bonheur, donc pas de différence.",
+                  qualite: "faible"
+                },
+                {
+                  texte: "L'intérêt bien compris coïncide avec la vertu.",
+                  qualite: "moyenne"
+                }
+              ]
+            }
+          ]
         },
         {
           id: "gyges_conclusion",
@@ -3445,112 +3830,243 @@
             { speaker: "platon", text: "Mais pour comprendre vraiment la justice, il faut maintenant parler de l'<strong>âme</strong> et de la <strong>cité</strong>." }
           ],
           action: "continue",
-          nextScene: "ame_cite_diagrammes"
+          nextScene: "ame_tripartite_intro"
+        },
+        {
+          id: "ame_tripartite_intro",
+          type: "dialogue",
+          philosopher: "platon",
+          background: "plato_academy",
+          dialogues: [
+            { speaker: "platon", text: "Pour la justice, il faut comprendre l'<strong>âme</strong> : <strong>raison</strong> (commande), <strong>thymos</strong> (courage, honneur), <strong>épithumia</strong> (désirs)." },
+            { speaker: "platon", text: "Justice de l'âme = chaque partie à sa place. Injustice = chaos intérieur. <!-- À GÉNÉRER : ame_tripartite.svg -->" },
+            { speaker: "platon", text: "Arbitre maintenant quelques conflits intérieurs : quelle « voix » domine chez toi ?" }
+          ],
+          action: "continue",
+          nextScene: "minigame_conflit_ame"
+        },
+        {
+          id: "minigame_conflit_ame",
+          type: "minigame",
+          gameType: "conflit_parties_ame",
+          title: "⚖️ Conflit interne",
+          instruction: "Pour chaque situation, choisis quelle partie de l'âme tu suis (raison, thymos, épithumia).",
+          skillGain: { clarte: 22, examen: 18 },
+          nextScene: "ame_cite_diagrammes",
+          unlocksNotions: ["ame_tripartite"],
+          scenarios: [
+            {
+              id: 1,
+              situation: "Très faim, le boulanger a le dos tourné : tu pourrais voler un pain.",
+              voix_epithumia: "« Prends-le, personne ne verra. »",
+              voix_thumos: "« C'est déshonorant. »",
+              voix_raison: "« Faim de survie ou simple envie ? Demande ou résiste selon le cas. »",
+              choix: [
+                { id: "epithumia", texte: "Je prends le pain.", consequence: "Les appétits dominent : injustice intérieure probable.", partie_dominante: "epithumia" },
+                { id: "thumos", texte: "Je refuse par fierté.", consequence: "Mieux que l'appétit seul — mais la raison devrait ordonner, pas seulement l'honneur.", partie_dominante: "thumos" },
+                { id: "raison", texte: "J'analyse : besoin vital ou confort ? J'agis en conséquence.", consequence: "La raison commande : âme plus ordonnée.", partie_dominante: "raison" }
+              ]
+            },
+            {
+              id: 2,
+              situation: "Quelqu'un t'insulte en public ; tu veux frapper.",
+              voix_epithumia: "« Laisse tomber, évite les ennuis. »",
+              voix_thumos: "« Frappe, défends ton honneur ! »",
+              voix_raison: "« L'insulte ne te blesse que si tu lui donnes pouvoir ; réponds avec mesure. »",
+              choix: [
+                { id: "epithumia", texte: "Je fuis par lâcheté.", consequence: "Indifférence ou peur, pas vraiment la raison.", partie_dominante: "epithumia" },
+                { id: "thumos", texte: "Je frappe.", consequence: "Le thumos commande sans la raison : chaos.", partie_dominante: "thumos" },
+                { id: "raison", texte: "Je réponds calmement ou j'ignore avec dignité.", consequence: "La raison maîtrise la colère.", partie_dominante: "raison" }
+              ]
+            },
+            {
+              id: 3,
+              situation: "Examen demain, mais tes amis t'appellent à une fête.",
+              voix_epithumia: "« Va t'amuser ! »",
+              voix_thumos: "« Reste bosser, sois fort ! »",
+              voix_raison: "« Pèse l'importance de l'examen et ce que tu peux reporter. »",
+              choix: [
+                { id: "epithumia", texte: "Je vais à la fête.", consequence: "Plaisir immédiat l'emporte.", partie_dominante: "epithumia" },
+                { id: "thumos", texte: "Je reste par fierté / discipline aveugle.", consequence: "Mieux que la fuite dans le plaisir, mais la raison doit juger le contexte.", partie_dominante: "thumos" },
+                { id: "raison", texte: "J'évalue et j'équilibre travail et loisir.", consequence: "Sagesse pratique.", partie_dominante: "raison" }
+              ]
+            }
+          ],
+          analyse_finale: {
+            speaker: "platon",
+            feedback: {
+              raison_majoritaire: "Souvent la raison : ton âme tend vers la justice platonicienne.",
+              thumos_majoritaire: "Le thymos domine : courage utile, mais il doit obéir à la raison (timocratie si on en fait un régime).",
+              epithumia_majoritaire: "Les désirs dominent : risque d'injustice intérieure, comme la cité livrée aux appétits."
+            }
+          }
         },
         {
           id: "ame_cite_diagrammes",
           type: "narrative_sequence",
           title: "Âme et cité",
           images: [
-            { path: "assets/scenes/caverne/09_three_worlds_diagram.jpg", title: "Tripartition de l'âme", text: "<strong>Raison</strong> (commande), <strong>courage / thymos</strong> (défend), <strong>désirs</strong> (doivent être maîtrisés). La justice de l'âme = chaque partie à sa place.", duration: 8000 },
-            { path: "assets/scenes/caverne/04_outside_world.jpg", title: "Trois classes de la cité", text: "<strong>Philosophes</strong> (gouvernent), <strong>gardiens</strong> (protègent), <strong>producteurs</strong> (travaillent). La cité juste reproduit au grand jour l'harmonie de l'âme.", duration: 8000 }
+            { path: "assets/scenes/caverne/09_three_worlds_diagram.jpg", title: "Tripartition de l'âme", text: "<strong>Raison</strong> / <strong>thymos</strong> / <strong>épithumia</strong>. <!-- À GÉNÉRER : schéma dédié -->", duration: 7500 },
+            { path: "assets/scenes/caverne/04_outside_world.jpg", title: "Trois classes", text: "<strong>Philosophes</strong>, <strong>gardiens</strong>, <strong>producteurs</strong> : parallèle âme-cité. <!-- À GÉNÉRER : cite_trois_classes.svg -->", duration: 7500 }
           ],
-          nextScene: "philosophe_roi_intro"
+          nextScene: "transition_cite_juste"
         },
         {
-          id: "philosophe_roi_intro",
+          id: "transition_cite_juste",
           type: "dialogue",
           philosopher: "platon",
           background: "plato_academy",
           dialogues: [
-            { speaker: "platon", text: "Pour comprendre ce qu'est une <strong>âme juste</strong> et une <strong>cité juste</strong>, il faut d'abord comprendre la <em>structure de l'âme</em>." },
-            { speaker: "platon", text: "L'âme humaine a <strong>trois parties</strong> :" },
-            { speaker: "platon", text: "<strong>1. La raison (logos)</strong> — Elle calcule, réfléchit, cherche la vérité et le Bien. Elle doit <em>commander</em>." },
-            { speaker: "platon", text: "<strong>2. Le courage (thymos)</strong> — C'est la partie ardente, colérique, qui défend et protège. Elle doit <em>obéir à la raison</em>." },
-            { speaker: "platon", text: "<strong>3. Les désirs (epithumia)</strong> — Les appétits : faim, soif, sexe, richesse. Ils doivent être <em>maîtrisés par la raison</em>." },
-            { speaker: "platon", text: "La <strong>justice de l'âme</strong>, c'est quand chaque partie fait son travail : la raison commande, le courage obéit, les désirs sont maîtrisés." },
-            { speaker: "platon", text: "L'<strong>injustice</strong>, c'est quand les désirs tyrannisent l'âme, ou quand le courage se rebelle contre la raison. C'est le chaos intérieur." }
+            { speaker: "platon", text: "La <strong>cité</strong> aussi a trois ordres : philosophes (raison), gardiens (thymos), producteurs (besoins et richesses)." },
+            { speaker: "platon", text: "Cité juste = chaque classe à sa fonction. Si les producteurs ou les gardiens gouvernent seuls, le régime dégénère : argent, gloire ou foule à la place du Bien." },
+            { speaker: "platon", text: "Seuls ceux qui ont <strong>vu le Bien</strong> peuvent gouverner pour le Bien — d'où le <strong>philosophe-roi</strong>. Je te propose une <strong>simulation</strong> : tu gères une cité. Observe les tensions." }
           ],
           action: "continue",
-          nextScene: "ame_cite_parallele"
+          nextScene: "minigame_simulation_cite"
         },
         {
-          id: "ame_cite_parallele",
-          type: "dialogue",
-          philosopher: "platon",
-          background: "plato_academy",
-          dialogues: [
-            { speaker: "platon", text: "Maintenant, regarde la <strong>cité</strong>. Elle aussi a trois classes, qui correspondent aux trois parties de l'âme :" },
-            { speaker: "platon", text: "<strong>1. Les gouvernants (philosophes)</strong> — Ils correspondent à la <em>raison</em>. Ils doivent diriger la cité selon la sagesse et le Bien." },
-            { speaker: "platon", text: "<strong>2. Les gardiens (soldats)</strong> — Ils correspondent au <em>courage</em>. Ils défendent la cité, mais obéissent aux philosophes." },
-            { speaker: "platon", text: "<strong>3. Les producteurs (artisans, commerçants, agriculteurs)</strong> — Ils correspondent aux <em>désirs</em>. Ils produisent les biens matériels, mais ne doivent pas gouverner." },
-            { speaker: "platon", text: "La <strong>cité juste</strong> est le modèle agrandi de l'<strong>âme juste</strong>. Chaque classe fait son travail, et les philosophes commandent." },
-            { speaker: "platon", text: "Si les producteurs ou les soldats gouvernent, c'est le chaos : ils chercheront l'argent ou la gloire, pas le Bien commun." }
-          ],
-          action: "continue",
-          nextScene: "pourquoi_philosophe"
-        },
-        {
-          id: "pourquoi_philosophe",
-          type: "dialogue",
-          philosopher: "platon",
-          background: "plato_academy",
-          dialogues: [
-            { speaker: "platon", text: "Mais pourquoi le <strong>philosophe</strong> doit-il gouverner ? Pourquoi pas un homme riche, ou un soldat courageux ?" },
-            { speaker: "platon", text: "Parce que seul celui qui a <strong>vu le Bien</strong> sait ce qui est vraiment juste. Les autres gouvernent pour l'<em>intérêt</em>, la <em>réputation</em>, le <em>pouvoir</em>." },
-            { speaker: "platon", text: "Le riche cherche à s'enrichir. Le soldat cherche la gloire. Le démagogue cherche à plaire à la foule." },
-            { speaker: "platon", text: "Mais le <strong>philosophe</strong>, qui a contemplé les Idées et le Bien, gouverne pour le <em>Bien</em> lui-même. Pas pour son intérêt personnel." },
-            { speaker: "platon", text: "C'est pourquoi il faut <em>forcer</em> les philosophes à gouverner. Car eux seuls ne désirent pas le pouvoir. Et c'est précisément pour cela qu'ils sont les seuls à devoir l'exercer." }
-          ],
-          action: "continue",
-          nextScene: "minigame_organiser_cite"
-        },
-        {
-          id: "minigame_organiser_cite",
+          id: "minigame_simulation_cite",
           type: "minigame",
-          gameType: "organiser_cite_platonicienne",
-          title: "🏛️ Construire la cité juste",
-          instruction: "Attribue les rôles aux trois groupes et décide qui doit commander.",
-          groupes: [
-            { id: "philosophes", nom: "Les philosophes", qualites: "Sagesse, connaissance du Bien, désintéressement" },
-            { id: "gardiens", nom: "Les gardiens (soldats)", qualites: "Courage, force, discipline" },
-            { id: "producteurs", nom: "Les producteurs", qualites: "Nombreux métiers, production de biens" }
-          ],
-          questions: [
+          gameType: "simulation_cite_platonicienne",
+          title: "🏛️ Gouverne la cité",
+          instruction: "Choisis d'abord qui dirige, puis tranche cinq crises. Regarde l'indicateur de stabilité.",
+          skillGain: { clarte: 28, justification: 28, examen: 22 },
+          nextScene: "minigame_timeline_regimes",
+          unlocksNotions: ["cite_juste", "philosophe_roi", "etat_platon", "regimes_politiques"],
+          unlocksReperes: ["bien_commun_interet_particulier"],
+          mecanisme_stabilite: { initial: 72 },
+          choix_regime: {
+            question: "Qui gouverne ta cité au départ ?",
+            options: [
+              {
+                id: "philosophes",
+                nom: "Les philosophes",
+                description: "Visent le Bien et la vérité — parfois impopulaires."
+              },
+              {
+                id: "gardiens",
+                nom: "Les gardiens",
+                description: "Ordre et honneur — risque de militarisme."
+              },
+              {
+                id: "producteurs",
+                nom: "Les producteurs (démocratie marchande)",
+                description: "Paix économique — risque de ploutocratie et démagogie."
+              }
+            ]
+          },
+          situations: [
             {
-              id: 1,
-              question: "Qui doit gouverner la cité ?",
-              options: [
-                { id: "philosophes", texte: "Les philosophes", correct: true, feedback: "Exact ! Seuls ceux qui ont vu le Bien peuvent gouverner pour le Bien. Les philosophes ne cherchent ni l'argent ni la gloire." },
-                { id: "gardiens", texte: "Les gardiens (les plus forts)", correct: false, feedback: "Non ! Les soldats cherchent l'honneur et la gloire. Ce serait une timocratie." },
-                { id: "producteurs", texte: "Les producteurs (démocratie)", correct: false, feedback: "Non ! Les producteurs cherchent l'enrichissement — ploutocratie ou chaos." },
-                { id: "elite_riche", texte: "Les plus riches (oligarchie)", correct: false, feedback: "Non ! Oligarchie : le pouvoir au service du profit privé." }
-              ]
+              id: "guerre",
+              contexte: "<strong>Guerre préventive ?</strong> Une cité voisine s'arme ; rien n'est sûr.",
+              options_par_regime: {
+                philosophes: [
+                  { texte: "Enquête rationnelle puis défense ciblée.", delta_stabilite: 14, note: "La raison distingue menace réelle et rumeur." },
+                  { texte: "Ambassadeurs et dialectique publique.", delta_stabilite: 8, note: "Paix possible ; les généraux peuvent murmurer contre « la faiblesse »." }
+                ],
+                gardiens: [
+                  { texte: "Frapper les premiers pour la gloire.", delta_stabilite: -12, note: "Victoire courte ; haine des voisins plus tard." },
+                  { texte: "Fortifications massives.", delta_stabilite: -6, note: "Coût lourd ; parfois fausse alerte." }
+                ],
+                producteurs: [
+                  { texte: "Négocier un traité à tout prix.", delta_stabilite: -16, note: "Économie sauvée court terme ; vulnérabilité si la menace était réelle." },
+                  { texte: "Guerre pour pillage.", delta_stabilite: -14, note: "Richesse illusoire ; coalition ennemie." }
+                ]
+              }
             },
             {
-              id: 2,
-              question: "Quel est le rôle des gardiens dans la cité juste ?",
-              options: [
-                { id: "defendre", texte: "Défendre la cité et obéir aux philosophes", correct: true, feedback: "Parfait ! Les gardiens protègent mais <em>obéissent</em> à la raison (les philosophes)." },
-                { id: "gouverner", texte: "Gouverner par la force", correct: false, feedback: "Non ! Gouvernement militaire = recherche de gloire, pas du Bien." },
-                { id: "produire", texte: "Produire des richesses", correct: false, feedback: "Non : chaque classe a sa fonction." }
-              ]
+              id: "noble",
+              contexte: "<strong>Justice ou clémence ?</strong> Un noble a tué en duel illégal ; sa famille menace la révolte.",
+              options_par_regime: {
+                philosophes: [
+                  { texte: "Enquête des circonstances ; peine proportionnée.", delta_stabilite: 12, note: "Justice nuancée." },
+                  { texte: "Loi stricte + promesse de réforme législative.", delta_stabilite: 4, note: "Ordre et avenir ; rancune des puissants." }
+                ],
+                gardiens: [
+                  { texte: "Exécution immédiate.", delta_stabilite: -10, note: "Ordre brutal ; soulèvement noble." },
+                  { texte: "Combat rituel.", delta_stabilite: -8, note: "Spectacle ; barbarie perçue." }
+                ],
+                producteurs: [
+                  { texte: "Clémence pour acheter la paix sociale.", delta_stabilite: -14, note: "Deux poids, deux mesures ; colère populaire." },
+                  { texte: "Confiscation + amnistie payante.", delta_stabilite: -12, note: "Justice monnayée." }
+                ]
+              }
             },
             {
-              id: 3,
-              question: "Pourquoi les producteurs ne doivent-ils pas gouverner ?",
-              options: [
-                { id: "interet", texte: "Parce qu'ils cherchent l'enrichissement personnel, pas le bien commun", correct: true, feedback: "Exactement ! On confondrait intérêt particulier et bien commun." },
-                { id: "incompetents", texte: "Parce qu'ils sont incompétents", correct: false, feedback: "Ce n'est pas le critère platonicien : c'est la <em>motivation</em>." },
-                { id: "trop_nombreux", texte: "Parce qu'ils sont trop nombreux", correct: false, feedback: "Le nombre n'est pas l'argument central." }
-              ]
+              id: "poete",
+              contexte: "<strong>Blasphème.</strong> Un poète moque les dieux ; la foule exige son sang.",
+              options_par_regime: {
+                philosophes: [
+                  { texte: "Débat public : loi et liberté de pensée expliquées.", delta_stabilite: 10, note: "Culture forte ; démagogues peuvent exploiter l'« impiété » (comme avec Socrate)." },
+                  { texte: "Acquittement motivé + éducation populaire.", delta_stabilite: 6, note: "Vérité difficile à vendre en politique." }
+                ],
+                gardiens: [
+                  { texte: "Exécution pour l'« honneur des dieux ».", delta_stabilite: -10, note: "Peur et conformisme." }
+                ],
+                producteurs: [
+                  { texte: "Condamner pour plaire à la foule.", delta_stabilite: -12, note: "Démagogie ; fuite des penseurs." },
+                  { texte: "Exil discrètement.", delta_stabilite: -8, note: "Compromis instable." }
+                ]
+              }
+            },
+            {
+              id: "secte",
+              contexte: "<strong>Liberté vs ordre.</strong> Une secte pacifique refuse certains impôts.",
+              options_par_regime: {
+                philosophes: [
+                  { texte: "Dialogue : quelles lois sont injustes ?", delta_stabilite: 12, note: "Réformes possibles ; conservateurs crient à la faiblesse." },
+                  { texte: "Liberté de conscience + sanctions civiles modérées.", delta_stabilite: 8, note: "Pluralisme ; extrêmes mécontents." }
+                ],
+                gardiens: [
+                  { texte: "Répression totale.", delta_stabilite: -12, note: "Paix de la terreur." }
+                ],
+                producteurs: [
+                  { texte: "Interdiction immédiate.", delta_stabilite: -10, note: "Martyrs et underground." },
+                  { texte: "Marchandage fiscal.", delta_stabilite: -8, note: "Précédent dangereux." }
+                ]
+              }
+            },
+            {
+              id: "epidemie",
+              contexte: "<strong>Vérité impopulaire.</strong> Épidémie : prêtres parlent de colère divine ; médecins, d'hygiène.",
+              options_par_regime: {
+                philosophes: [
+                  { texte: "Pédagogie publique + mesures d'hygiène.", delta_stabilite: 16, note: "Vies sauvées ; plus tard, réaction des traditionalistes contre les « impies »." },
+                  { texte: "Hygiène + rites symboliques pour apaiser.", delta_stabilite: 10, note: "Compromis : moins pur intellectuellement, plus stable." }
+                ],
+                gardiens: [
+                  { texte: "Obéissance aux prêtres.", delta_stabilite: -18, note: "Catastrophe sanitaire." },
+                  { texte: "Hygiène imposée par la force.", delta_stabilite: -6, note: "Santé mais ressentiment." }
+                ],
+                producteurs: [
+                  { texte: "Suivre les prêtres pour rester populaire.", delta_stabilite: -20, note: "Mort et ruine." },
+                  { texte: "Mélange superstition + science.", delta_stabilite: -4, note: "Mieux que rien ; gaspillage." }
+                ]
+              }
             }
           ],
-          conclusion: { speaker: "platon", text: "Voilà la <strong>cité juste</strong> : les philosophes commandent selon le Bien, les gardiens obéissent et protègent, les producteurs travaillent sans chercher le pouvoir." },
-          skillGain: { clarte: 25, justification: 25, examen: 20 },
+          revelation_finale: {
+            speaker: "platon",
+            texte: "<p>Chaque régime tire vers sa <strong>nature</strong> : les producteurs vers l'argent et la popularité ; les gardiens vers l'ordre et l'honneur ; les philosophes vers la vérité — au prix souvent de l'<em>impopularité</em>.</p><p>L'ironie tragique : celui qui dit vrai peut être chassé (Socrate). Pourtant mentir pour garder le pouvoir trahit le Bien. D'où l'idée de <strong>forcer</strong> les meilleurs à gouverner : ils ne veulent pas le pouvoir pour lui-même.</p>"
+          }
+        },
+        {
+          id: "minigame_timeline_regimes",
+          type: "minigame",
+          gameType: "chaine_causale",
+          title: "📊 Dégradation des régimes",
+          instruction: "Remets les régimes du <em>meilleur</em> au <em>pire</em> selon Platon. <!-- À GÉNÉRER : regimes_degeneration.svg -->",
+          feedback_succes: "Exact : de l'aristocratie (raison) à la tyrannie (désir pur).",
+          feedback_echec: "Réessaie : pense à ce qui commande dans chaque régime (sagesse, honneur, richesse, liberté sans mesure, violence d'un seul).",
+          skillGain: { clarte: 18, examen: 14 },
           nextScene: "cite_conclusion",
-          unlocksNotions: ["cite_juste", "philosophe_roi", "etat_platon"],
-          unlocksReperes: ["bien_commun_interet_particulier"]
+          evenements: [
+            { id: 1, texte: "Aristocratie (philosophes au pouvoir)", ordre: 1 },
+            { id: 2, texte: "Timocratie (gardiens / honneur)", ordre: 2 },
+            { id: 3, texte: "Oligarchie (riches / argent)", ordre: 3 },
+            { id: 4, texte: "Démocratie (liberté sans hiérarchie)", ordre: 4 },
+            { id: 5, texte: "Tyrannie (un seul, désirs déchaînés)", ordre: 5 }
+          ]
         },
         {
           id: "cite_conclusion",
@@ -3639,7 +4155,113 @@
             { speaker: "platon", text: "• <strong>Obligation</strong> vs <strong>contrainte</strong> : la contrainte vient de l'extérieur, l'obligation morale vient de la raison." }
           ],
           action: "continue",
-          nextScene: "synthese_notions"
+          nextScene: "minigame_quiz_final_platon"
+        },
+        {
+          id: "minigame_quiz_final_platon",
+          type: "minigame",
+          gameType: "quiz_final_multi",
+          title: "🎓 Quiz final : Platon",
+          instruction: "Dix questions — options mélangées à chaque écran.",
+          seuil_reussite: 0.7,
+          skillGain: { clarte: 22, examen: 22, justification: 18 },
+          nextScene: "synthese_notions",
+          feedback_final: {
+            reussite: "Tu maîtrises l'essentiel du chapitre Platon.",
+            echec: "Relis ton carnet et rejoue les passages qui bloquent."
+          },
+          questions: [
+            {
+              id: 1,
+              question: "Qu'est-ce qu'une Idée platonicienne ?",
+              options: [
+                { texte: "Une pensée arbitraire dans ma tête", correct: false },
+                { texte: "Une réalité éternelle et parfaite contemplée par la raison", correct: true },
+                { texte: "Un simple mot du langage", correct: false }
+              ]
+            },
+            {
+              id: 2,
+              question: "Pourquoi « savoir = opinion vraie + logos » échoue-t-il ?",
+              options: [
+                { texte: "Parce que Socrate refuse toute définition", correct: false },
+                { texte: "Parce que le logos est ambigu et peut rendre la définition circulaire", correct: true },
+                { texte: "Parce qu'aucune opinion n'est vraie", correct: false }
+              ]
+            },
+            {
+              id: 3,
+              question: "Le dilemme de Gygès met surtout en jeu :",
+              options: [
+                { texte: "La justice pour elle-même vs la justice pour les conséquences seulement", correct: true },
+                { texte: "L'existence des dieux", correct: false },
+                { texte: "Le droit de propriété", correct: false }
+              ]
+            },
+            {
+              id: 4,
+              question: "Dans l'âme juste, qui doit commander ?",
+              options: [
+                { texte: "La raison", correct: true },
+                { texte: "Le thymos seul", correct: false },
+                { texte: "L'épithumia seule", correct: false }
+              ]
+            },
+            {
+              id: 5,
+              question: "Pourquoi les philosophes devraient gouverner selon Platon ?",
+              options: [
+                { texte: "Parce qu'ils manipulent le peuple", correct: false },
+                { texte: "Parce qu'ils ont contemplé le Bien et ne cherchent pas le pouvoir pour lui-même", correct: true },
+                { texte: "Parce qu'ils sont les plus riches", correct: false }
+              ]
+            },
+            {
+              id: 6,
+              question: "Risque du gouvernement des sages :",
+              options: [
+                { texte: "Aucun : c'est le régime parfait sans tension", correct: false },
+                { texte: "La vérité peut être impopulaire ; le sage peut être rejeté", correct: true },
+                { texte: "Les philosophes deviennent toujours tyrans", correct: false }
+              ]
+            },
+            {
+              id: 7,
+              question: "« Toujours beau, partout, pour tous » décrit plutôt :",
+              options: [
+                { texte: "Une fleur sensible", correct: false },
+                { texte: "Le Beau en soi (Idée)", correct: true },
+                { texte: "Un goût subjectif", correct: false }
+              ]
+            },
+            {
+              id: 8,
+              question: "Le repère croire / savoir :",
+              options: [
+                { texte: "C'est la même chose", correct: false },
+                { texte: "Croire : adhérer sans pleine compréhension ; savoir : rapport aux Idées / vérité stable", correct: true },
+                { texte: "Savoir = avoir foi", correct: false }
+              ]
+            },
+            {
+              id: 9,
+              question: "Si les producteurs gouvernent seuls, Platon craint surtout :",
+              options: [
+                { texte: "L'aristocratie", correct: false },
+                { texte: "L'oligarchie (pouvoir de l'argent)", correct: true },
+                { texte: "La tyrannie immédiate", correct: false }
+              ]
+            },
+            {
+              id: 10,
+              question: "La conclusion du Théétète est surtout :",
+              options: [
+                { texte: "Le savoir = sensation", correct: false },
+                { texte: "Une aporie : les définitions examinées ne suffisent pas", correct: true },
+                { texte: "Le savoir = opinion vraie simple", correct: false }
+              ]
+            }
+          ]
         },
         {
           id: "synthese_notions",
@@ -3838,6 +4460,20 @@
           category: "Politique",
           relatedPhilosophers: ["platon"],
           examples: ["Classes sociales", "Communauté des gardiens"]
+        },
+        ame_tripartite: {
+          name: "Âme tripartite",
+          description: "Raison (commande), thymos (courage, honneur), épithumia (désirs) : la justice intérieure ordonne ces parties.",
+          category: "Éthique",
+          relatedPhilosophers: ["platon"],
+          examples: ["République IV", "Analogie avec les classes de la cité"]
+        },
+        regimes_politiques: {
+          name: "Régimes (dégénérescence platonicienne)",
+          description: "Du meilleur (aristocratie des sages) au pire (tyrannie) : timocratie, oligarchie, démocratie, tyrannie.",
+          category: "Politique",
+          relatedPhilosophers: ["platon"],
+          examples: ["République VIII–IX", "Critique de la démocratie radicale"]
         }
       },
 
@@ -3962,7 +4598,9 @@
 
           let tier = ratio >= 1 ? "perfect" : "good";
           const rewards = scene.rewards[tier] || {};
-          Object.keys(rewards).forEach((k) => updateSkill(k, rewards[k]));
+          if (Object.keys(rewards).length) Object.keys(rewards).forEach((k) => updateSkill(k, rewards[k]));
+          else if (scene.skillGain) Object.keys(scene.skillGain).forEach((k) => updateSkill(k, scene.skillGain[k]));
+          applyMinigameUnlocksFromScene(scene);
           showToast(
             tier === "perfect"
               ? `Bravo ! ${correct}/${n} — performance parfaite.`
@@ -4268,10 +4906,10 @@
         render(scene) {
           window.relierIdeesScene = scene;
           window.relierIdeesAnswers = {};
-          const opts = (scene.options || [])
+          const opts = shuffleCopy(scene.options || [])
             .map((o) => `<option value="${escapeAttrSingle(o.id)}">${escapeHtml(o.label)}</option>`)
             .join("");
-          const chunks = (scene.items || []).map(
+          const chunks = shuffleCopy(scene.items || []).map(
             (it) => `
             <div class="mg-panel">
               <p class="mg-arg">${escapeHtml(it.sensible)}</p>
@@ -4303,7 +4941,7 @@
         render(scene) {
           window.circScene = scene;
           window.circAnswers = {};
-          const chunks = (scene.definitions || []).map(
+          const chunks = shuffleCopy(scene.definitions || []).map(
             (def) => `
             <div class="mg-panel" data-did="${def.id}">
               <p>${def.texte}</p>
@@ -4377,10 +5015,13 @@
             ? `<div class="mg-panel" style="font-style:italic;line-height:1.65">${scene.lecture}</div><p class="mg-hint">${escapeHtml(scene.auteur || "")}</p>`
             : "";
           const qs = (scene.questions || []).map((q, qi) => {
-            const opts = q.options
+            const shOpts = shuffleCopy(
+              (q.options || []).map((o, i) => ({ o, origIdx: i }))
+            );
+            const opts = shOpts
               .map(
-                (o, oi) =>
-                  `<button type="button" class="choice-btn mg-expli-opt" data-q="${escapeAttrSingle(q.id)}" data-oi="${oi}">${escapeHtml(o.texte)}</button>`
+                ({ o, origIdx }) =>
+                  `<button type="button" class="choice-btn mg-expli-opt" data-q="${escapeAttrSingle(q.id)}" data-oi="${origIdx}">${escapeHtml(o.texte)}</button>`
               )
               .join("");
             return `<div class="mg-panel" data-exq="${escapeAttrSingle(q.id)}">
@@ -4409,8 +5050,636 @@
             }
           });
         }
+      },
+
+      quiz_reperes_rapide: {
+        render(scene) {
+          window.quizReperesScene = scene;
+          window.quizReperesAnswers = {};
+          const qs = (scene.questions || []).map((q, qi) => {
+            const opts = shuffleCopy(q.options || [])
+              .map(
+                (o) =>
+                  `<button type="button" class="choice-btn mg-quiz-opt" data-qi="${qi}" data-oid="${escapeAttrSingle(o.id)}">${escapeHtml(o.text)}</button>`
+              )
+              .join("");
+            return `<div class="mg-panel" data-quiz-i="${qi}"><p><strong>${escapeHtml(q.question)}</strong></p><div class="choices">${opts}</div><div class="mg-feedback" id="quiz-rep-fb-${qi}"></div></div>`;
+          });
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: qs,
+            footerHtml: `<div class="minigame-actions"><button type="button" class="btn-continue" id="btn-quiz-rep-val">Valider</button></div>`,
+            afterMount(root) {
+              root.querySelectorAll(".mg-quiz-opt").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                  const qi = parseInt(btn.dataset.qi, 10);
+                  const q = scene.questions[qi];
+                  const picked = (q.options || []).find((x) => x.id === btn.dataset.oid);
+                  window.quizReperesAnswers[qi] = picked;
+                  const panel = root.querySelector(`[data-quiz-i="${qi}"]`);
+                  if (panel) panel.querySelectorAll(".mg-quiz-opt").forEach((b) => b.classList.remove("selected"));
+                  btn.classList.add("selected");
+                  const fb = document.getElementById("quiz-rep-fb-" + qi);
+                  if (fb && picked) {
+                    fb.innerHTML = picked.correct
+                      ? `<div class="feedback-correct">${escapeHtml(q.feedback_correct)}</div>`
+                      : `<div class="feedback-wrong">${escapeHtml(q.feedback_incorrect)}</div>`;
+                  }
+                });
+              });
+              root.querySelector("#btn-quiz-rep-val").addEventListener("click", () => validateQuizReperesRapide());
+            }
+          });
+        }
+      },
+
+      fleur_fane_sequence: {
+        render(scene) {
+          window.fleurScene = scene;
+          const anim = scene.animation || {};
+          const etapes = anim.etapes || [];
+          const idee = anim.idee_fixe || {};
+          const firstImg = etapes[0] && etapes[0].image ? etapes[0].image : "assets/scenes/caverne/07_sun_contemplation.jpg";
+          const body = `
+            <div class="mg-panel mg-fleur-stage" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start">
+              <div style="flex:1;min-width:140px">
+                <img class="mg-fleur-img" id="mg-fleur-img" src="${assetUrl(resolveFromJpgTarget(firstImg))}" alt="" style="max-width:100%;border-radius:8px" />
+                <p id="mg-fleur-txt" class="mg-hint" style="margin-top:0.5rem;line-height:1.5"></p>
+                <p class="mg-hint" style="opacity:0.75;font-size:0.82rem">Image séquence : <!-- À GÉNÉRER assets/animations/fleur_qui_fane --></p>
+              </div>
+              <div style="flex:1;min-width:120px;border:1px dashed rgba(212,175,55,0.4);padding:0.75rem;border-radius:8px">
+                <p class="mg-hint" style="margin:0"><strong>${escapeHtml(idee.texte || "")}</strong></p>
+                <p class="mg-hint" style="opacity:0.85;margin-top:0.35rem">Idée fixe (intelligible) <!-- À GÉNÉRER idee_beau.svg --></p>
+              </div>
+            </div>
+            <div id="mg-fleur-final"></div>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: [body],
+            afterMount() {
+              clearTimeout(window.fleurTimer);
+              let i = 0;
+              function tick() {
+                const st = etapes[i];
+                if (!st) {
+                  mountFleurFinalQuestion();
+                  return;
+                }
+                const img = document.getElementById("mg-fleur-img");
+                const tx = document.getElementById("mg-fleur-txt");
+                if (img && st.image) img.src = assetUrl(resolveFromJpgTarget(st.image));
+                if (tx) tx.innerHTML = st.texte || "";
+                const wait = typeof st.dureeMs === "number" ? st.dureeMs : 2800;
+                i += 1;
+                window.fleurTimer = setTimeout(tick, wait);
+              }
+              tick();
+            }
+          });
+        }
+      },
+
+      dessiner_cercle_imparfait: {
+        render(scene) {
+          window.dessinCercleScene = scene;
+          const w = 300;
+          const h = 300;
+          const html = `<p class="mg-hint">Trace un cercle à main levée. <!-- À GÉNÉRER diagramme cercle imparfait vs parfait.svg --></p>
+            <canvas id="mg-circle-canvas" width="${w}" height="${h}" style="touch-action:none;max-width:100%;background:#1a1f2e;border-radius:50%;cursor:crosshair;border:2px solid rgba(212,175,55,0.35)"></canvas>
+            <div class="minigame-actions">
+              <button type="button" class="btn-ghost" id="mg-circle-clear">Effacer</button>
+              <button type="button" class="btn-continue" id="mg-circle-done">J'ai tracé mon cercle</button>
+            </div>
+            <div id="mg-circle-concl"></div>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: [html],
+            afterMount(root) {
+              const cv = document.getElementById("mg-circle-canvas");
+              if (!cv) return;
+              const ctx = cv.getContext("2d");
+              ctx.strokeStyle = "#D4AF37";
+              ctx.lineWidth = 2.5;
+              let draw = false;
+              function pos(e) {
+                const r = cv.getBoundingClientRect();
+                const t = e.touches && e.touches[0] ? e.touches[0] : e;
+                return {
+                  x: ((t.clientX - r.left) / r.width) * cv.width,
+                  y: ((t.clientY - r.top) / r.height) * cv.height
+                };
+              }
+              cv.addEventListener("mousedown", (e) => {
+                draw = true;
+                ctx.beginPath();
+                const p = pos(e);
+                ctx.moveTo(p.x, p.y);
+              });
+              cv.addEventListener(
+                "mousemove",
+                (e) => {
+                  if (!draw) return;
+                  const p = pos(e);
+                  ctx.lineTo(p.x, p.y);
+                  ctx.stroke();
+                }
+              );
+              window.addEventListener("mouseup", () => {
+                draw = false;
+              });
+              cv.addEventListener(
+                "touchstart",
+                (e) => {
+                  e.preventDefault();
+                  draw = true;
+                  ctx.beginPath();
+                  const p = pos(e);
+                  ctx.moveTo(p.x, p.y);
+                },
+                { passive: false }
+              );
+              cv.addEventListener(
+                "touchmove",
+                (e) => {
+                  e.preventDefault();
+                  if (!draw) return;
+                  const p = pos(e);
+                  ctx.lineTo(p.x, p.y);
+                  ctx.stroke();
+                },
+                { passive: false }
+              );
+              window.addEventListener("touchend", () => {
+                draw = false;
+              });
+              root.querySelector("#mg-circle-clear").addEventListener("click", () => ctx.clearRect(0, 0, w, h));
+              root.querySelector("#mg-circle-done").addEventListener("click", () => {
+                const d = ctx.getImageData(0, 0, w, h).data;
+                let px = 0;
+                for (let k = 3; k < d.length; k += 4) if (d[k] > 24) px++;
+                const concl = scene.conclusion || {};
+                const sp = escapeHtml(concl.speaker || "platon");
+                const inner = concl.texte || "";
+                document.getElementById("mg-circle-concl").innerHTML =
+                  `<div class="mg-panel" style="margin-top:0.75rem"><strong>${sp}</strong><div style="margin-top:0.5rem;line-height:1.6">${inner}</div></div>` +
+                  `<p class="mg-hint" style="margin-top:0.5rem">Tu as tracé environ <strong>${px}</strong> pixels : toujours imparfait comparé au Cercle en soi — que ton esprit conçoit pourtant.</p>` +
+                  `<button type="button" class="btn-continue" id="mg-circle-next" style="margin-top:0.75rem">Continuer →</button>`;
+                document.getElementById("mg-circle-next").addEventListener("click", () => {
+                  const sc = window.dessinCercleScene;
+                  const g = sc.skillGain || {};
+                  Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+                  goToScene(sc.nextScene);
+                });
+              });
+            }
+          });
+        }
+      },
+
+      construire_definition_savoir: {
+        render(scene) {
+          window.construireScene = scene;
+          window.construirePicks = new Set();
+          const chips = (scene.elements_disponibles || [])
+            .map(
+              (e) =>
+                `<button type="button" class="choice-btn mg-chip" data-chip="${escapeAttrSingle(e.id)}">${escapeHtml(e.texte)}</button>`
+            )
+            .join("");
+          const html = `<p class="mg-panel">${escapeHtml(scene.tache || "")}</p><div class="choices mg-chip-row" style="flex-wrap:wrap">${chips}</div><div id="construire-fb"></div>
+            <div class="minigame-actions"><button type="button" class="btn-continue" id="btn-construire-val">Valider ma composition</button></div>`;
+          mountMinigameTabbedPages({
+            title: scene.title,
+            instruction: scene.instruction,
+            bodyChunks: [html],
+            afterMount(root) {
+              root.querySelectorAll(".mg-chip").forEach((b) => {
+                b.addEventListener("click", () => {
+                  const id = b.dataset.chip;
+                  if (window.construirePicks.has(id)) {
+                    window.construirePicks.delete(id);
+                    b.classList.remove("selected");
+                  } else if (window.construirePicks.size < 3) {
+                    window.construirePicks.add(id);
+                    b.classList.add("selected");
+                  }
+                });
+              });
+              root.querySelector("#btn-construire-val").addEventListener("click", () => validateConstruireDefinition());
+            }
+          });
+        }
+      },
+
+      arbre_decisions_gyges: {
+        render(scene) {
+          window.arbreGygesScene = scene;
+          renderGygesArbreNode("start");
+        }
+      },
+
+      debat_contradictoire: {
+        render(scene) {
+          window.debatScene = scene;
+          window.debatRound = 0;
+          window.debatExcellent = 0;
+          renderDebatRound();
+        }
+      },
+
+      conflit_parties_ame: {
+        render(scene) {
+          window.ameConflitScene = scene;
+          window.ameConflitI = 0;
+          window.ameScores = { raison: 0, thumos: 0, epithumia: 0 };
+          renderAmeConflitStep();
+        }
+      },
+
+      simulation_cite_platonicienne: {
+        render(scene) {
+          window.simCite = { scene, regime: null, step: 0, stability: (scene.mecanisme_stabilite && scene.mecanisme_stabilite.initial) || 100 };
+          renderSimCitePhase();
+        }
+      },
+
+      quiz_final_multi: {
+        render(scene) {
+          window.quizFinalScene = scene;
+          window.quizFinalIdx = 0;
+          window.quizFinalOk = 0;
+          renderQuizFinalQuestion();
+        }
       }
     };
+
+    function validateQuizReperesRapide() {
+      const scene = window.quizReperesScene;
+      const qs = scene.questions || [];
+      for (let i = 0; i < qs.length; i++) {
+        const a = window.quizReperesAnswers[i];
+        if (!a) {
+          const wrap = document.querySelector(".minigame-wrap");
+          if (wrap) showWrongAttemptPanel(wrap, { title: "Quiz incomplet", bodyHtml: "<p>Réponds aux <strong>trois</strong> questions avant de valider.</p>" });
+          return;
+        }
+        if (!a.correct) {
+          const wrap = document.querySelector(".minigame-wrap");
+          if (wrap) showWrongAttemptPanel(wrap, { title: "À corriger", bodyHtml: "<p>Au moins une réponse est fausse. Relis les repères et réessaie.</p>" });
+          return;
+        }
+      }
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      applyMinigameUnlocksFromScene(scene);
+      setTimeout(() => goToScene(scene.nextScene), 600);
+    }
+
+    function mountFleurFinalQuestion() {
+      clearTimeout(window.fleurTimer);
+      const scene = window.fleurScene;
+      const el = document.getElementById("mg-fleur-final");
+      if (!el || !scene) return;
+      const opts = shuffleCopy(scene.options_finale || []);
+      el.innerHTML = `<p><strong>${escapeHtml(scene.question_finale || "")}</strong></p><div class="choices">${opts
+        .map((o) => `<button type="button" class="choice-btn" data-fid="${escapeAttrSingle(o.id)}">${escapeHtml(o.texte)}</button>`)
+        .join("")}</div><div id="mg-fleur-fb"></div>`;
+      el.querySelectorAll("[data-fid]").forEach((b) => {
+        b.addEventListener("click", () => {
+          const o = (scene.options_finale || []).find((x) => x.id === b.dataset.fid);
+          const fb = document.getElementById("mg-fleur-fb");
+          if (!o || !fb) return;
+          if (o.correct) {
+            fb.innerHTML = `<div class="feedback-correct">${o.feedback}</div>`;
+            const g = scene.skillGain || {};
+            Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+            setTimeout(() => goToScene(scene.nextScene), 900);
+          } else fb.innerHTML = `<div class="feedback-wrong">${o.feedback}</div>`;
+        });
+      });
+    }
+
+    function validateConstruireDefinition() {
+      const scene = window.construireScene;
+      const picks = [...window.construirePicks].sort().join("|");
+      const fb = document.getElementById("construire-fb");
+      if (!picks) {
+        const wrap = document.querySelector(".minigame-wrap");
+        if (wrap) showWrongAttemptPanel(wrap, { title: "Choisis au moins un élément", bodyHtml: "<p>Sélectionne une ou plusieurs briques pour former ta définition.</p>" });
+        return;
+      }
+      const match = (scene.definitions_possibles || []).find((d) => d.elements.slice().sort().join("|") === picks);
+      if (!match) {
+        if (fb) fb.innerHTML = `<div class="feedback-wrong">${escapeHtml(scene.feedback_inconnu || "Essaie une autre combinaison (2–3 éléments).")}</div>`;
+        return;
+      }
+      if (fb) fb.innerHTML = `<div class="feedback-correct"><strong>${escapeHtml(match.evaluation || "")}</strong><div style="margin-top:0.5rem">${match.feedback}</div></div>`;
+      const g = scene.skillGain || {};
+      Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      setTimeout(() => goToScene(scene.nextScene), 1200);
+    }
+
+    function renderGygesArbreNode(nodeId) {
+      const scene = window.arbreGygesScene;
+      if (!scene) return;
+      const ar = scene.arbre || {};
+      const n = ar[nodeId];
+      if (!n) {
+        goToScene(scene.nextScene);
+        return;
+      }
+      if (n.fin) {
+        const html = `<div class="mg-panel">${n.texte || ""}</div><p class="mg-hint"><em>${escapeHtml(n.analyse_platon || n.analyse || "")}</em></p><p>Motivation révélée : <strong>${escapeHtml(n.motivation_revelee || "")}</strong></p>
+          <div class="minigame-actions"><button type="button" class="btn-continue" id="btn-arbre-fin">Poursuivre →</button></div>`;
+        mountMinigameTabbedPages({
+          title: scene.title,
+          instruction: scene.instruction,
+          bodyChunks: [html],
+          afterMount(root) {
+            root.querySelector("#btn-arbre-fin").addEventListener("click", () => {
+              const g = scene.skillGain || {};
+              Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+              goToScene(scene.nextScene);
+            });
+          }
+        });
+        return;
+      }
+      const choix = shuffleCopy(n.choix || []);
+      const btns = choix
+        .map(
+          (c) =>
+            `<button type="button" class="choice-btn" data-arbre-next="${escapeAttrSingle(c.prochaine_situation)}">${escapeHtml(c.texte)}</button>`
+        )
+        .join("");
+      mountMinigameTabbedPages({
+        title: scene.title,
+        instruction: scene.instruction,
+        bodyChunks: [`<div class="mg-panel">${n.texte || ""}</div><div class="choices">${btns}</div>`],
+        afterMount(root) {
+          root.querySelectorAll("[data-arbre-next]").forEach((b) => {
+            b.addEventListener("click", () => renderGygesArbreNode(b.dataset.arbreNext));
+          });
+        }
+      });
+    }
+
+    function renderDebatRound() {
+      const scene = window.debatScene;
+      const rounds = scene.rounds || [];
+      const ri = window.debatRound || 0;
+      const r = rounds[ri];
+      if (!r) {
+        const need = scene.excellentRequired != null ? scene.excellentRequired : 2;
+        if ((window.debatExcellent || 0) >= need) {
+          const g = scene.skillGain || {};
+          Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+          applyMinigameUnlocksFromScene(scene);
+          const c = scene.conclusion || {};
+          if (c.texte) showToast(String(c.texte).replace(/<[^>]+>/g, "").slice(0, 120));
+          setTimeout(() => goToScene(scene.nextScene), 800);
+        } else {
+          const wrap = document.querySelector(".minigame-wrap");
+          if (wrap) {
+            showWrongAttemptPanel(wrap, {
+              title: "Arguments à renforcer",
+              bodyHtml: "<p>Il faut viser les réponses marquées comme les <strong>plus solides</strong> à chaque manche.</p>",
+              retryLabel: "Recommencer le débat",
+              onRetry: () => {
+                window.debatRound = 0;
+                window.debatExcellent = 0;
+                renderDebatRound();
+              }
+            });
+          }
+        }
+        return;
+      }
+      const opts = shuffleCopy(r.options || []);
+      const btns = opts
+        .map((o) => `<button type="button" class="choice-btn" data-debat-q="${escapeAttrSingle(o.qualite)}">${escapeHtml(o.texte)}</button>`)
+        .join("");
+      const these = scene.these_adverse ? `<p class="mg-panel"><em>${escapeHtml(scene.these_adverse)}</em></p>` : "";
+      mountMinigameTabbedPages({
+        title: scene.title,
+        instruction: r.intro || scene.instruction,
+        bodyChunks: [`${these}<p><strong>${escapeHtml(r.question || "")}</strong></p><div class="choices">${btns}</div><div id="debat-fb"></div>`],
+        afterMount(root) {
+          root.querySelectorAll("[data-debat-q]").forEach((b) => {
+            b.addEventListener("click", () => {
+              const q = b.dataset.debatQ;
+              const fb = root.querySelector("#debat-fb");
+              if (q === "excellente") {
+                window.debatExcellent = (window.debatExcellent || 0) + 1;
+                if (fb) fb.innerHTML = `<div class="feedback-correct">Très bon choix.</div>`;
+                window.debatRound = ri + 1;
+                setTimeout(() => renderDebatRound(), 650);
+              } else if (fb) fb.innerHTML = `<div class="feedback-wrong">Ce n'est pas l'argument le plus solide ici.</div>`;
+            });
+          });
+        }
+      });
+    }
+
+    function renderAmeConflitStep() {
+      const scene = window.ameConflitScene;
+      const scenarios = scene.scenarios || [];
+      const i = window.ameConflitI || 0;
+      const sc = scenarios[i];
+      if (!sc) {
+        const fb = scene.analyse_finale || {};
+        const scs = window.ameScores || { raison: 0, thumos: 0, epithumia: 0 };
+        let max = "raison";
+        if ((scs.thumos || 0) > (scs[max] || 0)) max = "thumos";
+        if ((scs.epithumia || 0) > (scs[max] || 0)) max = "epithumia";
+        const txt = (fb.feedback && fb.feedback[max + "_majoritaire"]) || "";
+        const html = `<div class="mg-panel"><strong>${escapeHtml(fb.speaker || "platon")}</strong><p>${txt}</p></div><button type="button" class="btn-continue" id="btn-ame-fin">Continuer →</button>`;
+        mountMinigameTabbedPages({
+          title: scene.title,
+          instruction: scene.instruction,
+          bodyChunks: [html],
+          afterMount(root) {
+            root.querySelector("#btn-ame-fin").addEventListener("click", () => {
+              const g = scene.skillGain || {};
+              Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+              applyMinigameUnlocksFromScene(scene);
+              goToScene(scene.nextScene);
+            });
+          }
+        });
+        return;
+      }
+      const voix = `<p class="mg-hint" style="font-style:italic;line-height:1.55">Épithumia : ${escapeHtml(sc.voix_epithumia || "")}<br>Thumos : ${escapeHtml(sc.voix_thumos || "")}<br>Raison : ${escapeHtml(sc.voix_raison || "")}</p>`;
+      const btns = (sc.choix || [])
+        .map(
+          (c) =>
+            `<button type="button" class="choice-btn" data-ame-p="${escapeAttrSingle(c.partie_dominante)}">${escapeHtml(c.texte)}</button>`
+        )
+        .join("");
+      mountMinigameTabbedPages({
+        title: scene.title,
+        instruction: scene.instruction,
+        bodyChunks: [`<div class="mg-panel"><strong>Situation ${i + 1} / ${scenarios.length}</strong><p>${escapeHtml(sc.situation || "")}</p></div>${voix}<div class="choices">${btns}</div><div id="ame-fb"></div>`],
+        afterMount(root) {
+          root.querySelectorAll("[data-ame-p]").forEach((b) => {
+            b.addEventListener("click", () => {
+              const p = b.dataset.ameP;
+              const ch = (sc.choix || []).find((x) => x.partie_dominante === p);
+              window.ameScores[p] = (window.ameScores[p] || 0) + 1;
+              const fb = root.querySelector("#ame-fb");
+              if (fb && ch) fb.innerHTML = `<div class="feedback-correct">${escapeHtml(ch.consequence || "")}</div>`;
+              window.ameConflitI = i + 1;
+              setTimeout(() => renderAmeConflitStep(), 700);
+            });
+          });
+        }
+      });
+    }
+
+    function renderSimCitePhase() {
+      const st = window.simCite;
+      const scene = st.scene;
+      if (!st.regime) {
+        const cr = scene.choix_regime || {};
+        const opts = shuffleCopy(cr.options || []).map(
+          (o) =>
+            `<button type="button" class="choice-btn" data-regime="${escapeAttrSingle(o.id)}"><strong>${escapeHtml(o.nom)}</strong><br><span class="mg-hint" style="font-size:0.88rem">${escapeHtml(o.description || "")}</span></button>`
+        );
+        mountMinigameTabbedPages({
+          title: scene.title,
+          instruction: scene.instruction,
+          bodyChunks: [`<p class="mg-panel">${escapeHtml(cr.question || "Qui gouverne ?")}</p><div class="choices">${opts.join("")}</div>`],
+          afterMount(root) {
+            root.querySelectorAll("[data-regime]").forEach((b) => {
+              b.addEventListener("click", () => {
+                window.simCite.regime = b.dataset.regime;
+                window.simCite.step = 0;
+                renderSimCitePhase();
+              });
+            });
+          }
+        });
+        return;
+      }
+      const sits = scene.situations || [];
+      if (st.step >= sits.length) {
+        const rev = scene.revelation_finale || {};
+        const html = `<p class="mg-stab mg-hint">Stabilité finale (indicatif) : <strong>${st.stability}</strong></p>
+          <div class="mg-panel"><strong>${escapeHtml(rev.speaker || "platon")}</strong><div style="margin-top:0.6rem;line-height:1.65">${rev.texte || ""}</div></div>
+          <p class="mg-hint" style="font-size:0.82rem">Diagramme âme/cité : <!-- À GÉNÉRER assets/diagrams/ame_cite_parallele.svg --></p>
+          <p class="mg-hint" style="font-size:0.82rem">Tu pourras rejouer cette simulation en relançant une partie depuis le menu.</p>
+          <div class="minigame-actions"><button type="button" class="btn-continue" id="btn-sim-cite-fin">Continuer →</button></div>`;
+        mountMinigameTabbedPages({
+          title: scene.title,
+          instruction: "Bilan",
+          bodyChunks: [html],
+          afterMount(root) {
+            root.querySelector("#btn-sim-cite-fin").addEventListener("click", () => {
+              const g = scene.skillGain || {};
+              Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+              applyMinigameUnlocksFromScene(scene);
+              goToScene(scene.nextScene);
+            });
+          }
+        });
+        return;
+      }
+      const sit = sits[st.step];
+      const reg = st.regime;
+      const choices = (sit.options_par_regime && sit.options_par_regime[reg]) || sit.options_all || [];
+      const sh = shuffleCopy(choices);
+      const btns = sh
+        .map(
+          (c, j) =>
+            `<button type="button" class="choice-btn" data-sim-i="${j}">${escapeHtml(c.texte)}</button>`
+        )
+        .join("");
+      mountMinigameTabbedPages({
+        title: sit.titre || scene.title,
+        instruction: sit.contexte || scene.instruction,
+        bodyChunks: [
+          `<p class="mg-hint">Situation <strong>${st.step + 1} / ${sits.length}</strong></p><div class="mg-panel">${sit.contexte || ""}</div><div class="choices">${btns}</div><div id="sim-fb"></div>`
+        ],
+        afterMount(root) {
+          root.querySelectorAll("[data-sim-i]").forEach((b) => {
+            b.addEventListener("click", () => {
+              const idx = parseInt(b.dataset.simI, 10);
+              const c = sh[idx];
+              if (c && typeof c.delta_stabilite === "number") window.simCite.stability += c.delta_stabilite;
+              const fb = root.querySelector("#sim-fb");
+              if (fb) fb.innerHTML = `<p class="mg-hint"><em>${escapeHtml(c.note || c.consequences || "")}</em></p>`;
+              window.simCite.step += 1;
+              setTimeout(() => renderSimCitePhase(), 650);
+            });
+          });
+        }
+      });
+    }
+
+    function renderQuizFinalQuestion() {
+      const scene = window.quizFinalScene;
+      const qs = scene.questions || [];
+      const idx = window.quizFinalIdx || 0;
+      const q = qs[idx];
+      if (!q) {
+        const n = qs.length;
+        const ratio = n ? window.quizFinalOk / n : 0;
+        const th = scene.seuil_reussite != null ? scene.seuil_reussite : 0.7;
+        if (ratio < th) {
+          const wrap = document.querySelector(".minigame-wrap");
+          const fbEnd = scene.feedback_final || {};
+          const echecHint = fbEnd.echec ? `<p>${escapeHtml(String(fbEnd.echec))}</p>` : "";
+          if (wrap) {
+            showWrongAttemptPanel(wrap, {
+              title: "Quiz final",
+              bodyHtml: `<p>Score : <strong>${window.quizFinalOk} / ${n}</strong>. Il faut au moins <strong>${Math.round(th * 100)}%</strong>.</p>${echecHint}`,
+              retryLabel: "Recommencer le quiz",
+              onRetry: () => {
+                window.quizFinalIdx = 0;
+                window.quizFinalOk = 0;
+                renderQuizFinalQuestion();
+              }
+            });
+          }
+          return;
+        }
+        const g = scene.skillGain || {};
+        Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+        const fb = scene.feedback_final || {};
+        showToast((fb.reussite || "Bravo !").replace(/<[^>]+>/g, "").slice(0, 100));
+        setTimeout(() => goToScene(scene.nextScene), 900);
+        return;
+      }
+      const opts = shuffleCopy(q.options || []);
+      const btns = opts
+        .map(
+          (o) =>
+            `<button type="button" class="choice-btn" data-qf-correct="${o.correct ? "1" : "0"}">${escapeHtml(o.texte)}</button>`
+        )
+        .join("");
+      mountMinigameTabbedPages({
+        title: scene.title,
+        instruction: `${scene.instruction || ""} (${idx + 1} / ${qs.length})`,
+        bodyChunks: [`<div class="mg-panel"><strong>${escapeHtml(q.question)}</strong></div><div class="choices">${btns}</div><div id="qf-fb"></div>`],
+        afterMount(root) {
+          root.querySelectorAll("[data-qf-correct]").forEach((b) => {
+            b.addEventListener("click", () => {
+              const ok = b.dataset.qfCorrect === "1";
+              const fb = root.querySelector("#qf-fb");
+              if (ok) {
+                window.quizFinalOk = (window.quizFinalOk || 0) + 1;
+                if (fb) fb.innerHTML = `<div class="feedback-correct">Exact.</div>`;
+              } else if (fb) fb.innerHTML = `<div class="feedback-wrong">Pas tout à fait.</div>`;
+              window.quizFinalIdx = idx + 1;
+              setTimeout(() => renderQuizFinalQuestion(), 550);
+            });
+          });
+        }
+      });
+    }
 
     function validateSophismeScene() {
       const scene = window.sophismeScene;
@@ -4631,6 +5900,7 @@
       res.innerHTML = `<div class="feedback-correct">${scene.feedback_succes || "Bravo !"}</div>`;
       const g = scene.skillGain || {};
       Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+      applyMinigameUnlocksFromScene(scene);
       setTimeout(() => goToScene(scene.nextScene), 1000);
     }
 
@@ -4863,6 +6133,7 @@
         const c = scene.conclusion || {};
         const g = scene.skillGain || {};
         Object.keys(g).forEach((k) => updateSkill(k, g[k]));
+        applyMinigameUnlocksFromScene(scene);
         screen.innerHTML = `
           <div class="minigame-wrap">
             <p class="mg-panel"><strong>${escapeHtml(c.speaker || "socrate")}</strong><br>${c.text || ""}</p>
@@ -4871,7 +6142,13 @@
         document.getElementById("btn-refut-end").addEventListener("click", () => goToScene(scene.nextScene));
         return;
       }
-      const btns = step.objections.map((o, i) => `<button type="button" class="choice-btn" data-oi="${i}">${escapeHtml(o.texte)}</button>`).join("");
+      const pairs = shuffleCopy(step.objections.map((o, i) => ({ o, i })));
+      const btns = pairs
+        .map(
+          ({ o, i }) =>
+            `<button type="button" class="choice-btn" data-oi="${i}">${escapeHtml(o.texte)}</button>`
+        )
+        .join("");
       const thesis = `<p class="mg-panel"><strong>Thèse :</strong> ${escapeHtml(step.affirmation)}</p>`;
       const play = `<div class="choices">${btns}</div><div id="refut-fb"></div>`;
       mountMinigameTabbedPages({
@@ -4883,12 +6160,16 @@
             btn.addEventListener("click", () => {
               const o = step.objections[parseInt(btn.dataset.oi, 10)];
               const fb = root.querySelector("#refut-fb");
+              const okMsg = o.feedback ? o.feedback : "Bien vu.";
+              const badMsg = o.feedback
+                ? o.feedback
+                : "Ce n'est pas l'objection la plus solide. Essaie un contre-exemple qui met la thèse en difficulté.";
               if (o.qualite === "excellente") {
-                fb.innerHTML = `<div class="feedback-correct">Bien vu.</div>`;
+                fb.innerHTML = `<div class="feedback-correct">${okMsg}</div>`;
                 window.refutStep = (window.refutStep || 0) + 1;
                 setTimeout(() => renderRefutStep(), 700);
               } else {
-                fb.innerHTML = `<div class="feedback-wrong">Ce n'est pas l'objection la plus solide. Essaie un contre-exemple qui met la thèse en difficulté.</div>`;
+                fb.innerHTML = `<div class="feedback-wrong">${badMsg}</div>`;
               }
             });
           });
@@ -5274,6 +6555,10 @@
         data.resume = null;
         migratedDemo = true;
       }
+      if (storyV < 3 && STORY_V3_SCENE_REMAP[scene]) {
+        scene = STORY_V3_SCENE_REMAP[scene];
+        data.resume = null;
+      }
       gameState.currentScene = scene;
       gameState.skills = { ...defaultState().skills, ...data.skills };
       gameState.notebookNotionKeys = data.notebookNotionKeys || [];
@@ -5348,7 +6633,10 @@
         `<h4 class="wrong-attempt-title">${title}</h4>` +
         `<div class="wrong-attempt-body">${bodyHtml}</div>` +
         `<button type="button" class="btn-retry-wrong">${retryLabel}</button>`;
-      panel.querySelector(".btn-retry-wrong").addEventListener("click", () => panel.remove());
+      panel.querySelector(".btn-retry-wrong").addEventListener("click", () => {
+        panel.remove();
+        if (typeof opts.onRetry === "function") opts.onRetry();
+      });
       container.appendChild(panel);
       panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
@@ -5357,7 +6645,8 @@
       aporie_conclusion: "aporie_conclusion_finale",
       transition_platon: "platon_herite",
       protagoras_intro: "sophistes_intro",
-      minigame_analogie_solaire: "transition_gyges"
+      minigame_analogie_solaire: "transition_gyges",
+      ...STORY_V3_SCENE_REMAP
     };
 
     function resolveSceneId(id) {
