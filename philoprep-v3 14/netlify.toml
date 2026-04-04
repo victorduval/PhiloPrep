@@ -2,6 +2,10 @@
   publish = "public"
   functions = "netlify/functions"
 
+# Délai max pour l’appel Anthropic (plafond selon formule Netlify ; évite 504 sur réponses longues).
+[functions.anthropic]
+  timeout = 26
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
